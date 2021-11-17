@@ -1,11 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import Todo from "../../../db/models/todo.model";
 import { ObjectId } from "mongodb";
+import Todo from "../../../lib/models/todo.schema";
+import withMongoDb from "../../../lib/db/mongodb/withMongoDb";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     const todoId = req.query.todoId;
 
@@ -29,3 +27,5 @@ export default async function handler(
 
   res.status(405).end();
 }
+
+export default withMongoDb(handler);
