@@ -2,21 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import withMongoDb from "../../../lib/db/mongodb/withMongoDb";
 import Todo from "../../../lib/models/todo.schema";
 
+
 function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     return findTodos(req, res);
-  }
-
-  if (req.method === "POST") {
-    return createTodo(req, res);
-  }
-
-  if (req.method === "PUT") {
-    return updateTodo(req, res);
-  }
-
-  if (req.method === "DELETE") {
-    return deleteTodo(req, res);
   }
 
   res.status(405).end();
@@ -43,8 +32,5 @@ async function createTodo(req: NextApiRequest, res: NextApiResponse) {
   return res.json(newTodo);
 }
 
-function updateTodo(req: NextApiRequest, res: NextApiResponse) {}
-
-function deleteTodo(req: NextApiRequest, res: NextApiResponse) {}
 
 export default withMongoDb(handler);

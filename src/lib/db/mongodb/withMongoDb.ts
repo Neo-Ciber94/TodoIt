@@ -1,18 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import * as Mongoose from "mongoose";
 import { ConnectionStates } from "mongoose";
-
-type Handler<T, TReturn> = (
-  req: NextApiRequest,
-  res: NextApiResponse<T>
-) => TReturn;
-
-type AsyncHandler<T, TReturn> = (
-  req: NextApiRequest,
-  res: NextApiResponse<T>
-) => Promise<TReturn>;
-
-type ApiHandler<T, TReturn> = Handler<T, TReturn> | AsyncHandler<T, TReturn>;
+import { NextApiRequest, NextApiResponse } from "next";
+import { ApiHandler } from "../../typings/handler";
 
 // prettier-ignore
 function withMongoDb<T, TReturn>(handler: ApiHandler<T, TReturn>) {

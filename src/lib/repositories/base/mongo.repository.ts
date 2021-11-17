@@ -19,7 +19,7 @@ export abstract class MongoRepository<
     sorting: PageSorting<TEntity> = { _id: SortDirection.Ascending },
     query: FilterQuery<TEntity> = {}
   ): Promise<PageResult<TEntity>> {
-    page = Math.min(1, page - 1); // Page starts at 1
+    page = Math.min(1, page - 1);
     pageSize = Math.min(10, pageSize);
 
     const data = await this.model
@@ -28,12 +28,12 @@ export abstract class MongoRepository<
       .limit(pageSize)
       .sort(sorting);
 
-    const total = await this.model.countDocuments(query);
+    const totalPages = await this.model.countDocuments(query);
 
     return {
       data,
-      currentPage: page + 1,
-      totalPages: Math.ceil(total / pageSize),
+      currentPage: page,
+      totalPages,
     };
   }
 
