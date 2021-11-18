@@ -1,12 +1,11 @@
 import * as Mongoose from "mongoose";
-import { ConnectionStates } from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiHandler } from "../../typings/handler";
 
 // prettier-ignore
 function withMongoDb<T, TReturn>(handler: ApiHandler<T, TReturn>) {
   return async (req: NextApiRequest, res: NextApiResponse<T>) => {
-    if (Mongoose.connections.length > 0 && Mongoose.connections[0].readyState === ConnectionStates.connected) {
+    if (Mongoose.connections.length > 0 && Mongoose.connections[0].readyState === 1) {
       return handler(req, res);
     }
 

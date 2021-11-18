@@ -6,10 +6,15 @@ const TodoSchema = new Schema({
   title: {
     type: String,
     required: true,
+    trim: true,
   },
-  content: String,
+  content: {
+    type: String,
+    trim: true
+  },
   completed: {
     type: Boolean,
+    default: false,
     required: true,
   },
   createdAt: {
@@ -42,5 +47,5 @@ TodoSchema.statics.findIncompleted = async (): Promise<TodoDocument[]> => {
 };
 
 // prettier-ignore
-const Todo = Mongoose.models.Todo || model<TodoDocument, TodoModel>("Todo", TodoSchema);
+const Todo = Mongoose.models.Todo as TodoModel || model<TodoDocument, TodoModel>("Todo", TodoSchema);
 export default Todo;

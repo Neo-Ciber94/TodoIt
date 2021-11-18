@@ -1,20 +1,34 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { isPromise } from "util/types";
 import { ApiHandler } from "../typings/handler";
+import isPromise from "../utils/isPromise";
 import { ValidationError } from "./errors";
+import { Logger } from "./logging";
+
+type NextApiHandler = ApiHandler<any, any>;
+type VoidApiHandler = ApiHandler<any, void>;
+type ErrorHandler = (
+  error: any,
+  req: NextApiRequest,
+  res: NextApiResponse
+) => void | Promise<void>;
 
 export interface RestApiConfig {
-  get?: (req: NextApiRequest, res: NextApiResponse) => any;
-  post?: (req: NextApiRequest, res: NextApiResponse) => any;
-  put?: (req: NextApiRequest, res: NextApiResponse) => any;
-  patch?: (req: NextApiRequest, res: NextApiResponse) => any;
-  delete?: (req: NextApiRequest, res: NextApiResponse) => any;
-  beforeRequest?: (req: NextApiRequest, res: NextApiResponse) => any;
-  afterRequest?: (req: NextApiRequest, res: NextApiResponse) => any;
-  onError?: (error: any, req: NextApiRequest, res: NextApiResponse) => any;
+  get?: NextApiHandler;
+  post?: NextApiHandler;
+  put?: NextApiHandler;
+  patch?: NextApiHandler;
+  delete?: NextApiHandler;
+  beforeRequest?: VoidApiHandler;
+  afterRequest?: VoidApiHandler;
+  onError?: ErrorHandler;
+  logging?: boolean;
 }
 
 export function withRestApi(config: RestApiConfig) {
+  if (config.logging == null) {
+    config.logging = true;
+  }
+
   return async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === "GET") {
       return await handleRequest(config, config.get, req, res);
@@ -44,30 +58,23 @@ async function handleRequest(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  logIncomingRequest(config, req, handler != null);
+
   if (handler == null) {
+    res.status(404).end();
     return;
   }
 
   try {
     // Run before the request
     if (config.beforeRequest) {
-      config.beforeRequest(req, res);
+      await wrapWithPromise(config.beforeRequest(req, res));
     }
 
     // Result of the handler
-    let result: any;
-
-    if (isPromise(handler)) {
-      result = await handler(req, res);
-    } else {
-      result = handler(req, res);
-    }
+    const result: any = await wrapWithPromise(handler(req, res));
 
     if (result != null) {
-      if (isPromise(result)) {
-        result = await result;
-      }
-
       if (typeof result === "object" || Array.isArray(result)) {
         res.json(result);
       } else {
@@ -77,23 +84,29 @@ async function handleRequest(
 
     // Run after the request
     if (config.afterRequest) {
-      config.afterRequest(req, res);
+      await wrapWithPromise(config.afterRequest(req, res));
     }
 
     // End the request
     res.end();
-  } catch (error) {
+  } catch (error: any) {
+    // Handle errors
+    if (config.logging === true) {
+      const message = error.message || error;
+      Logger.default.error(message);
+    }
+
     if (config.onError) {
-      config.onError(error, req, res);
+      await wrapWithPromise(config.onError(error, req, res));
     } else {
       defaultOnError(error, req, res);
     }
+  } finally {
+    logOutcomingRequest(config, req, res, handler != null);
   }
 }
 
 function defaultOnError(error: any, _: NextApiRequest, res: NextApiResponse) {
-  console.error(error);
-
   const message = error.message || error;
 
   if (error instanceof TypeError) {
@@ -102,5 +115,49 @@ function defaultOnError(error: any, _: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message });
   } else {
     res.status(500).json({ message });
+  }
+}
+
+async function wrapWithPromise<T>(value: T) {
+  if (isPromise(value)) {
+    return await value;
+  }
+
+  return value;
+}
+
+function logIncomingRequest(
+  config: RestApiConfig,
+  req: NextApiRequest,
+  hasHandler: boolean
+) {
+  if (config.logging === true) {
+    const method = req.method;
+    const url = req.url;
+
+    if (hasHandler === true) {
+      Logger.default.info(`${method} - ${url}`);
+    } else {
+      Logger.default.warn(`${method} (404) - ${url}`);
+    }
+  }
+}
+
+function logOutcomingRequest(
+  config: RestApiConfig,
+  req: NextApiRequest,
+  res: NextApiResponse,
+  hasHandler: boolean
+) {
+  if (config.logging === true) {
+    const method = req.method;
+    const url = req.url;
+    const status = res.statusCode;
+
+    if (hasHandler === true) {
+      Logger.default.info(`${method} (${status}) - ${url}`);
+    } else {
+      Logger.default.warn(`${method} (404) - ${url}`);
+    }
   }
 }

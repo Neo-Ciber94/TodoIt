@@ -44,7 +44,30 @@ export module Validate {
     }
   }
 
-  export function isNumber(value: any, argName?: string): void {
+  export function isString(value: any, argName?: string): value is string {
+    if (typeof value !== "string") {
+      const message = argName
+        ? "value must be a string"
+        : `'${argName}' must be a string`;
+
+      throw new ValidationError(message);
+    }
+
+    return true;
+  }
+
+  export function isBoolean(value: any, argName?: string): value is boolean {
+    if (typeof value !== "boolean") {
+      const message = argName
+        ? "value must be a boolean"
+        : `'${argName}' must be a boolean`;
+      throw new ValidationError(message);
+    }
+
+    return true;
+  }
+
+  export function isNumber(value: any, argName?: string): value is number {
     if (isNaN(Number(value))) {
       const message = argName
         ? "value must be a number"
@@ -52,9 +75,14 @@ export module Validate {
 
       throw new ValidationError(message);
     }
+
+    return true;
   }
 
-  export function isPositiveNumber(value: any, argName?: string): void {
+  export function isPositiveNumber(
+    value: any,
+    argName?: string
+  ): value is number {
     if (isNaN(Number(value)) || value <= 0) {
       const message = argName
         ? "value must be a positive number"
@@ -62,9 +90,14 @@ export module Validate {
 
       throw new ValidationError(message);
     }
+
+    return true;
   }
 
-  export function isNegativeNumber(value: any, argName?: string): void {
+  export function isNegativeNumber(
+    value: any,
+    argName?: string
+  ): value is number {
     if (isNaN(Number(value)) || value >= 0) {
       const message = argName
         ? "value must be a negative number"
@@ -72,6 +105,8 @@ export module Validate {
 
       throw new ValidationError(message);
     }
+
+    return true;
   }
 
   export function inRange(
