@@ -1,3 +1,4 @@
+import seedTodos from "@lib/models/todos.seed";
 import * as Mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiHandler } from "../../typings/handler";
@@ -19,6 +20,10 @@ function withMongoDb<T, TReturn>(handler: ApiHandler<T, TReturn>) {
 
     try {
       await Mongoose.connect(uri);
+
+      // Run an initialization routine
+      await initialize();
+
       console.log("Connected to MongoDB");
     } 
     catch (error) {
@@ -27,6 +32,10 @@ function withMongoDb<T, TReturn>(handler: ApiHandler<T, TReturn>) {
 
     return handler(req, res);
   };
+}
+
+async function initialize() {
+  await seedTodos();
 }
 
 export default withMongoDb;

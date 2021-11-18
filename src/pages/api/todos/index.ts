@@ -9,17 +9,23 @@ const todos = new TodoRepository();
 export default withMongoDbApi({
   // GET - /todos/
   get(req) {
-    const { page, pageSize, sortAscending, sortDescending } = req.query;
+    const { page, pageSize, sort, sortAscending, sortDescending } = req.query;
     const sorting: Record<string, SortDirection> = {};
 
+    if (sort) {
+      for (const key of ArrayUtils.getOrArray(sort)) {
+        sorting[key] = SortDirection.Descending;
+      }
+    }
+
     if (sortAscending) {
-      for (const key in ArrayUtils.getOrArray(sortAscending)) {
+      for (const key of ArrayUtils.getOrArray(sortAscending)) {
         sorting[key] = SortDirection.Ascending;
       }
     }
 
     if (sortDescending) {
-      for (const key in ArrayUtils.getOrArray(sortDescending)) {
+      for (const key of ArrayUtils.getOrArray(sortDescending)) {
         sorting[key] = SortDirection.Descending;
       }
     }

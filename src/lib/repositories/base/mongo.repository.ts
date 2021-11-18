@@ -21,25 +21,37 @@ export abstract class MongoRepository<
     sorting: PageSorting<TEntity> = {},
     query: FilterQuery<TEntity> = {}
   ): Promise<PageResult<TEntity>> {
-    const currentPage = Math.min(1, page - 1) || 1;
-    const currentPageSize = Math.min(DEFAULT_MAX_PAGE_SIZE, pageSize) || DEFAULT_MAX_PAGE_SIZE;
+    page = Math.max(1, page - 1) || 1;
+    pageSize =
+      Math.max(DEFAULT_MAX_PAGE_SIZE, pageSize) || DEFAULT_MAX_PAGE_SIZE;
 
     if (Object.entries(sorting).length === 0) {
-      sorting = { _id: SortDirection.Ascending };
+      sorting = { _id: SortDirection.Descending };
+    }
+
+    const count = await this.model.countDocuments(query);
+    const totalPages = Math.ceil(count / pageSize);
+
+    if (page > totalPages) {
+      return {
+        currentPage: page,
+        pageSize,
+        totalPages,
+        data: [],
+      };
     }
 
     const data = await this.model
       .find(query)
-      .skip(currentPage * pageSize)
-      .limit(currentPageSize)
-      .sort(sorting);
-
-    const totalPages = await this.model.countDocuments(query);
+      .sort(sorting)
+      .skip(page * pageSize)
+      .limit(pageSize);
 
     return {
-      data,
-      currentPage,
+      currentPage: page,
+      pageSize,
       totalPages,
+      data,
     };
   }
 
