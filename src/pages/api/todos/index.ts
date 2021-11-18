@@ -1,10 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import withMongoDbApi from "../../../lib/api/adaptors/withMongoDbApi";
-import { Validate } from "../../../lib/api/validate";
-import withMongoDb from "../../../lib/db/mongodb/withMongoDb";
-import Todo from "../../../lib/models/todo.schema";
-import { TodoDocument, TodoModel } from "../../../lib/models/todo.types";
-import { MongoRepository } from "../../../lib/repositories/base/mongo.repository";
+import Todo from "@lib/models/todo.schema";
+import { TodoDocument, TodoModel } from "@lib/models/todo.types";
+import { MongoRepository } from "@lib/repositories/base/mongo.repository";
+import { Validate } from "@lib/rest-api";
+import withMongoDbApi from "@lib/rest-api/adaptors/withMongoDbApi";
 
 class TodoRepository extends MongoRepository<TodoDocument, TodoModel> {
   constructor() {
@@ -37,6 +35,5 @@ export default withMongoDbApi({
     const { id } = req.query;
     const _id = Array.isArray(id) ? id.join("") : id;
     return await todos.delete(_id);
-  }
-
+  },
 });
