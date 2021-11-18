@@ -5,7 +5,7 @@ let connection: Mongoose.Connection;
 
 export async function connectMongoDb(): Promise<Mongoose.Connection> {
   // prettier-ignore
-  if (connection != null && connection.readyState === Mongoose.ConnectionStates.connected) {
+  if (connection != null && connection.readyState === 1) {
 
     // Returns the cached connection
     return connection;

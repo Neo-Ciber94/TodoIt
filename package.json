@@ -10,12 +10,14 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "mongoose": "^6.0.13",
+    "morgan": "^1.10.0",
     "next": "12.0.4",
     "next-connect": "^0.11.0",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
   "devDependencies": {
+    "@types/morgan": "^1.9.3",
     "@types/node": "16.11.7",
     "@types/react": "17.0.34",
     "eslint": "7.32.0",

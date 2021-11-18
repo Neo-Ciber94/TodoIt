@@ -15,17 +15,20 @@ export type PageSorting<T> = {
   [P in keyof T]?: SortDirection;
 };
 
-export interface IReadRepository<TEntity, TKey, TQuery = TEntity> {
-  findById(id: TKey): Promise<TEntity | null>;
-  findOne(query: TQuery): Promise<TEntity | null>;
-  find(query: TQuery): Promise<TEntity[]>;
+export interface PaginationOptions<T> {
+  page?: number;
+  pageSize?: number;
+  sorting?: PageSorting<T>;
+  query?: Partial<T>;
+}
 
-  findWithPagination(
-    page: number,
-    pageSize: number,
-    sorting: PageSorting<TEntity>,
-    query: TQuery
-  ): Promise<PageResult<TEntity>>;
+export interface IReadRepository<TEntity, TKey> {
+  findById(id: TKey): Promise<TEntity | null>;
+  findOne(query: Partial<TEntity>): Promise<TEntity | null>;
+  find(query: Partial<TEntity>): Promise<TEntity[]>;
+
+  // prettier-ignore
+  findWithPagination(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>>;
 }
 
 export interface IWriteRepository<TEntity, TKey> {
@@ -35,6 +38,6 @@ export interface IWriteRepository<TEntity, TKey> {
 }
 
 // prettier-ignore
-export type IRepository<TEntity, TKey, TQuery = TEntity> = 
-  IReadRepository<TEntity, TKey, TQuery> & 
+export type IRepository<TEntity, TKey> = 
+  IReadRepository<TEntity, TKey > & 
   IWriteRepository<TEntity, TKey>;
