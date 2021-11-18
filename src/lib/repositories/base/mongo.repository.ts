@@ -22,8 +22,7 @@ export abstract class MongoRepository<
     query: FilterQuery<TEntity> = {}
   ): Promise<PageResult<TEntity>> {
     page = Math.max(1, page - 1) || 1;
-    pageSize =
-      Math.max(DEFAULT_MAX_PAGE_SIZE, pageSize) || DEFAULT_MAX_PAGE_SIZE;
+    pageSize = Math.max(DEFAULT_MAX_PAGE_SIZE, pageSize) || DEFAULT_MAX_PAGE_SIZE;
 
     if (Object.entries(sorting).length === 0) {
       sorting = { _id: SortDirection.Descending };

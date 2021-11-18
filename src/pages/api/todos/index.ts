@@ -7,7 +7,7 @@ import { ArrayUtils } from "@lib/utils/ArrayUtils";
 const todos = new TodoRepository();
 
 export default withMongoDbApi({
-  // GET - /todos/
+  // GET - /api/todos/
   get(req) {
     const { page, pageSize, sort, sortAscending, sortDescending } = req.query;
     const sorting: Record<string, SortDirection> = {};
@@ -33,7 +33,7 @@ export default withMongoDbApi({
     return todos.findWithPagination(Number(page), Number(pageSize), sorting);
   },
 
-  // POST - /todos/
+  // POST - /api/todos/
   async post(req) {
     const { title, content } = req.body;
     Validate.isRequired(title, "title");

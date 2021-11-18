@@ -1,8 +1,8 @@
 import chalk from "chalk";
 
 export enum LogLevel {
-  INFO = 1,
-  SUCCESS = 2,
+  TRACE = 1,
+  INFO = 2,
   WARN = 3,
   ERROR = 4,
 }
@@ -19,11 +19,11 @@ export class Logger {
   }
 
   info(message: string) {
-    this.log(LogLevel.INFO, message);
+    this.log(LogLevel.TRACE, message);
   }
 
   success(message: string) {
-    this.log(LogLevel.SUCCESS, message);
+    this.log(LogLevel.INFO, message);
   }
 
   warn(message: string) {
@@ -39,10 +39,10 @@ export class Logger {
     const time = chalk.cyan(new Date().toISOString());
 
     switch (level) {
-      case LogLevel.INFO:
+      case LogLevel.TRACE:
         message = chalk.blueBright(`[${levelName}] ${message}`);
         break;
-      case LogLevel.SUCCESS:
+      case LogLevel.INFO:
         message = chalk.green(`[${levelName}] ${message}`);
         break;
       case LogLevel.WARN:

@@ -5,21 +5,21 @@ import { Validate } from "@lib/rest-api";
 const todos = new TodoRepository();
 
 export default withMongoDbApi({
-  // GET - /todos/:id
+  // GET - /api/todos/:id
   async get(req) {
     const { id } = req.query;
     const _id = Array.isArray(id) ? id.join("") : id;
     return todos.findById(_id);
   },
 
-   // PUT - /todos/:id
+   // PUT - /api/todos/:id
    async put(req) {
     const { id, title, content, completed } = req.body;
     Validate.isBoolean(completed, "completed");
     return await todos.update(id, { title, content, completed });
   },
 
-  // DELETE - /todos/:id
+  // DELETE - /api/todos/:id
   async delete(req) {
     const { id } = req.query;
     const _id = Array.isArray(id) ? id.join("") : id;
