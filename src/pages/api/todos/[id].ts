@@ -1,10 +1,10 @@
-import withMongoDbApi from "@lib/rest-api/adaptors/withMongoDbApi";
+import withApi from "@lib/api/withApi";
 import { TodoRepository } from "@lib/repositories/todo.repository";
 import { Validate } from "@lib/rest-api";
 
 const todos = new TodoRepository();
 
-export default withMongoDbApi({
+export default withApi({
   // GET - /api/todos/:id
   async get(req) {
     const { id } = req.query;

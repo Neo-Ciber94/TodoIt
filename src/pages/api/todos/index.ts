@@ -1,12 +1,12 @@
 import { TodoRepository } from "@lib/repositories/todo.repository";
-import withMongoDbApi from "@lib/rest-api/adaptors/withMongoDbApi";
+import withApi from "@lib/api/withApi";
 import { Validate } from "@lib/rest-api";
 import { SortDirection } from "@lib/repositories/base/repository";
 import { ArrayUtils } from "@lib/utils/ArrayUtils";
 
 const todos = new TodoRepository();
 
-export default withMongoDbApi({
+export default withApi({
   // GET - /api/todos/
   get(req) {
     const { page, pageSize, sort, sortAscending, sortDescending } = req.query;

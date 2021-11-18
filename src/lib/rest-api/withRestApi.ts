@@ -3,21 +3,14 @@ import { ApiHandler } from "../typings/handler";
 import isPromise from "../utils/isPromise";
 import { ValidationError } from "./errors";
 import { Logger } from "./logging";
-
-type NextApiHandler = ApiHandler<any, any>;
-type VoidApiHandler = ApiHandler<any, void>;
-type ErrorHandler = (
-  error: any,
-  req: NextApiRequest,
-  res: NextApiResponse
-) => void | Promise<void>;
+import { EndpointApiHandler, ErrorHandler, VoidApiHandler } from "./types";
 
 export interface RestApiConfig {
-  get?: NextApiHandler;
-  post?: NextApiHandler;
-  put?: NextApiHandler;
-  patch?: NextApiHandler;
-  delete?: NextApiHandler;
+  get?: EndpointApiHandler;
+  post?: EndpointApiHandler;
+  put?: EndpointApiHandler;
+  patch?: EndpointApiHandler;
+  delete?: EndpointApiHandler;
   beforeRequest?: VoidApiHandler;
   afterRequest?: VoidApiHandler;
   onError?: ErrorHandler;
@@ -58,6 +51,7 @@ async function handleRequest(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Log incoming request
   logIncomingRequest(config, req, handler != null);
 
   if (handler == null) {
@@ -89,7 +83,11 @@ async function handleRequest(
 
     // End the request
     res.end();
-  } catch (error: any) {
+
+    // Log output
+    logOutcomingRequest(config, req, res, handler != null);
+  } 
+  catch (error: any) {
     // Handle errors
     if (config.logging === true) {
       const message = error.message || error;
@@ -101,8 +99,6 @@ async function handleRequest(
     } else {
       defaultOnError(error, req, res);
     }
-  } finally {
-    logOutcomingRequest(config, req, res, handler != null);
   }
 }
 
