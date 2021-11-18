@@ -4,7 +4,7 @@ import Todo from "./todo.schema";
 import { TodoDocument } from "./todo.types";
 
 export default async function seedTodos() {
-  const count = await Todo.count();
+  const count = await Todo.countDocuments();
 
   if (count === 0) {
     const filePath = path.join(process.cwd(), "data/todos.json");

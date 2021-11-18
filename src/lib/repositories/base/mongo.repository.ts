@@ -33,12 +33,13 @@ export abstract class MongoRepository<
     const totalPages = Math.ceil(count / pageSize);
 
     if (page > totalPages) {
-      return {
+      return pageData({
         currentPage: page,
-        pageSize,
         totalPages,
+        pageSize,
+        totalItems: count,
         data: [],
-      };
+      });
     }
 
     const data = await this.model
@@ -47,12 +48,13 @@ export abstract class MongoRepository<
       .skip(page * pageSize)
       .limit(pageSize);
 
-    return {
+    return pageData({
       currentPage: page,
-      pageSize,
       totalPages,
+      pageSize,
+      totalItems: count,
       data,
-    };
+    });
   }
 
   async find(query: FilterQuery<TEntity> = {}): Promise<TEntity[]> {
@@ -101,4 +103,15 @@ export abstract class MongoRepository<
     await entityToDelete.remove();
     return entityToDelete;
   }
+}
+
+// prettier-ignore
+function pageData<T>({ data, pageSize, currentPage, totalPages, totalItems }: PageResult<T>): PageResult<T> {
+  return {
+    currentPage,
+    pageSize,
+    totalPages,
+    totalItems,
+    data,
+  };
 }

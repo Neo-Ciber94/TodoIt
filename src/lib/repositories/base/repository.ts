@@ -1,7 +1,8 @@
 export interface PageResult<T> {
   data: T[];
+  totalItems: number;
   currentPage: number;
-  pageSize: number,
+  pageSize: number;
   totalPages: number;
 }
 
