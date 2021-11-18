@@ -155,7 +155,7 @@ function logOutcomingRequest(
     const status = res.statusCode;
 
     if (hasHandler === true) {
-      Logger.default.info(`${method} (${status}) - ${url}`);
+      Logger.default.success(`${method} (${status}) - ${url}`);
     } else {
       Logger.default.warn(`${method} (404) - ${url}`);
     }

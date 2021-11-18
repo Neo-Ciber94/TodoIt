@@ -2,8 +2,9 @@ import chalk from "chalk";
 
 export enum LogLevel {
   INFO = 1,
-  WARN = 2,
-  ERROR = 3,
+  SUCCESS = 2,
+  WARN = 3,
+  ERROR = 4,
 }
 
 let DEFAULT_LOGGER: Logger | null = null;
@@ -21,6 +22,10 @@ export class Logger {
     this.log(LogLevel.INFO, message);
   }
 
+  success(message: string) {
+    this.log(LogLevel.SUCCESS, message);
+  }
+
   warn(message: string) {
     this.log(LogLevel.WARN, message);
   }
@@ -35,6 +40,9 @@ export class Logger {
 
     switch (level) {
       case LogLevel.INFO:
+        message = chalk.blueBright(`[${levelName}] ${message}`);
+        break;
+      case LogLevel.SUCCESS:
         message = chalk.green(`[${levelName}] ${message}`);
         break;
       case LogLevel.WARN:

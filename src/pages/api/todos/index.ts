@@ -1,39 +1,36 @@
-import Todo from "@lib/models/todo.schema";
-import { TodoDocument, TodoModel } from "@lib/models/todo.types";
-import { MongoRepository } from "@lib/repositories/base/mongo.repository";
-import { Validate } from "@lib/rest-api";
+import { TodoRepository } from "@lib/repositories/todo.repository";
 import withMongoDbApi from "@lib/rest-api/adaptors/withMongoDbApi";
-
-class TodoRepository extends MongoRepository<TodoDocument, TodoModel> {
-  constructor() {
-    super(Todo);
-  }
-}
+import { Validate } from "@lib/rest-api";
+import { SortDirection } from "@lib/repositories/base/repository";
+import { ArrayUtils } from "@lib/utils/ArrayUtils";
 
 const todos = new TodoRepository();
 
 export default withMongoDbApi({
-  // GET
-  get: () => todos.find(),
+  // GET - /todos/
+  get(req) {
+    const { page, pageSize, sortAscending, sortDescending } = req.query;
+    const sorting: Record<string, SortDirection> = {};
 
-  // POST
+    if (sortAscending) {
+      for (const key in ArrayUtils.getOrArray(sortAscending)) {
+        sorting[key] = SortDirection.Ascending;
+      }
+    }
+
+    if (sortDescending) {
+      for (const key in ArrayUtils.getOrArray(sortDescending)) {
+        sorting[key] = SortDirection.Descending;
+      }
+    }
+
+    return todos.findWithPagination(Number(page), Number(pageSize), sorting);
+  },
+
+  // POST - /todos/
   async post(req) {
     const { title, content } = req.body;
     Validate.isRequired(title, "title");
     return await todos.create({ title, content });
-  },
-
-  // PUT
-  async put(req) {
-    const { id, title, content, completed } = req.body;
-    Validate.isBoolean(completed, "completed");
-    return await todos.update(id, { title, content, completed });
-  },
-
-  // DELETE
-  async delete(req) {
-    const { id } = req.query;
-    const _id = Array.isArray(id) ? id.join("") : id;
-    return await todos.delete(_id);
   },
 });

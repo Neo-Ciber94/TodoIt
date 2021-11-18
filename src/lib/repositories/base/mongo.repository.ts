@@ -6,6 +6,8 @@ import {
 } from "./repository";
 import { Model, Document, FilterQuery } from "mongoose";
 
+const DEFAULT_MAX_PAGE_SIZE = 10;
+
 export abstract class MongoRepository<
   TEntity extends Document,
   TModel extends Model<TEntity>
@@ -16,23 +18,27 @@ export abstract class MongoRepository<
   async findWithPagination(
     page: number,
     pageSize: number,
-    sorting: PageSorting<TEntity> = { _id: SortDirection.Ascending },
+    sorting: PageSorting<TEntity> = {},
     query: FilterQuery<TEntity> = {}
   ): Promise<PageResult<TEntity>> {
-    page = Math.min(1, page - 1);
-    pageSize = Math.min(10, pageSize);
+    const currentPage = Math.min(1, page - 1) || 1;
+    const currentPageSize = Math.min(DEFAULT_MAX_PAGE_SIZE, pageSize) || DEFAULT_MAX_PAGE_SIZE;
+
+    if (Object.entries(sorting).length === 0) {
+      sorting = { _id: SortDirection.Ascending };
+    }
 
     const data = await this.model
       .find(query)
-      .skip(page * pageSize)
-      .limit(pageSize)
+      .skip(currentPage * pageSize)
+      .limit(currentPageSize)
       .sort(sorting);
 
     const totalPages = await this.model.countDocuments(query);
 
     return {
       data,
-      currentPage: page,
+      currentPage,
       totalPages,
     };
   }
