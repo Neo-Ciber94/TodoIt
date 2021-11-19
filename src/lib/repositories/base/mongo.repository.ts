@@ -5,8 +5,10 @@ import {
   SortDirection,
 } from "./repository";
 import { Model, Document, FilterQuery } from "mongoose";
+import { ValidationError } from "@lib/utils/errors";
 
 const DEFAULT_MAX_PAGE_SIZE = 10;
+const NO_FOUND_ERROR_MESSAGE = "Resourse not found";
 
 export abstract class MongoRepository<
   TEntity extends Document,
@@ -57,17 +59,29 @@ export abstract class MongoRepository<
   }
 
   async find(query: Partial<TEntity> = {}): Promise<TEntity[]> {
-    const mongodbQuery = query as FilterQuery<TEntity>;
-    return await this.model.find(mongodbQuery);
+    const filterQuery = query as FilterQuery<TEntity>;
+    return await this.model.find(filterQuery);
   }
 
   async findOne(query: Partial<TEntity> = {}): Promise<TEntity | null> {
-    const mongodbQuery = query as FilterQuery<TEntity>;
-    return await this.model.findOne(mongodbQuery);
+    const filterQuery = query as FilterQuery<TEntity>;
+    const result = await this.model.findOne(filterQuery);
+
+    if (result == null) {
+      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+    }
+
+    return result;
   }
 
   async findById(id: string): Promise<TEntity | null> {
-    return await this.model.findById(id);
+    const result = await this.model.findById(id);
+
+    if (result == null) {
+      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+    }
+
+    return result;
   }
 
   async create(entity: Partial<TEntity>): Promise<TEntity> {
@@ -78,7 +92,7 @@ export abstract class MongoRepository<
     const entityToUpdate = await this.model.findById(id);
 
     if (!entityToUpdate) {
-      throw new Error("Entity not found");
+      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
     }
 
     for (const key in entity) {
@@ -98,7 +112,7 @@ export abstract class MongoRepository<
     const entityToDelete = await this.model.findById(id);
 
     if (!entityToDelete) {
-      throw new Error("Entity not found");
+      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
     }
 
     await entityToDelete.remove();

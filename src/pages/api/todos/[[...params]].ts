@@ -1,3 +1,4 @@
+import { withRestApi } from "@lib/api/withRestApi";
 import withRoutes from "@lib/api/withRoutes";
 import { TodoRepository } from "@lib/repositories/todo.repository";
 import { getPagination } from "@lib/repositories/utils";
@@ -6,7 +7,7 @@ import { Validate } from "@lib/utils/validate";
 const BASE_PATH = "/api/todos";
 const todos = new TodoRepository();
 
-export default withRoutes({ attachParams: true })
+const _d = withRoutes({ attachParams: true })
   // GET - /api/todos
   .get(BASE_PATH, async (req, res) => {
     const pagination = getPagination(req);
@@ -50,3 +51,7 @@ export default withRoutes({ attachParams: true })
     const result = await todos.delete(id);
     return res.json(result);
   });
+
+export default withRestApi(new TodoRepository(), {
+  route: "/todos",
+});
