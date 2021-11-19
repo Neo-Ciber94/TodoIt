@@ -3,6 +3,10 @@ import * as Mongoose from "mongoose";
 
 let connection: Mongoose.Connection;
 
+/**
+ * Connects to the mongodb database.
+ * @returns {Promise<Mongoose.Connection>} The connection to the mongodb database.
+ */
 export async function connectMongoDb(): Promise<Mongoose.Connection> {
   // prettier-ignore
   if (connection != null && connection.readyState === 1) {
@@ -37,5 +41,9 @@ export async function connectMongoDb(): Promise<Mongoose.Connection> {
 }
 
 async function initialize() {
-  await seedTodos();
+  const result = await seedTodos();
+
+  if (result) {
+    console.log("Mongodb database was seeded");
+  }
 }
