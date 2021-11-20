@@ -8,9 +8,16 @@ type RequestParams = {
   [key: string]: string;
 };
 
-type NextConnectOptions = Options<
-  NextApiRequest & { params: RequestParams },
-  NextApiResponse
+type NextApiRequestWithParams = NextApiRequest & { params: RequestParams };
+
+export type NextApiHandlerWithParams<T = any> = (
+  req: NextApiRequestWithParams,
+  res: NextApiResponse<T>
+) => Promise<T> | T;
+
+export type NextConnectOptions<T = any> = Options<
+  NextApiRequestWithParams,
+  NextApiResponse<T>
 >;
 
 export default function withRoutes(options: NextConnectOptions = {}) {

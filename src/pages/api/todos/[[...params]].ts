@@ -1,57 +1,40 @@
-import { withRestApi } from "@lib/api/withRestApi";
-import withRoutes from "@lib/api/withRoutes";
+import { withApi } from "@lib/core/withApi";
+import { withRestApi } from "@lib/core/withRestApi";
+import withRouteController from "@lib/core/withRouteController";
+import { mongodb } from "@lib/db/mongodb/middleware";
 import { TodoRepository } from "@lib/repositories/todo.repository";
-import { getPagination } from "@lib/repositories/utils";
 import { Validate } from "@lib/utils/validate";
+import morgan from "morgan";
+import { NextApiRequest, NextApiResponse } from "next";
 
-const BASE_PATH = "/api/todos";
-const todos = new TodoRepository();
+// export default withRestApi(new TodoRepository(), {
+//   route: "/todos",
+//   update: async (repo, req, res) => {
+//     const { title, content, completed } = req.body;
 
-const _d = withRoutes({ attachParams: true })
-  // GET - /api/todos
-  .get(BASE_PATH, async (req, res) => {
-    const pagination = getPagination(req);
-    const result = await todos.findWithPagination(pagination);
-    return res.json(result);
-  })
+//     if (completed) {
+//       Validate.isBoolean(completed);
+//     }
 
-  // GET - /api/todos/:id
-  .get(BASE_PATH + "/:id", async (req, res) => {
-    const { id } = req.params;
-    console.log(id);
-    const result = await todos.findById(id);
-    return res.json(result);
-  })
+//     if (title) {
+//       Validate.isNonBlankString(title);
+//     }
 
-  // POST - /api/todos
-  .post(BASE_PATH, async (req, res) => {
-    const { title, content } = req.body;
-    Validate.isRequired(title, "title");
+//     if (content) {
+//       Validate.isNonBlankString(content);
+//     }
 
-    const result = await todos.create({ title, content });
-    return res.json(result);
-  })
+//     const id = req.params.id;
+//     const todo = await repo.update(id, { title, content, completed });
+//     return res.json(todo);
+//   },
+// });
 
-  // PUT - /api/todos/:id
-  .put(BASE_PATH + "/:id", async (req, res) => {
-    const { id } = req.params;
-    const { title, content, completed } = req.body;
-
-    if (completed) {
-      Validate.isBoolean(completed, "completed");
-    }
-
-    const result = await todos.update(id, { title, content, completed });
-    return res.json(result);
-  })
-
-  // DELETE - /api/todos/:id
-  .delete(BASE_PATH + "/:id", async (req, res) => {
-    const { id } = req.params;
-    const result = await todos.delete(id);
-    return res.json(result);
-  });
-
-export default withRestApi(new TodoRepository(), {
-  route: "/todos",
-});
+export default withRouteController<
+  NextApiRequest & { params: Record<string, string> },
+  NextApiResponse
+>()
+  .use(mongodb())
+  .use(morgan("dev"))
+  .get("/api/todos/hello", () => "Hello")
+  .get("/api/todos/hello/:name", (req) => `Hello ${req.params.name}`);
