@@ -5,11 +5,11 @@ import isPromise from "@lib/utils/isPromise";
 import morgan from "morgan";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ErrorHandler, RequestHandler } from "next-connect";
-import withRoutes, {
+import withApiRoutes, {
   RouteController,
   NextApiRequestWithParams,
   NextConnectRoute,
-} from "./withRoutes";
+} from "./withApiRoutes";
 
 const DEFAULT_BASE_PATH = "/api";
 const DEFAULT_ID_NAME = "id";
@@ -71,7 +71,7 @@ export function withRestApi<TEntity, TKey>(
   validateRoutePath(config.route);
 
   const path = `${basePath}${config.route}`;
-  const controller = withRoutes<NextApiRequestWithParams, NextApiResponse>({ onError: config.onError })
+  const controller = withApiRoutes<NextApiRequestWithParams, NextApiResponse>({ onError: config.onError })
     .use(mongodb())
     .use(morgan("dev"));
 

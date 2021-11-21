@@ -4,13 +4,7 @@ import { Validate } from "@lib/utils/validate";
 
 export default withRestApi(new TodoRepository(), {
   route: "/todos",
-  customEndpoints: {
-      get: {
-          "/" : () => "hello",
-          "/hello/:name": (_, req) => `Hello ${req.params.name}` 
-      }
-  },
-  update: async (repo, req, res) => {
+  update: async (repo, req) => {
     const { title, content, completed } = req.body;
 
     if (completed) {

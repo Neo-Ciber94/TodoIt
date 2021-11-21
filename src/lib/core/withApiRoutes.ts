@@ -48,7 +48,7 @@ export interface RouteController<Req, Res> {
   trace(pattern: string | RegExp, handler: RouteHandler<Req, Res>): this;
 }
 
-export default function withRoutes<
+export default function withApiRoutes<
   Req = NextApiRequestWithParams,
   Res = NextApiResponse
 >(config: RouterConfig<Req, Res> = {}): RouteController<Req, Res> {
