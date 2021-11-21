@@ -1,14 +1,8 @@
 import { Document, Model } from "mongoose";
-
-export interface ITodo {
-  title: string;
-  content: string;
-  completed: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { ITodo } from "src/shared/todo.model";
 
 export interface TodoDocument extends ITodo, Document<ITodo> {
+  id: string;
   markAsCompleted(this: TodoDocument): Promise<TodoDocument>;
 }
 
