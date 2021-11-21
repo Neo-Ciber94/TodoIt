@@ -1,16 +1,13 @@
+import { mongodb } from "@lib/db/mongodb/middleware";
 import { IRepository, PageResult } from "@lib/repositories/base/repository";
 import { getPagination } from "@lib/repositories/utils";
 import isPromise from "@lib/utils/isPromise";
+import morgan from "morgan";
 import { NextApiRequest, NextApiResponse } from "next";
-import { ErrorHandler, NextConnect, RequestHandler } from "next-connect";
-import nc from "next-connect";
-import withRoutes from "./withRoutes";
+import { ErrorHandler, RequestHandler } from "next-connect";
+import withRoutes, { RouteController, NextApiRequestWithParams, NextConnectRoute } from "./withRoutes";
 
 const DEFAULT_BASE_PATH = "/api";
-
-type NextApiRequestWithParams = NextApiRequest & {
-  params: Record<string, string>;
-};
 
 type RestEndpoint<TEntity, TKey, TReturn> = (
   repository: IRepository<TEntity, TKey>,
@@ -30,11 +27,11 @@ export interface CrudConfig<T, TKey> {
   baseRoute?: string;
   customEndpoints?: CustomApiEndpoints<T, TKey>;
   onError?: ErrorHandler<NextApiRequest, NextApiResponse>;
-  getAll?: RestEndpoint<T, TKey, any> | null;
-  getById?: RestEndpoint<T, TKey, any> | null;
-  create?: RestEndpoint<T, TKey, any> | null;
-  update?: RestEndpoint<T, TKey, any> | null;
-  delete?: RestEndpoint<T, TKey, any> | null;
+  getAll?: RestEndpoint<T, TKey, PageResult<T>> | null;
+  getById?: RestEndpoint<T, TKey, T | null> | null;
+  create?: RestEndpoint<T, TKey, T> | null;
+  update?: RestEndpoint<T, TKey, T> | null;
+  delete?: RestEndpoint<T, TKey, T> | null;
 }
 
 export interface CustomApiEndpoints<T, TKey> {
@@ -44,9 +41,12 @@ export interface CustomApiEndpoints<T, TKey> {
   delete?: RouteRestEndPoint<T, TKey>;
   patch?: RouteRestEndPoint<T, TKey>;
   options?: RouteRestEndPoint<T, TKey>;
+  trace?: RouteRestEndPoint<T, TKey>;
+  head?: RouteRestEndPoint<T, TKey>;
   all?: RouteRestEndPoint<T, TKey>;
 }
 
+// prettier-ignore
 export function withRestApi<TEntity, TKey>(
   repository: IRepository<TEntity, TKey>,
   config: CrudConfig<TEntity, TKey>
@@ -58,42 +58,60 @@ export function withRestApi<TEntity, TKey>(
   validateRoutePath(config.route);
 
   const path = `${basePath}${config.route}`;
-  let router = nc({ attachParams: true, onError: config.onError });
+  const controller = withRoutes<NextApiRequestWithParams, NextApiResponse>({ onError: config.onError })
+    .use(mongodb())
+    .use(morgan("dev"));
 
-  // First set custom routes
-  setupCustomRoutes(config, router, path, repository);
+  for (const method in config.customEndpoints) {
+    const endpoint = config.customEndpoints[method as keyof CustomApiEndpoints<TEntity, TKey>];
+
+    if (endpoint) {
+      for (const route in endpoint) {
+        validateRoutePath(route);
+        const restEndpoint = endpoint[route as keyof RouteRestEndPoint<TEntity, TKey>];
+
+        if (restEndpoint != null) {
+          const onRoute = controller[method as keyof RouteController<any, any>] as NextConnectRoute<any, any>;
+
+          if (onRoute != null) {
+            onRoute(`${path}${route}`, (req, res) => restEndpoint(repository, req, res));
+          }
+        }
+      }
+    }
+  }
 
   // GetAll
   if (config.getAll !== null) {
     const handler = config.getAll! || getAllEndpoint();
-    setRouteHandler(path, repository, handler, router.get);
+    controller.get(path, (req, res) => handler(repository, req, res));
   }
 
   // GetById
   if (config.getById !== null) {
     const handler = config.getById! || getByIdEndpoint();
-    setRouteHandler(`${path}/:id`, repository, handler, router.get);
+    controller.get(`${path}/:id`, (req, res) => handler(repository, req, res));
   }
 
   // Create
   if (config.create !== null) {
     const handler = config.create! || createEndpoint();
-    setRouteHandler(path, repository, handler, router.post);
+    controller.post(path, (req, res) => handler(repository, req, res));
   }
 
   // Update
   if (config.update !== null) {
     const handler = config.update! || updateEndpoint();
-    setRouteHandler(`${path}/:id`, repository, handler, router.put);
+    controller.put(`${path}/:id`, (req, res) => handler(repository, req, res));
   }
 
   // Delete
   if (config.delete !== null) {
     const handler = config.delete! || deleteEndpoint();
-    setRouteHandler(`${path}/:id`, repository, handler, router.delete);
+    controller.delete(`${path}/:id`, (req, res) => handler(repository, req, res));
   }
 
-  return router;
+  return controller;
 }
 
 function getAllEndpoint<T, TKey>(): RestEndpoint<T, TKey, void> {
@@ -116,7 +134,7 @@ function getByIdEndpoint<T, TKey>(): RestEndpoint<T, TKey, void> {
 function createEndpoint<T, TKey>(): RestEndpoint<T, TKey, void> {
   return async (repo, req, res) => {
     const result = await repo.create(req.body);
-    return res.json(result);
+    return res.status(201).json(result);
   };
 }
 
@@ -137,69 +155,6 @@ function deleteEndpoint<T, TKey>(): RestEndpoint<T, TKey, void> {
     const result = await repo.delete(id);
     return res.json(result);
   };
-}
-
-function setupCustomRoutes(
-  config: CrudConfig<any, any>,
-  router: NextConnect<NextApiRequestWithParams, NextApiResponse<any>>,
-  path: string,
-  repository: IRepository<any, any>
-) {
-  const validMethods = [
-    "get",
-    "post",
-    "put",
-    "delete",
-    "patch",
-    "options",
-    "all",
-  ];
-
-  for (const method in config.customEndpoints) {
-    if (!validMethods.includes(method)) {
-      throw new Error(`Invalid method: '${method}'`);
-    }
-
-    const key = method as keyof CustomApiEndpoints<any, any>;
-    const routes = config.customEndpoints[key];
-
-    if (routes != null) {
-      for (const route in routes) {
-        const endpoint = routes[route];
-
-        if (endpoint != null) {
-          let routeHandler: ApiRouter;
-
-          switch (method) {
-            case "get":
-              routeHandler = router.get;
-              break;
-            case "post":
-              routeHandler = router.post;
-              break;
-            case "put":
-              routeHandler = router.put;
-              break;
-            case "delete":
-              routeHandler = router.delete;
-              break;
-            case "patch":
-              routeHandler = router.patch;
-              break;
-            case "options":
-              routeHandler = router.options;
-              break;
-            case "all":
-              routeHandler = router.all;
-              break;
-          }
-
-          const routePath = `${path}${route}`;
-          setRouteHandler(routePath, repository, endpoint, routeHandler!);
-        }
-      }
-    }
-  }
 }
 
 function setRouteHandler(
