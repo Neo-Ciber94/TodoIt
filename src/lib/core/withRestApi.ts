@@ -5,9 +5,14 @@ import isPromise from "@lib/utils/isPromise";
 import morgan from "morgan";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ErrorHandler, RequestHandler } from "next-connect";
-import withRoutes, { RouteController, NextApiRequestWithParams, NextConnectRoute } from "./withRoutes";
+import withRoutes, {
+  RouteController,
+  NextApiRequestWithParams,
+  NextConnectRoute,
+} from "./withRoutes";
 
 const DEFAULT_BASE_PATH = "/api";
+const DEFAULT_ID_NAME = "id";
 
 type RestEndpoint<TEntity, TKey, TReturn> = (
   repository: IRepository<TEntity, TKey>,
@@ -22,9 +27,14 @@ type ApiRouter = (
   handler: RequestHandler<NextApiRequestWithParams, NextApiResponse>
 ) => Promise<any> | any;
 
-export interface CrudConfig<T, TKey> {
+export interface NamingConventions {
+  id?: string;
+}
+
+export interface RestApiConfig<T, TKey> {
   route: string;
   baseRoute?: string;
+  namingConventions?: NamingConventions;
   customEndpoints?: CustomApiEndpoints<T, TKey>;
   onError?: ErrorHandler<NextApiRequest, NextApiResponse>;
   getAll?: RestEndpoint<T, TKey, PageResult<T>> | null;
@@ -49,9 +59,12 @@ export interface CustomApiEndpoints<T, TKey> {
 // prettier-ignore
 export function withRestApi<TEntity, TKey>(
   repository: IRepository<TEntity, TKey>,
-  config: CrudConfig<TEntity, TKey>
+  config: RestApiConfig<TEntity, TKey>
 ) {
   config.customEndpoints = config.customEndpoints || {};
+  config.namingConventions = config.namingConventions || {};
+  config.namingConventions.id = config.namingConventions.id || DEFAULT_ID_NAME;
+
   const basePath = config.baseRoute || DEFAULT_BASE_PATH;
 
   validateRoutePath(basePath);
@@ -62,6 +75,7 @@ export function withRestApi<TEntity, TKey>(
     .use(mongodb())
     .use(morgan("dev"));
 
+  // Configure custom endpoints
   for (const method in config.customEndpoints) {
     const endpoint = config.customEndpoints[method as keyof CustomApiEndpoints<TEntity, TKey>];
 
@@ -95,7 +109,7 @@ export function withRestApi<TEntity, TKey>(
 
   // Create
   if (config.create !== null) {
-    const handler = config.create! || createEndpoint();
+    const handler = config.create! || createEndpoint(config);
     controller.post(path, (req, res) => handler(repository, req, res));
   }
 
@@ -131,9 +145,13 @@ function getByIdEndpoint<T, TKey>(): RestEndpoint<T, TKey, void> {
   };
 }
 
-function createEndpoint<T, TKey>(): RestEndpoint<T, TKey, void> {
+function createEndpoint<T, TKey>(
+  config: RestApiConfig<T, TKey>
+): RestEndpoint<T, TKey, void> {
   return async (repo, req, res) => {
     const result = await repo.create(req.body);
+    const id = config.namingConventions!.id as keyof T;
+    res.setHeader("Location", `${req.url}/${result[id]}`);
     return res.status(201).json(result);
   };
 }
