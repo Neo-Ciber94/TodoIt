@@ -15,17 +15,22 @@ export type PageSorting<T> = {
   [P in keyof T]?: SortDirection;
 };
 
+
+export type Query<T> = {
+  [P in keyof T]?: any;
+};
+
 export interface PaginationOptions<T> {
   page?: number;
   pageSize?: number;
   sorting?: PageSorting<T>;
-  query?: Partial<T>;
+  query?: Query<T>;
 }
 
 export interface IReadRepository<TEntity, TKey> {
   findById(id: TKey): Promise<TEntity | null>;
-  findOne(query: Partial<TEntity>): Promise<TEntity | null>;
-  find(query: Partial<TEntity>): Promise<TEntity[]>;
+  findOne(query: Query<TEntity>): Promise<TEntity | null>;
+  find(query: Query<TEntity>): Promise<TEntity[]>;
 
   // prettier-ignore
   findWithPagination(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>>;

@@ -4,22 +4,32 @@ import { ITodo } from "src/shared/todo.model";
 import Masonry from "@mui/lab/Masonry";
 import TodoNote from "src/components/TodoNote";
 import { Container, Box, CircularProgress, TextField } from "@mui/material";
-import React, { ChangeEvent, FormEvent, useEffect } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { styled } from "@mui/material/styles";
 
 const API_URL = "http://localhost:3000/api/todos";
 
+interface FetchTodosOptions {
+  page: number;
+  limit?: number;
+  search?: string;
+}
+
 export const getServerSideProps = async () => {
-  const pageResult = await loadTodos(1);
+  const pageResult = await loadTodos();
   return { props: { pageResult } };
 };
 
 async function loadTodos(
-  page: number,
-  pageSize: number = 10
+  options: FetchTodosOptions = { page: 1 }
 ): Promise<PageResult<ITodo>> {
-  const res = await fetch(`${API_URL}?page=${page}&pageSize=${pageSize}`);
+  const page = options.page;
+  const limit = options.limit || 10;
+  const search = options.search || "";
+  const res = await fetch(
+    `${API_URL}?page=${page}&pageSize=${limit}&search=${search}`
+  );
   return await res.json();
 }
 
@@ -50,8 +60,9 @@ function Page({
   pageResult,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { data: todos, currentPage, totalPages } = pageResult;
-  const [isLoading, setIsLoading] = React.useState(false);
   const hasMoreItems = currentPage < totalPages;
+  const [searchString, setSearchString] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
   const [page, setPage] = React.useState(1);
 
   return (
@@ -88,7 +99,7 @@ function Page({
               });
 
               try {
-                const newTodos = await loadTodos(page + 1);
+                const newTodos = await loadTodos({ page: page + 1 });
                 await new Promise((resolve) => setTimeout(resolve, 1000));
                 todos.push(...newTodos.data);
                 console.log(todos);
