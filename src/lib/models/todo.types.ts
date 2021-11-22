@@ -2,7 +2,7 @@ import { Document, Model } from "mongoose";
 import { ITodo } from "src/shared/todo.model";
 
 export interface TodoDocument extends ITodo, Document {
-  _id: string;
+  id: string;
   markAsCompleted(this: TodoDocument): Promise<TodoDocument>;
 }
 

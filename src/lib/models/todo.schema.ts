@@ -10,7 +10,7 @@ const TodoSchema = new Schema({
   },
   content: {
     type: String,
-    trim: true
+    trim: true,
   },
   completed: {
     type: Boolean,
@@ -30,6 +30,13 @@ const TodoSchema = new Schema({
 });
 
 /// Extensions
+TodoSchema.set("toJSON", {
+  transform: (_doc, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+  },
+});
 
 TodoSchema.methods.markAsCompleted = function (
   this: TodoDocument
