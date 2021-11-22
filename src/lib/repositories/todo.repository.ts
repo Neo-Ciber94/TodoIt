@@ -28,7 +28,7 @@ export class TodoRepository
       return this.findWithPagination(options);
     }
 
-    const query: Query<TodoDocument> = {
+    const query: FilterQuery<TodoDocument> = {
       title: { $regex: options.search, $options: "i" },
       content: { $regex: options.search, $options: "i" },
     };

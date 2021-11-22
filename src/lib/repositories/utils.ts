@@ -1,8 +1,8 @@
 import { ArrayUtils } from "@lib/utils/ArrayUtils";
 import { NextApiRequest } from "next";
-import { SortDirection } from "./base/repository";
+import { PaginationOptions, SortDirection } from "./base/repository";
 
-export function getPagination(req: NextApiRequest) {
+export function buildPaginationOptions<T>(req: NextApiRequest): PaginationOptions<T> {
   const { page, pageSize, sort, sortAscending, sortDescending } = req.query;
   const sorting: Record<string, SortDirection> = {};
 
