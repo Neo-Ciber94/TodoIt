@@ -1,5 +1,5 @@
-import Todo from "@lib/models/todo.schema";
-import { TodoDocument, TodoModel } from "@lib/models/todo.types";
+import Todo from "@lib/db/mongodb/schemas/todo.schema";
+import { TodoDocument, TodoModel } from "@lib/db/mongodb/schemas/todo.types";
 import { FilterQuery } from "mongoose";
 import { MongoRepository } from "./base/mongo.repository";
 import { IRepository, PageResult, PaginationOptions, Query } from "./base/repository";
