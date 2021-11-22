@@ -11,7 +11,7 @@ export type TodoPaginationOptions = Omit<
   search?: string;
 };
 
-export interface ITodoRepository extends IRepository<TodoDocument, string> {
+export interface ITodoRepository extends IRepository<TodoDocument> {
   search(options: TodoPaginationOptions): Promise<PageResult<TodoDocument>>;
 }
 

@@ -15,7 +15,6 @@ export type PageSorting<T> = {
   [P in keyof T]?: SortDirection;
 };
 
-
 export type Query<T> = {
   [P in keyof T]?: any;
 };
@@ -27,8 +26,8 @@ export interface PaginationOptions<T> {
   query?: Query<T>;
 }
 
-export interface IReadRepository<TEntity, TKey> {
-  findById(id: TKey): Promise<TEntity | null>;
+export interface IReadRepository<TEntity> {
+  findById(id: string): Promise<TEntity | null>;
   findOne(query: Query<TEntity>): Promise<TEntity | null>;
   find(query: Query<TEntity>): Promise<TEntity[]>;
 
@@ -36,13 +35,14 @@ export interface IReadRepository<TEntity, TKey> {
   findWithPagination(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>>;
 }
 
-export interface IWriteRepository<TEntity, TKey> {
+export interface IWriteRepository<TEntity> {
   create(entity: Partial<TEntity>): Promise<TEntity>;
-  update(id: TKey, entity: Partial<TEntity>): Promise<TEntity>;
-  delete(id: TKey): Promise<TEntity>;
+  update(id: string, entity: Partial<TEntity>): Promise<TEntity>;
+  partialUpdate(id: string, entity: Partial<TEntity>): Promise<TEntity>;
+  delete(id: string): Promise<TEntity>;
 }
 
 // prettier-ignore
-export type IRepository<TEntity, TKey> = 
-  IReadRepository<TEntity, TKey > & 
-  IWriteRepository<TEntity, TKey>;
+export type IRepository<TEntity> = 
+  IReadRepository<TEntity > & 
+  IWriteRepository<TEntity>;

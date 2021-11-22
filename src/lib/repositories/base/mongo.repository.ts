@@ -13,7 +13,7 @@ const NO_FOUND_ERROR_MESSAGE = "Resourse not found";
 export abstract class MongoRepository<
   TEntity extends Document,
   TModel extends Model<TEntity>
-> implements IRepository<TEntity, string>
+> implements IRepository<TEntity>
 {
   constructor(protected readonly model: TModel) {}
 
@@ -90,6 +90,22 @@ export abstract class MongoRepository<
   }
 
   async update(id: string, entity: Partial<TEntity>): Promise<TEntity> {
+    let entityToUpdate = await this.model.findById(id);
+
+    if (!entityToUpdate) {
+      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+    }
+
+    entityToUpdate = {
+      ...entityToUpdate,
+      ...entity,
+    };
+
+    entityToUpdate.save();
+    return entityToUpdate;
+  }
+
+  async partialUpdate(id: string, entity: Partial<TEntity>): Promise<TEntity> {
     const entityToUpdate = await this.model.findById(id);
 
     if (!entityToUpdate) {
@@ -97,15 +113,14 @@ export abstract class MongoRepository<
     }
 
     for (const key in entity) {
-      if (entity.hasOwnProperty(key)) {
-        const value = (entity as any)[key];
+      const value = entity[key];
 
-        if (value !== undefined) {
-          (entityToUpdate as any)[key] = value;
-        }
+      if (value !== undefined) {
+        (entityToUpdate as Partial<TEntity>)[key] = value;
       }
     }
 
+    entityToUpdate.save();
     return entityToUpdate;
   }
 
