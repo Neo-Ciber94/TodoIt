@@ -1,7 +1,12 @@
 import { PageResult } from "@lib/repositories/base/repository";
 import axios, { Axios } from "axios";
 
-export class ApiClient<T, TKey> {
+export interface QueryOptions {
+  page?: number;
+  pageSize?: number;
+}
+
+export class RestApiClient<T, TKey> {
   protected readonly client: Axios;
 
   constructor(baseURL: string) {
@@ -10,7 +15,10 @@ export class ApiClient<T, TKey> {
     });
   }
 
-  getAll(page: number, pageSize: number): Promise<PageResult<T>> {
+  getAll(options: QueryOptions = {}): Promise<PageResult<T>> {
+    const page = options.page || 1;
+    const pageSize = options.pageSize || 10;
+
     return this.client.get(`/`, {
       params: {
         page,

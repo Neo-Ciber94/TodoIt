@@ -1,18 +1,20 @@
 import { PageResult } from "@lib/repositories/base/repository";
 import { ITodo } from "src/shared/todo.model";
 import { API_URL } from "../constants";
-import { ApiClient } from "./api.client";
+import { RestApiClient, QueryOptions } from "./rest-api.client";
 
-export class TodoApiClient extends ApiClient<ITodo, string> {
+export type QueryTodosOptions = QueryOptions & { search?: string };
+
+export class TodoApiClient extends RestApiClient<ITodo, string> {
   constructor() {
     super(API_URL + "/todos");
   }
 
-  search(
-    page: number,
-    pageSize: number,
-    search: string = ""
-  ): Promise<PageResult<ITodo>> {
+  search(options: QueryTodosOptions): Promise<PageResult<ITodo>> {
+    const search = options.search || "";
+    const page = options.page || 1;
+    const pageSize = options.pageSize || 10;
+
     return this.client.get(`/`, {
       params: {
         page,
