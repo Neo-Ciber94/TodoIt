@@ -6,17 +6,13 @@ export interface TodoNoteProps {
   todo: ITodo;
   height?: number;
   width?: number;
-  onComplete: (todo: ITodo) => void;
 }
 
-export default function TodoNote({
-  todo,
-  height,
-  width,
-  onComplete,
-}: TodoNoteProps) {
+export default function TodoNote({ todo, height, width }: TodoNoteProps) {
   height = height || 200;
   width = width || 200;
+
+  const [isCompleted, setIsCompleted] = React.useState(todo.completed);
 
   return (
     <Paper
@@ -26,19 +22,27 @@ export default function TodoNote({
         height,
       }}
     >
-      <h1 className="font-bold text-lg">{todo.title}</h1>
-      <p>{todo.content}</p>
-      <div className="flex flex-row justify-between mt-auto">
+      <h1 className="font-bold text-lg font-mono">{todo.title}</h1>
+      <p className="font-mono py-3">{todo.content}</p>
+      <div className="flex flex-row justify-between mt-auto py-3">
         <Button
           variant="contained"
           className={
-            todo.completed
+            isCompleted
               ? `bg-blue-500 hover:bg-blue-600`
               : `bg-gray-500 hover:bg-gray-600`
           }
-          onClick={() => onComplete(todo)}
+          onClick={() => {
+            fetch(`/api/todos/${todo._id}`, {
+              method: "PUT",
+              body: JSON.stringify(todo),
+            }).then(() => {
+              todo.completed = !isCompleted;
+              setIsCompleted(!isCompleted);
+            });
+          }}
         >
-          {todo.completed ? "Complete" : "Uncompleted"}
+          {isCompleted ? "Complete" : "Uncompleted"}
         </Button>
         <Button variant="contained" color="error" onClick={() => {}}>
           Delete
