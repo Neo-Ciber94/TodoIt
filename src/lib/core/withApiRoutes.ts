@@ -103,21 +103,20 @@ function addRoute(
 
       // If the body is already set, close the stream
       if (res.body != null) {
-        res.end();
-        return;
+        return res.end();
       }
 
       if (result === null && config.status404OnNull === true) {
-        res.status(404);
+        return res.status(404).end();
       }
 
       if (result === undefined && config.status404OnUndefined === true) {
-        res.status(404);
+        return res.status(404).end();
       }
 
       if (result != null) {
         if (typeof result === "object") {
-          return res.status(200).json(result).end();
+          return res.status(200).json(result);
         } else {
           return res.status(200).end(result);
         }
