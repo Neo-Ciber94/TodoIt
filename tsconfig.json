@@ -17,8 +17,6 @@
     "incremental": true,
     "paths": {
       "@lib/*": ["src/lib/*"],
-      "@rest-api/*": ["src/lib/rest-api/*"],
-      "@repositories/*": ["src/lib/repositories/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
