@@ -2,6 +2,9 @@ import { ITodo } from "src/shared/todo.model";
 import * as React from "react";
 import { Paper, Button } from "@mui/material";
 import { useEffect } from "react";
+import { TodoApiClient } from "src/client/api/todos.client";
+
+const todoClient = new TodoApiClient();
 
 export interface TodoNoteProps {
   todo: ITodo;
@@ -76,13 +79,9 @@ export default function TodoNote({
               ? `bg-gray-500 hover:bg-gray-600`
               : `bg-blue-500 hover:bg-blue-600`
           }
-          onClick={() => {
-            fetch(`/api/todos/${todo.id}`, {
-              method: "PUT",
-              body: JSON.stringify(todo),
-            }).then(() => {
-              setIsCompleted(!isCompleted);
-            });
+          onClick={async () => {
+            const result = await todoClient.partialUpdate(id, { completed: !isCompleted });
+            setIsCompleted(result.completed);
           }}
         >
           {isCompleted ? "Done" : "Complete"}

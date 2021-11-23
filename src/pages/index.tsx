@@ -62,8 +62,7 @@ function Page({
     const searchTodos = async () => {
       try {
         const result = await todoClient.search({ search: searchString });
-        setTodos(result.data);
-        
+        setTodos(result.data);        
       } finally {
         setIsLoading(false);
       }
@@ -75,7 +74,7 @@ function Page({
 
   return (
     <div className="bg-orange-100">
-      <Container sx={{ padding: 5, paddingBottom: 10 }}>
+      <Container className="pt-16 pb-8">
         <div className="flex flex-row justify-center">
           <h1 className="font-mono text-5xl">Todos</h1>
         </div>
@@ -87,7 +86,7 @@ function Page({
           />
         </div>
         {isLoading && <CircularProgress />}
-        <Masonry columns={[1, 2, 3, 4]} spacing={2}>
+        <Masonry columns={[1, 2, 3, 3, 4]} spacing={[1]}>
           {todos.map((todo, index) => (
             <TodoNote
               key={todo.id}
@@ -100,7 +99,6 @@ function Page({
         <ViewInterceptor
           inView={async (inView) => {
             if (inView) {
-              console.log("In View");
               if (hasMoreItems && !isMoreLoading) {
                 setIsMoreLoading(true);
                 try {
