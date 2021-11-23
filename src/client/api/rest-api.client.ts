@@ -1,4 +1,4 @@
-import { PageResult } from "@lib/repositories/base/repository";
+import { PageResult } from "@server/repositories/base/repository";
 import axios, { Axios, AxiosRequestConfig } from "axios";
 
 export interface QueryOptions {

@@ -1,4 +1,4 @@
-import seedTodos from "@lib/db/mongodb/schemas/todos.seed";
+import seedTodos from "@server/db/mongodb/schemas/todos.seed";
 import * as Mongoose from "mongoose";
 
 let connection: Mongoose.Connection;

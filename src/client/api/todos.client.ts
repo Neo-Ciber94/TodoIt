@@ -1,6 +1,6 @@
-import { PageResult } from "@lib/repositories/base/repository";
+import { PageResult } from "@server/repositories/base/repository";
 import { AxiosRequestConfig } from "axios";
-import { ITodo } from "src/shared/todo.model";
+import { ITodo } from "src/shared/models/todo.model";
 import { API_URL } from "../constants";
 import { RestApiClient, QueryOptions } from "./rest-api.client";
 

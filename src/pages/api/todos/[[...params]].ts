@@ -1,11 +1,11 @@
-import { withRestApi } from "@lib/core/withRestApi";
+import { withRestApi } from "@server/core/withRestApi";
 import {
   TodoPaginationOptions,
   TodoRepository,
-} from "@lib/repositories/todo.repository";
-import { buildPaginationOptions } from "@lib/repositories/utils";
-import { Validate } from "@lib/utils/validate";
-import { ITodo } from "src/shared/todo.model";
+} from "@server/repositories/todo.repository";
+import { buildPaginationOptions } from "@server/repositories/utils";
+import { Validate } from "@server/utils/validate";
+import { ITodo } from "src/shared/models/todo.model";
 
 export default withRestApi(new TodoRepository(), {
   route: "/todos",

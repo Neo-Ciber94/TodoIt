@@ -1,8 +1,9 @@
-import { ITodo } from "src/shared/todo.model";
+import { ITodo } from "src/shared/models/todo.model";
 import * as React from "react";
 import { Paper, Button } from "@mui/material";
 import { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
+import { useSwal } from "src/hooks/useSwal";
 
 const todoClient = new TodoApiClient();
 
@@ -36,6 +37,7 @@ export default function TodoNote({
   const color = COLORS[computedIndex % COLORS.length];
   const ref = React.useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = React.useState(false);
+  const swal = useSwal();
 
   useEffect(() => {
     if (ref.current) {
@@ -48,10 +50,10 @@ export default function TodoNote({
 
   return (
     <Paper
+      ref={ref}
       className={`p-4 flex flex-col opacity-0 ${color} ${
         isVisible ? "note-appear-anim" : ""
       }`}
-      ref={ref}
       sx={{
         width,
         height,
@@ -80,13 +82,32 @@ export default function TodoNote({
               : `bg-blue-500 hover:bg-blue-600`
           }
           onClick={async () => {
-            const result = await todoClient.partialUpdate(id, { completed: !isCompleted });
+            const result = await todoClient.partialUpdate(id, {
+              completed: !isCompleted,
+            });
             setIsCompleted(result.completed);
           }}
         >
           {isCompleted ? "Done" : "Complete"}
         </Button>
-        <Button variant="contained" color="error" onClick={() => {}}>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={async () => {
+            const result = await swal.fire({
+              title: "Delete Todo?",
+              icon: "info",
+              showCancelButton: true,
+              customClass: {
+                confirmButton: "bg-red-500 hover:bg-red-600",
+              }
+            });
+
+            if (result.isConfirmed) {
+              console.log("Deleted!!");
+            }
+          }}
+        >
           Delete
         </Button>
       </div>

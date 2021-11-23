@@ -69,7 +69,7 @@ function Page({
           <Button
             color="inherit"
             variant="contained"
-            className="text-white bg-gray-400 hover:bg-fuchsia-500 sm:w-auto w-full"
+            className="text-white bg-gray-400 hover:bg-black sm:w-auto w-full"
           >
             <AddIcon />
             New Note

@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body { padding-right: 0 !important }
+
+body.swal2-shown {
+    overflow: auto !important;
+}

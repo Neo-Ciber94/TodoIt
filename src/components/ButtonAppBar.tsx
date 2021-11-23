@@ -8,7 +8,7 @@ import {
 export function ButtonAppBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" className="bg-fuchsia-500">
+      <AppBar position="fixed" className="bg-black">
         <Toolbar>
           <Button color="inherit" className="ml-auto">
             Login

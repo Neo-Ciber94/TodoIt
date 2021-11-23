@@ -1,5 +1,5 @@
 import { Document, Model } from "mongoose";
-import { ITodo } from "src/shared/todo.model";
+import { ITodo } from "src/shared/models/todo.model";
 
 export interface TodoDocument extends ITodo, Document {
   id: string;
