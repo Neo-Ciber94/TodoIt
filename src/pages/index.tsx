@@ -1,14 +1,28 @@
 import { InferGetServerSidePropsType } from "next";
 import Masonry from "@mui/lab/Masonry";
 import TodoNote from "src/components/TodoNote";
-import { Container, Box, CircularProgress, TextField } from "@mui/material";
+import {
+  Container,
+  Box,
+  CircularProgress,
+  TextField,
+  Button,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import React, { ChangeEvent, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { styled } from "@mui/material/styles";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
+import AddIcon from "@mui/icons-material/Add";
+import MenuIcon from '@mui/icons-material/Menu';
 
 const todoClient = new TodoApiClient();
+
+// Currently heights are hardcored
 const HEIGHTS = [200, 300, 400, 200, 500, 200, 190, 200, 400, 200, 300];
 
 export const getServerSideProps = async () => {
@@ -17,7 +31,6 @@ export const getServerSideProps = async () => {
 };
 
 const StyledTextField = styled(TextField)({
-  width: "50%",
   "& label.Mui-focused": {
     color: "gray",
   },
@@ -62,7 +75,7 @@ function Page({
     const searchTodos = async () => {
       try {
         const result = await todoClient.search({ search: searchString });
-        setTodos(result.data);        
+        setTodos(result.data);
       } finally {
         setIsLoading(false);
       }
@@ -74,7 +87,18 @@ function Page({
 
   return (
     <div className="bg-orange-100">
+      <ButtonAppBar />
       <Container className="pt-16 pb-8">
+        <div className="flex flex-row justify-start">
+          <Button
+            color="inherit"
+            variant="contained"
+            className="text-white bg-gray-400 hover:bg-gray-500"
+          >
+            <AddIcon />
+            New Note
+          </Button>
+        </div>
         <div className="flex flex-row justify-center">
           <h1 className="font-mono text-5xl">Todos</h1>
         </div>
@@ -86,7 +110,7 @@ function Page({
           />
         </div>
         {isLoading && <CircularProgress />}
-        <Masonry columns={[1, 2, 3, 3, 4]} spacing={[1]}>
+        <Masonry columns={[1, 2, 3, 3, 4]} spacing={1}>
           {todos.map((todo, index) => (
             <TodoNote
               key={todo.id}
@@ -133,6 +157,7 @@ function SearchTextField({ value, onSearch }: SearchTextFieldProps) {
     <StyledTextField
       label="Search"
       variant="standard"
+      className="w-full md:w-1/2"
       value={value}
       onKeyPress={(e) => {
         if (e.key === "Enter") {
@@ -163,5 +188,17 @@ const ViewInterceptor: React.FC<InterceptorProps> = (props) => {
 
   return <div ref={ref}></div>;
 };
+
+function ButtonAppBar() {
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static" className="bg-fuchsia-700">
+        <Toolbar>
+          <Button color="inherit" className="ml-auto">Login</Button>
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
+}
 
 export default Page;
