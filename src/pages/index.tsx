@@ -10,10 +10,10 @@ import {
 import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
-import AddIcon from "@mui/icons-material/Add";
 import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
 import { ButtonAppBar } from "src/components/ButtonAppBar";
+import AddIcon from "@mui/icons-material/Add";
 
 const todoClient = new TodoApiClient();
 
@@ -24,7 +24,6 @@ export const getServerSideProps = async () => {
   const pageResult = await todoClient.getAll();
   return { props: { pageResult } };
 };
-
 
 
 function Page({
@@ -65,12 +64,12 @@ function Page({
   return (
     <div className="bg-orange-100">
       <ButtonAppBar />
-      <Container className="pt-16 pb-8">
-        <div className="flex flex-row justify-start mt-8">
+      <Container className="pt-12 pb-8">
+        <div className="flex flex-row justify-start my-8">
           <Button
             color="inherit"
             variant="contained"
-            className="text-white bg-gray-400 hover:bg-gray-500"
+            className="text-white bg-gray-400 hover:bg-fuchsia-500 sm:w-auto w-full"
           >
             <AddIcon />
             New Note

@@ -21,7 +21,9 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "^4.3.1",
-    "react-intersection-observer": "^8.32.3"
+    "react-intersection-observer": "^8.32.3",
+    "sweetalert2": "^11.2.0",
+    "sweetalert2-react-content": "^4.2.0"
   },
   "devDependencies": {
     "@types/morgan": "^1.9.3",
