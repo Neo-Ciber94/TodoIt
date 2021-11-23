@@ -5,20 +5,15 @@ import {
   Container,
   Box,
   CircularProgress,
-  TextField,
   Button,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
 } from "@mui/material";
-import React, { ChangeEvent, useEffect } from "react";
-import { useInView } from "react-intersection-observer";
-import { styled } from "@mui/material/styles";
+import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
 import AddIcon from "@mui/icons-material/Add";
-import MenuIcon from '@mui/icons-material/Menu';
+import { ViewInterceptor } from "src/components/ViewInterceptor";
+import { SearchTextField } from "src/components/SearchTextField";
+import { ButtonAppBar } from "src/components/ButtonAppBar";
 
 const todoClient = new TodoApiClient();
 
@@ -30,25 +25,7 @@ export const getServerSideProps = async () => {
   return { props: { pageResult } };
 };
 
-const StyledTextField = styled(TextField)({
-  "& label.Mui-focused": {
-    color: "gray",
-  },
-  "& .MuiInput-underline:after": {
-    borderBottomColor: "gray",
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "gray",
-    },
-    "&:hover fieldset": {
-      borderColor: "black",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "black",
-    },
-  },
-});
+
 
 function Page({
   pageResult,
@@ -89,7 +66,7 @@ function Page({
     <div className="bg-orange-100">
       <ButtonAppBar />
       <Container className="pt-16 pb-8">
-        <div className="flex flex-row justify-start">
+        <div className="flex flex-row justify-start mt-8">
           <Button
             color="inherit"
             variant="contained"
@@ -144,60 +121,6 @@ function Page({
         )}
       </Container>
     </div>
-  );
-}
-
-interface SearchTextFieldProps {
-  value: string;
-  onSearch: (term: string) => void;
-}
-
-function SearchTextField({ value, onSearch }: SearchTextFieldProps) {
-  return (
-    <StyledTextField
-      label="Search"
-      variant="standard"
-      className="w-full md:w-1/2"
-      value={value}
-      onKeyPress={(e) => {
-        if (e.key === "Enter") {
-          onSearch(value);
-        }
-      }}
-      onChange={(e: ChangeEvent<HTMLInputElement>) => {
-        onSearch(e.target.value);
-      }}
-    />
-  );
-}
-
-interface InterceptorProps {
-  inView: (inView: boolean) => void;
-}
-
-const ViewInterceptor: React.FC<InterceptorProps> = (props) => {
-  const { ref, inView } = useInView();
-  const [wasInView, setWasInView] = React.useState(inView);
-
-  useEffect(() => {
-    if (inView != wasInView) {
-      props.inView(inView);
-      setWasInView(inView);
-    }
-  }, [props, inView, wasInView]);
-
-  return <div ref={ref}></div>;
-};
-
-function ButtonAppBar() {
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" className="bg-fuchsia-700">
-        <Toolbar>
-          <Button color="inherit" className="ml-auto">Login</Button>
-        </Toolbar>
-      </AppBar>
-    </Box>
   );
 }
 
