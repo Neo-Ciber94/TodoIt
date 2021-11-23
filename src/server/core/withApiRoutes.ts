@@ -1,4 +1,3 @@
-import isPromise from "@server/utils/isPromise";
 import nextConnect, {
   ErrorHandler,
   Middleware,
@@ -7,6 +6,7 @@ import nextConnect, {
 } from "next-connect";
 import { ValidationError } from "@server/utils/errors";
 import { NextApiRequest, NextApiResponse } from "next";
+import isPromise from "@shared/utils/isPromise";
 
 export type RequestParams = {
   [key: string]: string;
