@@ -1,4 +1,5 @@
 import { PageResult } from "@lib/repositories/base/repository";
+import { AxiosRequestConfig } from "axios";
 import { ITodo } from "src/shared/todo.model";
 import { API_URL } from "../constants";
 import { RestApiClient, QueryOptions } from "./rest-api.client";
@@ -10,17 +11,23 @@ export class TodoApiClient extends RestApiClient<ITodo, string> {
     super(API_URL + "/todos");
   }
 
-  search(options: QueryTodosOptions): Promise<PageResult<ITodo>> {
+  async search(
+    options: QueryTodosOptions,
+    config: AxiosRequestConfig<ITodo> = {}
+  ): Promise<PageResult<ITodo>> {
     const search = options.search || "";
     const page = options.page || 1;
     const pageSize = options.pageSize || 10;
 
-    return this.client.get(`/`, {
+    const result = await this.client.get<PageResult<ITodo>>(`/`, {
+      ...config,
       params: {
         page,
         pageSize,
         search,
       },
     });
+
+    return result.data;
   }
 }

@@ -1,5 +1,5 @@
 import { PageResult } from "@lib/repositories/base/repository";
-import axios, { Axios } from "axios";
+import axios, { Axios, AxiosRequestConfig } from "axios";
 
 export interface QueryOptions {
   page?: number;
@@ -7,7 +7,7 @@ export interface QueryOptions {
 }
 
 export class RestApiClient<T, TKey> {
-  protected readonly client: Axios;
+  public readonly client: Axios;
 
   constructor(baseURL: string) {
     this.client = axios.create({
@@ -15,31 +15,52 @@ export class RestApiClient<T, TKey> {
     });
   }
 
-  getAll(options: QueryOptions = {}): Promise<PageResult<T>> {
+  async getAll(
+    options: QueryOptions = {},
+    config: AxiosRequestConfig<T> = {}
+  ): Promise<PageResult<T>> {
     const page = options.page || 1;
     const pageSize = options.pageSize || 10;
 
-    return this.client.get(`/`, {
+    const result = await this.client.get<PageResult<T>>(`/`, {
+      ...config,
       params: {
         page,
         pageSize,
       },
     });
+
+    return result.data;
   }
 
-  getById(id: TKey): Promise<T> {
-    return this.client.get(`/${id}`);
+  async getById(id: TKey, config: AxiosRequestConfig<T> = {}): Promise<T> {
+    const result = await this.client.get(`/${id}`, config);
+    return result.data;
   }
 
-  create(item: Partial<T>): Promise<T> {
-    return this.client.post(`/`, item);
+  async create(
+    item: Partial<T>,
+    config: AxiosRequestConfig<T> = {}
+  ): Promise<T> {
+    const result = await this.client.post(`/`, item, config);
+    return result.data;
   }
 
-  update(id: TKey, item: Partial<T>): Promise<T> {
-    return this.client.put(`/${id}`, item);
+  async update(
+    id: TKey,
+    item: Partial<T>,
+    config: AxiosRequestConfig<T> = {}
+  ): Promise<T> {
+    const result = await this.client.put(`/${id}`, item, config);
+    return result.data;
   }
 
-  partialUpdate(id: TKey, item: Partial<T>): Promise<T> {
-    return this.client.patch(`/${id}`, item);
+  async partialUpdate(
+    id: TKey,
+    item: Partial<T>,
+    config: AxiosRequestConfig<T> = {}
+  ): Promise<T> {
+    const result = await this.client.patch(`/${id}`, item, config);
+    return result.data;
   }
 }

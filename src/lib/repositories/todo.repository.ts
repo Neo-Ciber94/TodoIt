@@ -29,8 +29,10 @@ export class TodoRepository
     }
 
     const query: FilterQuery<TodoDocument> = {
-      title: { $regex: options.search, $options: "i" },
-      content: { $regex: options.search, $options: "i" },
+      $or: [
+        { title: { $regex: options.search, $options: "i" } },
+        { content: { $regex: options.search, $options: "i" } },
+      ]
     };
 
     // SAFETY: Merge the search query with the existing query
