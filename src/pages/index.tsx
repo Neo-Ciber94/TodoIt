@@ -1,18 +1,12 @@
 import { InferGetServerSidePropsType } from "next";
 import Masonry from "@mui/lab/Masonry";
 import TodoNote from "src/components/TodoNote";
-import {
-  Container,
-  Box,
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { Container, Box, CircularProgress, Button } from "@mui/material";
 import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
 import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
-import { ButtonAppBar } from "src/components/ButtonAppBar";
 import AddIcon from "@mui/icons-material/Add";
 
 const todoClient = new TodoApiClient();
@@ -24,7 +18,6 @@ export const getServerSideProps = async () => {
   const pageResult = await todoClient.getAll();
   return { props: { pageResult } };
 };
-
 
 function Page({
   pageResult,
@@ -62,64 +55,61 @@ function Page({
   }, [searchString]);
 
   return (
-    <div className="bg-orange-100">
-      <ButtonAppBar />
-      <Container className="pt-12 pb-8">
-        <div className="flex flex-row justify-start my-8">
-          <Button
-            color="inherit"
-            variant="contained"
-            className="text-white bg-gray-400 hover:bg-black sm:w-auto w-full"
-          >
-            <AddIcon />
-            New Note
-          </Button>
-        </div>
-        <div className="flex flex-row justify-center">
-          <h1 className="font-mono text-5xl">Todos</h1>
-        </div>
-        <div className="flex flex-row justify-center p-3 mb-4">
-          <SearchTextField
-            key={"search-input"}
-            value={searchTerm}
-            onSearch={setSearchTerm}
+    <Container className="pt-12 pb-8">
+      <div className="flex flex-row justify-start my-8">
+        <Button
+          color="inherit"
+          variant="contained"
+          className="text-white bg-gray-400 hover:bg-black sm:w-auto w-full"
+        >
+          <AddIcon />
+          New Note
+        </Button>
+      </div>
+      <div className="flex flex-row justify-center">
+        <h1 className="font-mono text-5xl">Todos</h1>
+      </div>
+      <div className="flex flex-row justify-center p-3 mb-4">
+        <SearchTextField
+          key={"search-input"}
+          value={searchTerm}
+          onSearch={setSearchTerm}
+        />
+      </div>
+      {isLoading && <CircularProgress />}
+      <Masonry columns={[1, 2, 3, 3, 4]} spacing={1}>
+        {todos.map((todo, index) => (
+          <TodoNote
+            key={todo.id}
+            delayIndex={index % 10}
+            todo={todo}
+            height={HEIGHTS[index % todos.length]}
           />
-        </div>
-        {isLoading && <CircularProgress />}
-        <Masonry columns={[1, 2, 3, 3, 4]} spacing={1}>
-          {todos.map((todo, index) => (
-            <TodoNote
-              key={todo.id}
-              delayIndex={index % 10}
-              todo={todo}
-              height={HEIGHTS[index % todos.length]}
-            />
-          ))}
-        </Masonry>
-        <ViewInterceptor
-          inView={async (inView) => {
-            if (inView) {
-              if (hasMoreItems && !isMoreLoading) {
-                setIsMoreLoading(true);
-                try {
-                  const newTodos = await todoClient.getAll({ page: page + 1 });
-                  await new Promise((resolve) => setTimeout(resolve, 1000));
-                  setTodos([...todos, ...newTodos.data]);
-                  setPage(newTodos.currentPage);
-                } finally {
-                  setIsMoreLoading(false);
-                }
+        ))}
+      </Masonry>
+      <ViewInterceptor
+        inView={async (inView) => {
+          if (inView) {
+            if (hasMoreItems && !isMoreLoading) {
+              setIsMoreLoading(true);
+              try {
+                const newTodos = await todoClient.getAll({ page: page + 1 });
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+                setTodos([...todos, ...newTodos.data]);
+                setPage(newTodos.currentPage);
+              } finally {
+                setIsMoreLoading(false);
               }
             }
-          }}
-        />
-        {isMoreLoading && (
-          <Box className="flex flex-row justify-center p-3">
-            <CircularProgress color="inherit" className="text-black"/>
-          </Box>
-        )}
-      </Container>
-    </div>
+          }
+        }}
+      />
+      {isMoreLoading && (
+        <Box className="flex flex-row justify-center p-3">
+          <CircularProgress color="inherit" className="text-black" />
+        </Box>
+      )}
+    </Container>
   );
 }
 
