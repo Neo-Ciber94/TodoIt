@@ -3,7 +3,7 @@ import { ITodo } from "src/shared/models/todo.model";
 
 export interface TodoDocument extends ITodo, Document {
   id: string;
-  markAsCompleted(this: TodoDocument): Promise<TodoDocument>;
+  toggleCompleted(this: TodoDocument): Promise<TodoDocument>;
 }
 
 export interface TodoModel extends Model<TodoDocument> {

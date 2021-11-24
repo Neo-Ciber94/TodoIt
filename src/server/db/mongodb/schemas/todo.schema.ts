@@ -42,10 +42,10 @@ todoSchema.set("toJSON", {
   },
 });
 
-todoSchema.methods.markAsCompleted = function (
+todoSchema.methods.toggleCompleted = function (
   this: TodoDocument
 ): Promise<TodoDocument> {
-  this.completed = true;
+  this.completed = !this.completed;
   return this.save();
 };
 
