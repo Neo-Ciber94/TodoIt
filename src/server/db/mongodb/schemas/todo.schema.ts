@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import * as Mongoose from "mongoose";
 import { TodoDocument, TodoModel } from "./todo.types";
 
-const TodoSchema = new Schema({
+const todoSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -34,7 +34,7 @@ const TodoSchema = new Schema({
 });
 
 /// Extensions
-TodoSchema.set("toJSON", {
+todoSchema.set("toJSON", {
   transform: (_doc, ret) => {
     ret.id = ret._id;
     delete ret._id;
@@ -42,21 +42,21 @@ TodoSchema.set("toJSON", {
   },
 });
 
-TodoSchema.methods.markAsCompleted = function (
+todoSchema.methods.markAsCompleted = function (
   this: TodoDocument
 ): Promise<TodoDocument> {
   this.completed = true;
   return this.save();
 };
 
-TodoSchema.statics.findCompleted = async (): Promise<TodoDocument[]> => {
+todoSchema.statics.findCompleted = async (): Promise<TodoDocument[]> => {
   return await Todo.find({ completed: true });
 };
 
-TodoSchema.statics.findIncompleted = async (): Promise<TodoDocument[]> => {
+todoSchema.statics.findIncompleted = async (): Promise<TodoDocument[]> => {
   return await Todo.find({ completed: false });
 };
 
 // prettier-ignore
-const Todo = Mongoose.models.Todo as TodoModel || model<TodoDocument, TodoModel>("Todo", TodoSchema);
+const Todo = Mongoose.models.Todo as TodoModel || model<TodoDocument, TodoModel>("Todo", todoSchema);
 export default Todo;
