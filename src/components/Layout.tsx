@@ -3,13 +3,7 @@ import { ButtonAppBar } from "./ButtonAppBar";
 
 export const Layout: React.FC = ({ children }) => {
   return (
-    <Box
-      className="bg-orange-100"
-      sx={{
-        height: "100vh",
-        paddingTop: 10,
-      }}
-    >
+    <Box>
       <ButtonAppBar />
       {children}
     </Box>

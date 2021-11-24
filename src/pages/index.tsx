@@ -9,6 +9,8 @@ import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
+import { PageTitle } from "src/components/PageTitle";
+import { CustomButton } from "src/components/CustomButton";
 
 const todoClient = new TodoApiClient();
 
@@ -59,19 +61,13 @@ function Page({
     <Container className="pt-4 pb-8">
       <div className="flex flex-row justify-start">
         <Link href="/todos/create" passHref>
-          <Button
-            color="inherit"
-            variant="contained"
-            className="text-white bg-gray-400 hover:bg-black sm:w-auto w-full"
-          >
+          <Button variant="contained" className="bg-black hover:bg-gray-800">
             <AddIcon />
             New Note
           </Button>
         </Link>
       </div>
-      <div className="flex flex-row justify-center">
-        <h1 className="font-mono text-5xl">Todos</h1>
-      </div>
+      <PageTitle title="Todos" center />
       <div className="flex flex-row justify-center p-3 mb-4">
         <SearchTextField
           key={"search-input"}

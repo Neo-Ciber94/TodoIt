@@ -1,9 +1,10 @@
 import { ITodo } from "src/shared/models/todo.model";
 import * as React from "react";
-import { Paper, Button } from "@mui/material";
+import { Paper, Button, Checkbox } from "@mui/material";
 import { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useSwal } from "src/hooks/useSwal";
+import Link from "next/link";
 
 const todoClient = new TodoApiClient();
 
@@ -13,6 +14,8 @@ export interface TodoNoteProps {
   width?: number;
   delayIndex?: number;
 }
+
+const CHECKBOX_LABEL = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const COLORS = [
   "bg-yellow-100",
@@ -51,7 +54,7 @@ export default function TodoNote({
   return (
     <Paper
       ref={ref}
-      className={`p-4 flex flex-col opacity-0 ${color} ${
+      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer hover:brightness-200 ${color} ${
         isVisible ? "note-appear-anim" : ""
       }`}
       sx={{
@@ -59,6 +62,20 @@ export default function TodoNote({
         height,
       }}
     >
+      <div className="flex flex-row justify-end">
+        <Checkbox
+          {...CHECKBOX_LABEL}
+          checked={isCompleted}
+          sx={{ "& .MuiSvgIcon-root": { fontSize: 30 } }}
+          color="default"
+          onClick={async () => {
+            const result = await todoClient.partialUpdate(id, {
+              completed: !isCompleted,
+            });
+            setIsCompleted(result.completed);
+          }}
+        />
+      </div>
       <h1
         className={`font-bold text-lg font-mono ${
           isCompleted ? "line-through opacity-40" : ""
@@ -74,22 +91,9 @@ export default function TodoNote({
         {todo.content}
       </p>
       <div className="flex flex-row justify-between mt-auto py-3">
-        <Button
-          variant="contained"
-          className={
-            isCompleted
-              ? `bg-gray-500 hover:bg-gray-600`
-              : `bg-blue-500 hover:bg-blue-600`
-          }
-          onClick={async () => {
-            const result = await todoClient.partialUpdate(id, {
-              completed: !isCompleted,
-            });
-            setIsCompleted(result.completed);
-          }}
-        >
-          {isCompleted ? "Done" : "Complete"}
-        </Button>
+        <Link href={`/todos/edit/${id}`} passHref>
+          <Button variant="contained">Edit</Button>
+        </Link>
         <Button
           variant="contained"
           color="error"
@@ -100,7 +104,7 @@ export default function TodoNote({
               showCancelButton: true,
               customClass: {
                 confirmButton: "bg-red-500 hover:bg-red-600",
-              }
+              },
             });
 
             if (result.isConfirmed) {

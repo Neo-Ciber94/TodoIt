@@ -10,7 +10,15 @@ body.swal2-shown {
   overflow: auto !important;
 }
 
-html,
 body {
+  min-height: 100%;
+  @apply bg-orange-100;
+}
+
+html {
+  height: 100%;
+}
+
+div#__next {
   height: 100%;
 }
