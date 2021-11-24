@@ -54,7 +54,7 @@ export default function TodoNote({
   return (
     <Paper
       ref={ref}
-      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer hover:brightness-200 ${color} ${
+      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer ${color} ${
         isVisible ? "note-appear-anim" : ""
       }`}
       sx={{

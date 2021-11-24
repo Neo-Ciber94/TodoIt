@@ -60,7 +60,7 @@ function Page({
   return (
     <Container className="pt-4 pb-8">
       <div className="flex flex-row justify-start">
-        <Link href="/todos/create" passHref>
+        <Link href="/todos/add" passHref>
           <Button variant="contained" className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left">
             <AddIcon />
             New Note
