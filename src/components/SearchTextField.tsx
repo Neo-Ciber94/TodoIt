@@ -25,14 +25,15 @@ const StyledTextField = styled(TextField)({
 export interface SearchTextFieldProps {
   value: string;
   onSearch: (term: string) => void;
+  className?: string;
 }
 
-export function SearchTextField({ value, onSearch }: SearchTextFieldProps) {
+export function SearchTextField({ value, onSearch, className }: SearchTextFieldProps) {
   return (
     <StyledTextField
       label="Search"
       variant="standard"
-      className="w-full md:w-1/2"
+      className={`w-full md:w-1/2 ${className || ""}`}
       value={value}
       onKeyPress={(e) => {
         if (e.key === "Enter") {

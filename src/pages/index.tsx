@@ -61,16 +61,17 @@ function Page({
     <Container className="pt-4 pb-8">
       <div className="flex flex-row justify-start">
         <Link href="/todos/create" passHref>
-          <Button variant="contained" className="bg-black hover:bg-gray-800">
+          <Button variant="contained" className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left">
             <AddIcon />
             New Note
           </Button>
         </Link>
       </div>
-      <PageTitle title="Todos" center />
+      <PageTitle title="Todos" className="translate-x-[-140%] animate-slide-left" center />
       <div className="flex flex-row justify-center p-3 mb-4">
         <SearchTextField
           key={"search-input"}
+          className="translate-x-[-180%] animate-slide-left"
           value={searchTerm}
           onSearch={setSearchTerm}
         />
