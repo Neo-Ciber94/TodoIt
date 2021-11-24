@@ -21,10 +21,12 @@ const todoSchema = new Schema({
     type: Date,
     immutable: true,
     required: true,
+    default: () => new Date()
   },
   updatedAt: {
     type: Date,
     required: true,
+    default: () => new Date()
   },
 }, {
   timestamps: {

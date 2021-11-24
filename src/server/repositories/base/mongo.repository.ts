@@ -65,21 +65,11 @@ export abstract class MongoRepository<TEntity, TModel extends Model<TEntity>>
   async findOne(query: Partial<TEntity> = {}): Promise<TEntity | null> {
     const filterQuery = query as FilterQuery<TEntity>;
     const result = await this.model.findOne(filterQuery);
-
-    if (result == null) {
-      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
-    }
-
     return result;
   }
 
   async findById(id: string): Promise<TEntity | null> {
     const result = await this.model.findById(id);
-
-    if (result == null) {
-      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
-    }
-
     return result;
   }
 
