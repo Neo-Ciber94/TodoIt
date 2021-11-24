@@ -42,7 +42,7 @@ todoSchema.set("toJSON", {
   },
 });
 
-todoSchema.methods.toggleCompleted = function (
+todoSchema.methods.toggleComplete = function (
   this: TodoDocument
 ): Promise<TodoDocument> {
   this.completed = !this.completed;
