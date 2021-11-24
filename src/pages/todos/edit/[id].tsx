@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { ITodo } from "@shared/models/todo.model";
+import { PromiseUtils } from "@shared/utils/PromiseUtilts";
 
 const todoClient = new TodoApiClient();
 
@@ -58,6 +59,8 @@ export default function EditTodo({
               ...todo,
               ...data,
             });
+
+            await PromiseUtils.delay(1000);
             console.log("EDITED: ", result);
             router.push("/");
           } catch (e) {

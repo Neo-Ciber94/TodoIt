@@ -1,4 +1,10 @@
-import { Button, FormControl, TextField, styled } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  TextField,
+  CircularProgress,
+  styled,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 
 type FormData = {
@@ -39,11 +45,13 @@ export function TodoForm({
 }: TodoFormProps) {
   const {
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isSubmitted },
     handleSubmit,
   } = useForm<FormData>({
     defaultValues: initialValue,
   });
+
+  const showLoading = isSubmitting || isSubmitted;
 
   return (
     <form
@@ -81,9 +89,10 @@ export function TodoForm({
         type="submit"
         variant="contained"
         disabled={isSubmitting}
-        className="text-white bg-black hover:bg-gray-800 mt-2 translate-x-[-260%] animate-slide-left"
+        className="flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2 translate-x-[-260%] animate-slide-left"
       >
         {buttonText}
+        {showLoading && <CircularProgress className="text-white mx-4" size={20} />}
       </Button>
     </form>
   );

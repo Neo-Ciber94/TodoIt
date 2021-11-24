@@ -16,6 +16,13 @@ const todoClient = new TodoApiClient();
 
 // Currently heights are hardcored
 const HEIGHTS = [200, 300, 400, 200, 500, 200, 190, 200, 400, 200, 300];
+const CLASS_COLORS = [
+  "bg-yellow-100",
+  "bg-green-100",
+  "bg-red-100",
+  "bg-blue-100",
+  "bg-pink-100",
+];
 
 export const getServerSideProps = async () => {
   const pageResult = await todoClient.getAll();
@@ -61,13 +68,20 @@ function Page({
     <Container className="pt-4 pb-8">
       <div className="flex flex-row justify-start">
         <Link href="/todos/add" passHref>
-          <Button variant="contained" className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left">
+          <Button
+            variant="contained"
+            className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left"
+          >
             <AddIcon />
             New Note
           </Button>
         </Link>
       </div>
-      <PageTitle title="Todos" className="translate-x-[-140%] animate-slide-left" center />
+      <PageTitle
+        title="Todos"
+        className="translate-x-[-140%] animate-slide-left"
+        center
+      />
       <div className="flex flex-row justify-center p-3 mb-4">
         <SearchTextField
           key={"search-input"}
@@ -78,14 +92,20 @@ function Page({
       </div>
       {isLoading && <Loading />}
       <Masonry columns={[1, 2, 3, 3, 4]} spacing={1}>
-        {todos.map((todo, index) => (
-          <TodoNote
-            key={todo.id}
-            delayIndex={index % 10}
-            todo={todo}
-            // height={HEIGHTS[index % todos.length]}
-          />
-        ))}
+        {todos.map((todo, index) => {
+          const { id } = todo;
+          const colorIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
+          const colorClass = CLASS_COLORS[colorIndex % CLASS_COLORS.length];
+
+          return (
+            <TodoNote
+              key={todo.id}
+              delayIndex={index % 10}
+              todo={todo}
+              colorClass={colorClass}
+            />
+          );
+        })}
       </Masonry>
       <ViewInterceptor
         inView={async (inView) => {

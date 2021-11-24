@@ -13,31 +13,23 @@ export interface TodoNoteProps {
   height?: number | string;
   width?: number | string;
   delayIndex?: number;
+  colorClass?: string;
 }
 
 const CHECKBOX_LABEL = { inputProps: { "aria-label": "Checkbox demo" } };
-
-const COLORS = [
-  "bg-yellow-100",
-  "bg-green-100",
-  "bg-red-100",
-  "bg-blue-100",
-  "bg-pink-100",
-];
 
 export default function TodoNote({
   todo,
   height,
   width,
   delayIndex,
+  colorClass
 }: TodoNoteProps) {
   height = height || "auto";
   width = width || 200;
 
   const id = todo.id;
   const [isCompleted, setIsCompleted] = React.useState(todo.completed);
-  const computedIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-  const color = COLORS[computedIndex % COLORS.length];
   const ref = React.useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = React.useState(false);
   const swal = useSwal();
@@ -54,7 +46,7 @@ export default function TodoNote({
   return (
     <Paper
       ref={ref}
-      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer ${color} ${
+      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer ${colorClass} ${
         isVisible ? "note-appear-anim" : ""
       }`}
       sx={{
