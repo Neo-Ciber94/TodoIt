@@ -71,7 +71,8 @@ export function TodoForm({
           label="Content"
           variant="outlined"
           multiline
-          rows={4}
+          minRows={4}
+          maxRows={8}
           {...register("content")}
         />
       </FormControl>
