@@ -5,6 +5,7 @@ import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { PromiseUtils } from "@shared/utils/PromiseUtilts";
 
 const todoClient = new TodoApiClient();
 
@@ -35,7 +36,7 @@ export default function CreateTodo() {
         onSubmit={async (data) => {
           try {
             const result = await todoClient.create(data);
-            console.log("ADDED: ", result);
+            await PromiseUtils.delay(1000);
             router.push("/");
           } catch (e) {
             console.error(e);

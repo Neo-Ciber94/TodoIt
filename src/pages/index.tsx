@@ -73,7 +73,7 @@ function Page({
             className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left"
           >
             <AddIcon />
-            New Note
+            New Todo
           </Button>
         </Link>
       </div>

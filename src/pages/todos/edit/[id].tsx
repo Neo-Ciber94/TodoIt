@@ -61,7 +61,6 @@ export default function EditTodo({
             });
 
             await PromiseUtils.delay(1000);
-            console.log("EDITED: ", result);
             router.push("/");
           } catch (e) {
             console.error(e);
