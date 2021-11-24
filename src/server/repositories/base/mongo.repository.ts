@@ -4,16 +4,14 @@ import {
   PaginationOptions,
   SortDirection,
 } from "./repository";
-import { Model, Document, FilterQuery } from "mongoose";
+import { Model, FilterQuery } from "mongoose";
 import { ValidationError } from "@server/utils/errors";
 
 const DEFAULT_MAX_PAGE_SIZE = 10;
 const NO_FOUND_ERROR_MESSAGE = "Resourse not found";
 
-export abstract class MongoRepository<
-  TEntity extends Document,
-  TModel extends Model<TEntity>
-> implements IRepository<TEntity>
+export abstract class MongoRepository<TEntity, TModel extends Model<TEntity>>
+  implements IRepository<TEntity>
 {
   constructor(protected readonly model: TModel) {}
 

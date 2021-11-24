@@ -32,7 +32,7 @@ export class TodoRepository
       $or: [
         { title: { $regex: options.search, $options: "i" } },
         { content: { $regex: options.search, $options: "i" } },
-      ]
+      ],
     };
 
     // SAFETY: Merge the search query with the existing query

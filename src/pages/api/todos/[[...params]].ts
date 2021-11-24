@@ -58,4 +58,18 @@ export default withRestApi(new TodoRepository(), {
     const id = req.params.id;
     return repo.partialUpdate(id, { title, content, completed });
   },
+  customEndpoints: {
+    post: {
+      "/:id/toggle" : async (repo, req) => {
+        const id = req.params.id;
+        const todo = await repo.findById(id);
+
+        if (todo == null) {
+          return null;
+        }
+
+        return await todo.toggleComplete();
+      }
+    }
+  }
 });
