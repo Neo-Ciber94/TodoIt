@@ -27,6 +27,9 @@ export const getServerSideProps: GetServerSideProps<Data> = async (context) => {
 export default function EditTodo({
   todo,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter();
+  const { id } = router.query;
+
   return (
     <Container className="pt-4">
       <div className="sm:px-40 px-0 ">
@@ -49,8 +52,17 @@ export default function EditTodo({
       <TodoForm
         initialValue={todo}
         buttonText="Edit Todo"
-        onSubmit={(data) => {
-          console.log(data);
+        onSubmit={async (data) => {
+          try {
+            const result = await todoClient.update(String(id), {
+              ...todo,
+              ...data,
+            });
+            console.log("EDITED: ", result);
+            router.push("/");
+          } catch (e) {
+            console.error(e);
+          }
         }}
       />
     </Container>

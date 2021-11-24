@@ -1,10 +1,16 @@
 import { TodoForm } from "src/components/TodoForm";
+import { TodoApiClient } from "src/client/api/todos.client";
 import { Button, Container } from "@mui/material";
 import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
+const todoClient = new TodoApiClient();
+
 export default function CreateTodo() {
+  const router = useRouter();
+
   return (
     <Container className="pt-4">
       <div className="sm:px-40 px-0 ">
@@ -26,8 +32,14 @@ export default function CreateTodo() {
       />
       <TodoForm
         buttonText="Create Todo"
-        onSubmit={(data) => {
-          console.log(data);
+        onSubmit={async (data) => {
+          try {
+            const result = await todoClient.create(data);
+            console.log("ADDED: ", result);
+            router.push("/");
+          } catch (e) {
+            console.error(e);
+          }
         }}
       />
     </Container>

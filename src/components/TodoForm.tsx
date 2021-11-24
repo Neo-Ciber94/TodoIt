@@ -39,9 +39,11 @@ export function TodoForm({
 }: TodoFormProps) {
   const {
     register,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: initialValue,
+  });
 
   return (
     <form
@@ -50,25 +52,24 @@ export function TodoForm({
     >
       <FormControl
         variant="standard"
-        className="translate-x-[-180%] animate-slide-left"
+        className="mt-8 mb-2 translate-x-[-180%] animate-slide-left"
       >
         <StyledTextField
-          variant="standard"
           label="Title"
-          defaultValue={initialValue?.title}
+          variant="standard"
           {...register("title", { required: true })}
+          error={!!errors.title}
+          helperText={errors.title && "Title is required"}
         />
       </FormControl>
 
       <FormControl
         variant="standard"
-        className="translate-x-[-220%] animate-slide-left"
+        className="mt-8 mb-2 translate-x-[-220%] animate-slide-left"
       >
         <StyledTextField
-          defaultValue={initialValue?.content}
-          className="mt-8 mb-2"
-          variant="outlined"
           label="Content"
+          variant="outlined"
           multiline
           rows={4}
           {...register("content")}
@@ -78,6 +79,7 @@ export function TodoForm({
       <Button
         type="submit"
         variant="contained"
+        disabled={isSubmitting}
         className="text-white bg-black hover:bg-gray-800 mt-2 translate-x-[-260%] animate-slide-left"
       >
         {buttonText}
