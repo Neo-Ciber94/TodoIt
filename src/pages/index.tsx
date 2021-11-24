@@ -76,7 +76,7 @@ function Page({
           onSearch={setSearchTerm}
         />
       </div>
-      {isLoading && <CircularProgress />}
+      {isLoading && <Loading />}
       <Masonry columns={[1, 2, 3, 3, 4]} spacing={1}>
         {todos.map((todo, index) => (
           <TodoNote
@@ -106,11 +106,15 @@ function Page({
       />
       {isMoreLoading && (
         <Box className="flex flex-row justify-center p-3">
-          <CircularProgress color="inherit" className="text-black" />
+          <Loading />
         </Box>
       )}
     </Container>
   );
+}
+
+function Loading() {
+  return <CircularProgress color="inherit" className="text-black" />;
 }
 
 export default Page;
