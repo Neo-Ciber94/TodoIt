@@ -2,11 +2,7 @@ import { ITodo } from "src/shared/models/todo.model";
 import * as React from "react";
 import { Paper, Button, Checkbox } from "@mui/material";
 import { useEffect } from "react";
-import { TodoApiClient } from "src/client/api/todos.client";
-import { useSwal } from "src/hooks/useSwal";
-import Link from "next/link";
-
-const todoClient = new TodoApiClient();
+import { NavLink } from "./NavLink";
 
 export interface TodoNoteProps {
   todo: ITodo;
@@ -14,6 +10,8 @@ export interface TodoNoteProps {
   width?: number | string;
   delayIndex?: number;
   colorClass?: string;
+  onDelete: (todo: ITodo) => void;
+  onToggle: (todo: ITodo) => Promise<ITodo> | ITodo;
 }
 
 const CHECKBOX_LABEL = { inputProps: { "aria-label": "Checkbox demo" } };
@@ -23,7 +21,9 @@ export default function TodoNote({
   height,
   width,
   delayIndex,
-  colorClass
+  colorClass,
+  onDelete,
+  onToggle,
 }: TodoNoteProps) {
   height = height || "auto";
   width = width || 200;
@@ -32,7 +32,6 @@ export default function TodoNote({
   const [isCompleted, setIsCompleted] = React.useState(todo.completed);
   const ref = React.useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = React.useState(false);
-  const swal = useSwal();
 
   useEffect(() => {
     if (ref.current) {
@@ -61,9 +60,7 @@ export default function TodoNote({
           sx={{ "& .MuiSvgIcon-root": { fontSize: 30 } }}
           color="default"
           onClick={async () => {
-            const result = await todoClient.partialUpdate(id, {
-              completed: !isCompleted,
-            });
+            const result = await onToggle(todo);
             setIsCompleted(result.completed);
           }}
         />
@@ -83,26 +80,11 @@ export default function TodoNote({
         {todo.content}
       </p>
       <div className="flex flex-row justify-between mt-auto py-3">
-        <Link href={`/todos/edit/${id}`} passHref>
-          <Button variant="contained">Edit</Button>
-        </Link>
+        <NavLink href={`/todos/edit/${id}`}>Edit</NavLink>
         <Button
           variant="contained"
           color="error"
-          onClick={async () => {
-            const result = await swal.fire({
-              title: "Delete Todo?",
-              icon: "info",
-              showCancelButton: true,
-              customClass: {
-                confirmButton: "bg-red-500 hover:bg-red-600",
-              },
-            });
-
-            if (result.isConfirmed) {
-              console.log("Deleted!!");
-            }
-          }}
+          onClick={() => onDelete(todo)}
         >
           Delete
         </Button>

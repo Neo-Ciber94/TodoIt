@@ -10,7 +10,8 @@ import { SearchTextField } from "src/components/SearchTextField";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
 import { PageTitle } from "src/components/PageTitle";
-import { CustomButton } from "src/components/CustomButton";
+import { ITodo } from "@shared/models/todo.model";
+import { useSwal } from "src/hooks/useSwal";
 
 const todoClient = new TodoApiClient();
 
@@ -41,7 +42,29 @@ function Page({
   const [isMoreLoading, setIsMoreLoading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [page, setPage] = React.useState(1);
+  const swal = useSwal();
   const firstRender = React.useRef(true);
+
+  const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
+    const result = await swal.fire({
+      title: "Delete Todo?",
+      icon: "info",
+      showCancelButton: true,
+      customClass: {
+        confirmButton: "bg-red-500 hover:bg-red-600",
+      },
+    });
+
+    if (result.isConfirmed) {
+      console.log("Deleted!! ", todo);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onToggleTodo = React.useCallback(
+    (todo: ITodo) => todoClient.toggle(todo.id),
+    []
+  );
 
   useEffect(() => {
     // Avoid make other request on first render
@@ -103,6 +126,8 @@ function Page({
               delayIndex={index % 10}
               todo={todo}
               colorClass={colorClass}
+              onDelete={onDeleteTodo}
+              onToggle={onToggleTodo}
             />
           );
         })}

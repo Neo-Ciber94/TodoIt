@@ -55,7 +55,7 @@ export default function EditTodo({
         buttonText="Edit Todo"
         onSubmit={async (data) => {
           try {
-            const result = await todoClient.update(String(id), {
+            await todoClient.update(String(id), {
               ...todo,
               ...data,
             });
@@ -63,6 +63,7 @@ export default function EditTodo({
             await PromiseUtils.delay(1000);
             router.push("/");
           } catch (e) {
+            // TODO: Shows the error to the user
             console.error(e);
           }
         }}

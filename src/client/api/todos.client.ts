@@ -11,6 +11,11 @@ export class TodoApiClient extends RestApiClient<ITodo, string> {
     super(API_URL + "/todos");
   }
 
+  async toggle(id: string, config: AxiosRequestConfig<ITodo> = {}) {
+    const result = await this.client.post<ITodo>(`/${id}/toggle`, null, config);
+    return result.data;
+  }
+
   async search(
     options: QueryTodosOptions,
     config: AxiosRequestConfig<ITodo> = {}
