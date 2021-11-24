@@ -19,14 +19,18 @@ const TodoSchema = new Schema({
   },
   createdAt: {
     type: Date,
+    immutable: true,
     required: true,
-    default: Date.now(),
   },
   updatedAt: {
     type: Date,
     required: true,
-    default: Date.now(),
   },
+}, {
+  timestamps: {
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
+  }
 });
 
 /// Extensions
