@@ -8,6 +8,7 @@ import { useDebounce } from "src/hooks/useDebounce";
 import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
 import AddIcon from "@mui/icons-material/Add";
+import Link from "next/link";
 
 const todoClient = new TodoApiClient();
 
@@ -55,16 +56,18 @@ function Page({
   }, [searchString]);
 
   return (
-    <Container className="pt-12 pb-8">
-      <div className="flex flex-row justify-start my-8">
-        <Button
-          color="inherit"
-          variant="contained"
-          className="text-white bg-gray-400 hover:bg-black sm:w-auto w-full"
-        >
-          <AddIcon />
-          New Note
-        </Button>
+    <Container className="pt-4 pb-8">
+      <div className="flex flex-row justify-start">
+        <Link href="/todos/create" passHref>
+          <Button
+            color="inherit"
+            variant="contained"
+            className="text-white bg-gray-400 hover:bg-black sm:w-auto w-full"
+          >
+            <AddIcon />
+            New Note
+          </Button>
+        </Link>
       </div>
       <div className="flex flex-row justify-center">
         <h1 className="font-mono text-5xl">Todos</h1>
