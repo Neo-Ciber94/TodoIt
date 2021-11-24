@@ -49,14 +49,6 @@ todoSchema.methods.toggleComplete = function (
   return this.save();
 };
 
-todoSchema.statics.findCompleted = async (): Promise<TodoDocument[]> => {
-  return await Todo.find({ completed: true });
-};
-
-todoSchema.statics.findIncompleted = async (): Promise<TodoDocument[]> => {
-  return await Todo.find({ completed: false });
-};
-
 // prettier-ignore
 const Todo = Mongoose.models.Todo as TodoModel || model<TodoDocument, TodoModel>("Todo", todoSchema);
 export default Todo;

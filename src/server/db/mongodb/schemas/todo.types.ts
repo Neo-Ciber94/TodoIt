@@ -6,7 +6,4 @@ export interface TodoDocument extends ITodo, Document {
   toggleComplete(this: TodoDocument): Promise<TodoDocument>;
 }
 
-export interface TodoModel extends Model<TodoDocument> {
-  findCompleted(): Promise<TodoDocument[]>;
-  findIncompleted(): Promise<TodoDocument[]>;
-}
+export interface TodoModel extends Model<TodoDocument> {}
