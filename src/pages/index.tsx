@@ -83,7 +83,7 @@ function Page({
             key={todo.id}
             delayIndex={index % 10}
             todo={todo}
-            height={HEIGHTS[index % todos.length]}
+            // height={HEIGHTS[index % todos.length]}
           />
         ))}
       </Masonry>

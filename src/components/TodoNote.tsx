@@ -10,8 +10,8 @@ const todoClient = new TodoApiClient();
 
 export interface TodoNoteProps {
   todo: ITodo;
-  height?: number;
-  width?: number;
+  height?: number | string;
+  width?: number | string;
   delayIndex?: number;
 }
 
@@ -31,7 +31,7 @@ export default function TodoNote({
   width,
   delayIndex,
 }: TodoNoteProps) {
-  height = height || 200;
+  height = height || "auto";
   width = width || 200;
 
   const id = todo.id;
@@ -84,7 +84,7 @@ export default function TodoNote({
         {todo.title}
       </h1>
       <p
-        className={`font-mono py-3 ${
+        className={`font-mono py-3 max-h-[200px] overflow-y-auto break-words ${
           isCompleted ? "line-through opacity-40" : ""
         }`}
       >
