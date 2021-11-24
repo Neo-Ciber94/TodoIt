@@ -84,11 +84,7 @@ export abstract class MongoRepository<TEntity, TModel extends Model<TEntity>>
       throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
     }
 
-    entityToUpdate = {
-      ...entityToUpdate,
-      ...entity,
-    };
-
+    entityToUpdate.set(entity);
     entityToUpdate.save();
     return entityToUpdate;
   }
