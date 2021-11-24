@@ -1,4 +1,4 @@
-import { ArrayUtils } from "@server/utils/ArrayUtils";
+import { ArrayUtils } from "@shared/utils/ArrayUtils";
 import { NextApiRequest } from "next";
 import { PaginationOptions, SortDirection } from "./base/repository";
 

@@ -115,7 +115,7 @@ function Page({
         />
         {isMoreLoading && (
           <Box className="flex flex-row justify-center p-3">
-            <CircularProgress color="primary" />
+            <CircularProgress color="inherit" className="text-black"/>
           </Box>
         )}
       </Container>
