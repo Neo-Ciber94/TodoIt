@@ -1,7 +1,15 @@
 import { InferGetServerSidePropsType } from "next";
 import Masonry from "@mui/lab/Masonry";
 import TodoNote from "src/components/TodoNote";
-import { Container, Box, CircularProgress, Button } from "@mui/material";
+import {
+  Container,
+  Box,
+  CircularProgress,
+  Button,
+  Grow,
+  Fade,
+  Zoom,
+} from "@mui/material";
 import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
@@ -12,8 +20,25 @@ import Link from "next/link";
 import { PageTitle } from "src/components/PageTitle";
 import { ITodo } from "@shared/models/todo.model";
 import { useSwal } from "src/hooks/useSwal";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import { TransitionProps } from "@mui/material/transitions";
 
 const todoClient = new TodoApiClient();
+
+type DialogTransitionProps = TransitionProps & {
+  children: React.ReactElement<any, any>;
+};
+
+const Transition = React.forwardRef(function Transition(
+  props: DialogTransitionProps,
+  ref
+) {
+  return <Grow ref={ref} {...props} timeout={200} />;
+});
 
 // Currently heights are hardcored
 const HEIGHTS = [200, 300, 400, 200, 500, 200, 190, 200, 400, 200, 300];
@@ -24,6 +49,8 @@ const CLASS_COLORS = [
   "bg-blue-100",
   "bg-pink-100",
 ];
+
+const COLORS = ["#FEF3C7", "#D1FAE5", "#FEE2E2", "#DBEAFE", "#FCE7F3"];
 
 export const getServerSideProps = async () => {
   const pageResult = await todoClient.getAll();
@@ -44,20 +71,27 @@ function Page({
   const [page, setPage] = React.useState(1);
   const swal = useSwal();
   const firstRender = React.useRef(true);
+  const [dialogColor, setDialogColor] = React.useState("");
+  const [selectedTodo, setSelectedTodo] = React.useState<ITodo | null>(null);
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
-    const result = await swal.fire({
-      title: "Delete Todo?",
-      icon: "info",
-      showCancelButton: true,
-      customClass: {
-        confirmButton: "bg-red-500 hover:bg-red-600",
-      },
-    });
+    const { id } = todo;
+    const colorIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
+    const color = COLORS[colorIndex % COLORS.length];
 
-    if (result.isConfirmed) {
-      console.log("Deleted!! ", todo);
-    }
+    handleClickOpen();
+    setDialogColor(color);
+    setSelectedTodo(todo);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -137,9 +171,11 @@ function Page({
           if (inView) {
             if (hasMoreItems && !isMoreLoading) {
               setIsMoreLoading(true);
+
               try {
                 const newTodos = await todoClient.getAll({ page: page + 1 });
                 await new Promise((resolve) => setTimeout(resolve, 1000));
+
                 setTodos([...todos, ...newTodos.data]);
                 setPage(newTodos.currentPage);
               } finally {
@@ -154,7 +190,65 @@ function Page({
           <Loading />
         </Box>
       )}
+
+      <DeleteTodoDialog
+        open={open}
+        onClose={handleClose}
+        color={dialogColor}
+        todo={selectedTodo!}
+      />
     </Container>
+  );
+}
+
+interface DeleteTodoDialogProps {
+  open: boolean;
+  todo: ITodo;
+  color?: string;
+  onClose: () => void;
+}
+
+function DeleteTodoDialog({
+  open,
+  onClose,
+  todo,
+  color,
+}: DeleteTodoDialogProps) {
+  return (
+    <Dialog
+      open={open}
+      TransitionComponent={Transition}
+      keepMounted
+      onClose={onClose}
+      aria-describedby="alert-dialog-slide-description"
+      PaperProps={{
+        sx: {
+          background: color,
+        },
+      }}
+    >
+      <DialogTitle>Delete Todo?</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          {`Are you sure about deleting `}
+          <strong>{todo?.title}</strong>?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={onClose}
+          className="text-black hover:bg-black font-bold hover:bg-opacity-10"
+        >
+          Delete
+        </Button>
+        <Button
+          onClick={onClose}
+          className="text-black hover:bg-black font-bold hover:bg-opacity-10"
+        >
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 

@@ -1,3 +1,5 @@
+@import "@sweetalert2/theme-material-ui/material-ui.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -59,6 +61,7 @@ body.swal2-shown {
 body {
   min-height: 100%;
   @apply bg-orange-100;
+  overflow: auto !important;
 }
 
 html {
