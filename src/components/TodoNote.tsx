@@ -81,7 +81,10 @@ export default function TodoNote({
         <Button
           variant="contained"
           color="error"
-          onClick={() => onDelete(todo)}
+          onClick={e => {
+            e.stopPropagation();
+            onDelete(todo);
+          }}
         >
           Delete
         </Button>
