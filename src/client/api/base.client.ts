@@ -6,7 +6,7 @@ export interface QueryOptions {
   pageSize?: number;
 }
 
-export class RestApiClient<T, TKey> {
+export class BaseApiClient<T, TKey> {
   public readonly client: Axios;
 
   constructor(baseURL: string) {

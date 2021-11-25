@@ -2,11 +2,11 @@ import { PageResult } from "@server/repositories/base/repository";
 import { AxiosRequestConfig } from "axios";
 import { ITodo } from "src/shared/models/todo.model";
 import { API_URL } from "../constants";
-import { RestApiClient, QueryOptions } from "./rest-api.client";
+import { BaseApiClient, QueryOptions } from "./base.client";
 
 export type QueryTodosOptions = QueryOptions & { search?: string };
 
-export class TodoApiClient extends RestApiClient<ITodo, string> {
+export class TodoApiClient extends BaseApiClient<ITodo, string> {
   constructor() {
     super(API_URL + "/todos");
   }
