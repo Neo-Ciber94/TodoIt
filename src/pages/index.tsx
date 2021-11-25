@@ -20,6 +20,7 @@ import Link from "next/link";
 import { PageTitle } from "src/components/PageTitle";
 import { ITodo } from "@shared/models/todo.model";
 import { useSwal } from "src/hooks/useSwal";
+import { useRouter } from "next/router";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -63,18 +64,18 @@ function Page({
   const { data, currentPage, totalPages } = pageResult;
   const hasMoreItems = currentPage < totalPages;
 
+  //const swal = useSwal();
   const [todos, setTodos] = React.useState(data);
   const [searchTerm, setSearchTerm] = React.useState("");
   const searchString = useDebounce(searchTerm, 500);
   const [isMoreLoading, setIsMoreLoading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [page, setPage] = React.useState(1);
-  const swal = useSwal();
   const firstRender = React.useRef(true);
   const [dialogColor, setDialogColor] = React.useState("");
   const [selectedTodo, setSelectedTodo] = React.useState<ITodo | null>(null);
-
   const [open, setOpen] = React.useState(false);
+  const router = useRouter();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -97,6 +98,12 @@ function Page({
 
   const onToggleTodo = React.useCallback(
     (todo: ITodo) => todoClient.toggle(todo.id),
+    []
+  );
+
+  const onTodoClick = React.useCallback(
+    (todo: ITodo) => router.push(`/todos/details/${todo.id}`),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -162,6 +169,7 @@ function Page({
               colorClass={colorClass}
               onDelete={onDeleteTodo}
               onToggle={onToggleTodo}
+              onClick={onTodoClick}
             />
           );
         })}

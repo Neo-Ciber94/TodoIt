@@ -10,6 +10,7 @@ export interface TodoNoteProps {
   width?: number | string;
   delayIndex?: number;
   colorClass?: string;
+  onClick?: (todo: ITodo) => void;
   onDelete: (todo: ITodo) => void;
   onToggle: (todo: ITodo) => Promise<ITodo> | ITodo;
 }
@@ -24,6 +25,7 @@ export default function TodoNote({
   colorClass,
   onDelete,
   onToggle,
+  onClick
 }: TodoNoteProps) {
   height = height || "auto";
   width = width || 200;
@@ -51,6 +53,11 @@ export default function TodoNote({
       sx={{
         width,
         height,
+      }}
+      onClick={() => {
+        if (onClick) {
+          onClick(todo);
+        }
       }}
     >
       <div className="flex flex-row justify-end">
