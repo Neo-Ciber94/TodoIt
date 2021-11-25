@@ -3,6 +3,8 @@ import * as React from "react";
 import { Paper, Button, Checkbox } from "@mui/material";
 import { useEffect } from "react";
 import { NavLink } from "./NavLink";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export interface TodoNoteProps {
   todo: ITodo;
@@ -25,7 +27,7 @@ export default function TodoNote({
   colorClass,
   onDelete,
   onToggle,
-  onClick
+  onClick,
 }: TodoNoteProps) {
   height = height || "auto";
   width = width || 200;
@@ -34,6 +36,8 @@ export default function TodoNote({
   const [isCompleted, setIsCompleted] = React.useState(todo.completed);
   const ref = React.useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = React.useState(false);
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
 
   useEffect(() => {
     if (ref.current) {
@@ -50,10 +54,7 @@ export default function TodoNote({
       className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer ${colorClass} ${
         isVisible ? "note-appear-anim" : ""
       }`}
-      sx={{
-        width,
-        height,
-      }}
+      sx={{ width, height }}
       onClick={() => {
         if (onClick) {
           onClick(todo);
@@ -72,20 +73,9 @@ export default function TodoNote({
           }}
         />
       </div>
-      <h1
-        className={`font-bold text-lg font-mono ${
-          isCompleted ? "line-through opacity-40" : ""
-        }`}
-      >
-        {todo.title}
-      </h1>
-      <p
-        className={`font-mono py-3 max-h-[200px] overflow-y-auto break-words ${
-          isCompleted ? "line-through opacity-40" : ""
-        }`}
-      >
-        {todo.content}
-      </p>
+      <TodoNoteTitle isCompleted={isCompleted} title={todo.title} />
+      <TodoNoteContent isCompleted={isCompleted} content={todo.content} />
+
       <div className="flex flex-row justify-between mt-auto py-3">
         <NavLink href={`/todos/edit/${id}`}>Edit</NavLink>
         <Button
@@ -97,5 +87,39 @@ export default function TodoNote({
         </Button>
       </div>
     </Paper>
+  );
+}
+
+type TTodoNoteTitleProps = {
+  isCompleted: boolean;
+  title: string;
+};
+
+function TodoNoteTitle({ isCompleted, title }: TTodoNoteTitleProps) {
+  return (
+    <h1
+      className={`font-bold text-lg font-mono ${
+        isCompleted ? "line-through opacity-40" : ""
+      }`}
+    >
+      {title}
+    </h1>
+  );
+}
+
+type TodoNoteContentProps = {
+  isCompleted: boolean;
+  content?: string;
+};
+
+function TodoNoteContent({ isCompleted, content }: TodoNoteContentProps) {
+  return (
+    <p
+      className={`font-mono py-3 max-h-[200px] overflow-y-auto break-words ${
+        isCompleted ? "line-through opacity-40" : ""
+      }`}
+    >
+      {content}
+    </p>
   );
 }

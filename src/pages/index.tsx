@@ -102,7 +102,7 @@ function Page({
   );
 
   const onTodoClick = React.useCallback(
-    (todo: ITodo) => router.push(`/todos/details/${todo.id}`),
+    (todo: ITodo) => router.push(`/todos/edit/${todo.id}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
