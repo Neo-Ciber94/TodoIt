@@ -1,5 +1,4 @@
 import { InferGetServerSidePropsType } from "next";
-//import Masonry from "@mui/lab/Masonry";
 import TodoNote from "src/components/TodoNote";
 import {
   Container,
@@ -7,19 +6,17 @@ import {
   CircularProgress,
   Button,
   Grow,
-  Fade,
-  Zoom,
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
 import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
+import { MasonryGrid } from "src/components/MasonryGrid";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
 import { PageTitle } from "src/components/PageTitle";
 import { ITodo } from "@shared/models/todo.model";
-import { useSwal } from "src/hooks/useSwal";
 import { useRouter } from "next/router";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -27,7 +24,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { TransitionProps } from "@mui/material/transitions";
-import Masonry from "masonry-layout";
 
 const todoClient = new TodoApiClient();
 
@@ -129,20 +125,8 @@ function Page({
     searchTodos();
   }, [searchString]);
 
-  useEffect(() => {
-    // const masonry = new Masonry(".masonry-grid", {
-    //   itemSelector: ".masonry-grid-item",
-    //   columnWidth: ".grid-sizer",
-    //   gutter: 10,
-    //   percentPosition: true,
-    //   horizontalOrder: true,
-    // });
-
-    // masonry.layout!();
-  });
-
   return (
-    <Container className="pt-4 pb-8">
+    <Container className="pt-4 pb-16">
       <div className="flex flex-row justify-start">
         <Link href="/todos/add" passHref>
           <Button
@@ -168,29 +152,26 @@ function Page({
         />
       </div>
       {isLoading && <Loading />}
-      {/* <Box columns={[1, 2, 3, 3, 4]} spacing={1}> */}
-      <Box className="masonry-grid">
-        <div className="grid-sizer"></div>
+      <MasonryGrid gap={0}>
         {todos.map((todo, index) => {
           const { id } = todo;
           const colorIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
           const colorClass = CLASS_COLORS[colorIndex % CLASS_COLORS.length];
 
           return (
-            <div key={todo.id} className="masonry-grid-item">
-              <TodoNote
-                width="100%"
-                delayIndex={index % 10}
-                todo={todo}
-                colorClass={colorClass}
-                onDelete={onDeleteTodo}
-                onToggle={onToggleTodo}
-                onClick={onTodoClick}
-              />
-            </div>
+            <TodoNote
+              key={id}
+              width="100%"
+              delayIndex={index % 10}
+              todo={todo}
+              colorClass={colorClass}
+              onDelete={onDeleteTodo}
+              onToggle={onToggleTodo}
+              onClick={onTodoClick}
+            />
           );
         })}
-      </Box>
+      </MasonryGrid>
       <ViewInterceptor
         inView={async (inView) => {
           if (inView) {
@@ -210,8 +191,9 @@ function Page({
           }
         }}
       />
+
       {isMoreLoading && (
-        <Box className="flex flex-row justify-center p-3">
+        <Box className="flex flex-row justify-center p-3 fixed bottom-0 left-0 right-0">
           <Loading />
         </Box>
       )}
