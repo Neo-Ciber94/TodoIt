@@ -75,7 +75,7 @@ export default function TodoNote({
         />
       </div>
       <TodoNoteTitle isCompleted={isCompleted} title={todo.title} />
-      <TodoNoteContent isCompleted={isCompleted} content={todo.content} />
+      {matches && <TodoNoteContent isCompleted={isCompleted} content={todo.content} />}
 
       <div className="flex flex-row justify-between mt-auto py-3">
         <NavLink href={`/todos/edit/${id}`}>Edit</NavLink>
