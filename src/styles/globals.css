@@ -48,9 +48,6 @@
   }
 }
 
-body {
-  padding-right: 0 !important;
-}
 
 body.swal2-shown {
   overflow: auto !important;
@@ -58,7 +55,6 @@ body.swal2-shown {
 
 body {
   min-height: 100%;
-  overflow: auto !important;
 }
 
 html {

@@ -1,10 +1,19 @@
 import { ITodo } from "src/shared/models/todo.model";
 import * as React from "react";
-import { Paper, Button, Checkbox } from "@mui/material";
+import {
+  Paper,
+  Box,
+  IconButton,
+  Checkbox,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+} from "@mui/material";
 import { useEffect } from "react";
-import { NavLink } from "./NavLink";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 export interface TodoNoteProps {
   todo: ITodo;
@@ -30,12 +39,13 @@ export default function TodoNote({
   height = height || "auto";
   width = width || 200;
 
-  const id = todo.id;
   const [isCompleted, setIsCompleted] = React.useState(todo.completed);
   const ref = React.useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = React.useState(false);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = !!anchorEl;
 
   useEffect(() => {
     if (ref.current) {
@@ -45,6 +55,21 @@ export default function TodoNote({
       setIsVisible(true);
     }
   }, [delayIndex, ref]);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setAnchorEl(null);
+  };
+
+  const handleOnDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(todo);
+  };
 
   return (
     <Paper
@@ -59,11 +84,11 @@ export default function TodoNote({
         }
       }}
     >
-      <div className="flex flex-row justify-end">
+      <div className="flex flex-row justify-between">
         <Checkbox
           {...CHECKBOX_LABEL}
           checked={isCompleted}
-          sx={{ "& .MuiSvgIcon-root": { fontSize: 30 } }}
+          sx={{ "& .MuiSvgIcon-root": { fontSize: 25 } }}
           color="default"
           onClick={async (e) => {
             e.stopPropagation();
@@ -71,25 +96,23 @@ export default function TodoNote({
             setIsCompleted(result.completed);
           }}
         />
-      </div>
-      <TodoNoteTitle isCompleted={isCompleted} title={todo.title} />
-      {matches && (
-        <TodoNoteContent isCompleted={isCompleted} content={todo.content} />
-      )}
 
-      <div className="flex flex-row justify-between mt-auto py-3">
-        <NavLink href={`/todos/edit/${id}`}>Edit</NavLink>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(todo);
-          }}
-        >
-          Delete
-        </Button>
+        <IconButton onClick={handleClick}>
+          <MoreVertIcon sx={{ fontSize: 25 }} />
+        </IconButton>
+        <TodoMenu
+          anchorEl={anchorEl}
+          open={open}
+          handleClose={handleClose}
+          handleOnDelete={handleOnDelete}
+        />
       </div>
+      <Box className="my-8">
+        <TodoNoteTitle isCompleted={isCompleted} title={todo.title} />
+        {matches && (
+          <TodoNoteContent isCompleted={isCompleted} content={todo.content} />
+        )}
+      </Box>
     </Paper>
   );
 }
@@ -125,5 +148,46 @@ function TodoNoteContent({ isCompleted, content }: TodoNoteContentProps) {
     >
       {content}
     </p>
+  );
+}
+
+interface TodoMenuProps {
+  anchorEl: Element | null;
+  open: boolean;
+  handleOnDelete: (e: React.MouseEvent) => void;
+  handleClose: (e: React.MouseEvent) => void;
+}
+
+function TodoMenu({
+  anchorEl,
+  open,
+  handleClose,
+  handleOnDelete,
+}: TodoMenuProps) {
+  return (
+    <Menu
+      id="basic-menu"
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+      MenuListProps={{
+        "aria-labelledby": "basic-button",
+      }}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+    >
+      <MenuItem onClick={handleOnDelete}>
+        <ListItemIcon>
+          <DeleteIcon fontSize="small" />
+        </ListItemIcon>
+        Delete
+      </MenuItem>
+    </Menu>
   );
 }
