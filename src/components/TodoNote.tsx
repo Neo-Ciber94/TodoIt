@@ -67,7 +67,8 @@ export default function TodoNote({
           checked={isCompleted}
           sx={{ "& .MuiSvgIcon-root": { fontSize: 30 } }}
           color="default"
-          onClick={async () => {
+          onClick={async (e) => {
+            e.stopPropagation();
             const result = await onToggle(todo);
             setIsCompleted(result.completed);
           }}

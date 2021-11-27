@@ -152,7 +152,7 @@ function Page({
         />
       </div>
       {isLoading && <Loading />}
-      <MasonryGrid gap={0}>
+      <MasonryGrid>
         {todos.map((todo, index) => {
           const { id } = todo;
           const colorIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
