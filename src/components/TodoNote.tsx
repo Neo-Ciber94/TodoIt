@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { NavLink } from "./NavLink";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { usePageColor } from "src/contexts/PageColorContext";
 
 export interface TodoNoteProps {
   todo: ITodo;
@@ -38,6 +39,7 @@ export default function TodoNote({
   const [isVisible, setIsVisible] = React.useState(false);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
+  const { setPageColor } = usePageColor();
 
   useEffect(() => {
     if (ref.current) {
@@ -75,14 +77,16 @@ export default function TodoNote({
         />
       </div>
       <TodoNoteTitle isCompleted={isCompleted} title={todo.title} />
-      {matches && <TodoNoteContent isCompleted={isCompleted} content={todo.content} />}
+      {matches && (
+        <TodoNoteContent isCompleted={isCompleted} content={todo.content} />
+      )}
 
       <div className="flex flex-row justify-between mt-auto py-3">
         <NavLink href={`/todos/edit/${id}`}>Edit</NavLink>
         <Button
           variant="contained"
           color="error"
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
             onDelete(todo);
           }}

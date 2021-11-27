@@ -9,10 +9,9 @@ import { PromiseUtils } from "@shared/utils/PromiseUtilts";
 import PaletteIcon from "@mui/icons-material/Palette";
 import React, { useState } from "react";
 import CircleIcon from "@mui/icons-material/Circle";
+import { PASTEL_COLORS } from "@shared/config";
 
 const todoClient = new TodoApiClient();
-
-const COLORS = ["#FEF3C7", "#D1FAE5", "#FEE2E2", "#DBEAFE", "#FCE7F3"];
 
 export default function CreateTodo() {
   const router = useRouter();
@@ -61,7 +60,7 @@ export default function CreateTodo() {
         />
       </Container>
       <SelectColorDrawer
-        colors={COLORS}
+        colors={PASTEL_COLORS}
         open={openColorSelector}
         onClose={() => {
           setOpenColorSelector(false);
