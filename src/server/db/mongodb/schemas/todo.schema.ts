@@ -1,39 +1,49 @@
 import { model, Schema } from "mongoose";
 import * as Mongoose from "mongoose";
 import { TodoDocument, TodoModel } from "./todo.types";
+import { PASTEL_COLORS, randomPastelColor } from "@shared/config";
 
-const todoSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
+const todoSchema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    content: {
+      type: String,
+      trim: true,
+    },
+    color: {
+      type: String,
+      trim: true,
+      required: true,
+      default: PASTEL_COLORS[0],
+    },
+    completed: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      immutable: true,
+      required: true,
+      default: () => new Date(),
+    },
+    updatedAt: {
+      type: Date,
+      required: true,
+      default: () => new Date(),
+    },
   },
-  content: {
-    type: String,
-    trim: true,
-  },
-  completed: {
-    type: Boolean,
-    default: false,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    immutable: true,
-    required: true,
-    default: () => new Date()
-  },
-  updatedAt: {
-    type: Date,
-    required: true,
-    default: () => new Date()
-  },
-}, {
-  timestamps: {
-    createdAt: "createdAt",
-    updatedAt: "updatedAt",
+  {
+    timestamps: {
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
+    },
   }
-});
+);
 
 /// Extensions
 todoSchema.set("toJSON", {

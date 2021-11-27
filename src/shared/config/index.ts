@@ -1,22 +1,26 @@
 export const PASTEL_COLORS = [
   // Orange
-  "#FED7AA",
+  "#FFEDD5",
 
   // Yellow
-  "#FDE68A",
-
-  // Green
-  "#D9F99D",
-
-  // Blue
-  "#BFDBFE",
-
-  // Purple
-  "#E9D5FF",
-
-  // Pink
-  "#FBCFE8",
+  "#FEF9C3",
 
   // Red
-  "#FECACA",
+  "#FEE2E2",
+
+  // Green
+  "#DCFCE7",
+
+  // Blue
+  "#DBEAFE",
+
+  // Purple
+  "#F3E8FF",
+
+  // Pink
+  "#FCE7F3",
 ];
+
+export function randomPastelColor() {
+  return PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)];
+}

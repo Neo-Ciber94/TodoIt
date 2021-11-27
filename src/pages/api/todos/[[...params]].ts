@@ -19,17 +19,17 @@ export default withRestApi(new TodoRepository(), {
     return repo.search(options);
   },
   create: (repo, req) => {
-    const { title, content } = req.body;
+    const { title, content, color } = req.body;
     Validate.isNonBlankString(title);
 
     if (content) {
       Validate.isNonBlankString(content);
     }
 
-    return repo.create({ title, content });
+    return repo.create({ title, content, color });
   },
   update: async (repo, req) => {
-    const { title, content, completed } = req.body;
+    const { title, content, completed, color } = req.body;
     Validate.isBoolean(completed);
     Validate.isNonBlankString(title);
 
@@ -38,10 +38,10 @@ export default withRestApi(new TodoRepository(), {
     }
 
     const id = req.params.id;
-    return repo.update(id, { title, content, completed });
+    return repo.update(id, { title, content, completed, color });
   },
   partialUpdate: async (repo, req) => {
-    const { title, content, completed } = req.body;
+    const { title, content, completed, color } = req.body;
 
     if (completed) {
       Validate.isBoolean(completed);
@@ -56,7 +56,7 @@ export default withRestApi(new TodoRepository(), {
     }
 
     const id = req.params.id;
-    return repo.partialUpdate(id, { title, content, completed });
+    return repo.partialUpdate(id, { title, content, completed, color });
   },
   customEndpoints: {
     post: {

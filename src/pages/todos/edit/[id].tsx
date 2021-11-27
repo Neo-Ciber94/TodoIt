@@ -1,13 +1,9 @@
-import { TodoForm } from "src/components/TodoForm";
-import { Button, Container } from "@mui/material";
-import { PageTitle } from "src/components/PageTitle";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { ITodo } from "@shared/models/todo.model";
 import { PromiseUtils } from "@shared/utils/PromiseUtilts";
+import { CreateOrEditTodoPage } from "src/components/CreateOrEditTodoPage";
 
 const todoClient = new TodoApiClient();
 
@@ -29,45 +25,23 @@ export default function EditTodo({
   todo,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  const { id } = router.query;
 
   return (
-    <Container className="pt-4">
-      <div className="sm:px-40 px-0 ">
-        <Link href="/" passHref>
-          <Button
-            variant="contained"
-            className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left"
-          >
-            <ArrowBackIcon />
-            Back
-          </Button>
-        </Link>
-      </div>
-
-      <PageTitle
-        title="Edit Todo"
-        center
-        className="translate-x-[-140%] animate-slide-left"
-      />
-      <TodoForm
-        initialValue={todo}
-        buttonText="Edit Todo"
-        onSubmit={async (data) => {
-          try {
-            await todoClient.update(String(id), {
-              ...todo,
-              ...data,
-            });
-
-            await PromiseUtils.delay(1000);
-            router.push("/");
-          } catch (e) {
-            // TODO: Shows the error to the user
-            console.error(e);
-          }
-        }}
-      />
-    </Container>
+    <CreateOrEditTodoPage
+      todo={todo}
+      title={"Edit Todo"}
+      submitText={"Edit Todo"}
+      onSubmit={async (data) => {
+        try {
+          const { id } = router.query;
+          await todoClient.update(String(id), data);
+          await PromiseUtils.delay(1000);
+          router.push("/");
+        } catch (e) {
+          // TODO: Shows the error to the user
+          console.error(e);
+        }
+      }}
+    />
   );
 }

@@ -24,6 +24,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { TransitionProps } from "@mui/material/transitions";
+import { PASTEL_COLORS } from "@shared/config";
 
 const todoClient = new TodoApiClient();
 
@@ -47,8 +48,6 @@ const CLASS_COLORS = [
   "bg-blue-100",
   "bg-pink-100",
 ];
-
-const COLORS = ["#FEF3C7", "#D1FAE5", "#FEE2E2", "#DBEAFE", "#FCE7F3"];
 
 export const getServerSideProps = async () => {
   const pageResult = await todoClient.getAll();
@@ -85,7 +84,7 @@ function Page({
   const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
     const { id } = todo;
     const colorIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-    const color = COLORS[colorIndex % COLORS.length];
+    const color = PASTEL_COLORS[colorIndex % PASTEL_COLORS.length];
 
     handleClickOpen();
     setDialogColor(color);
@@ -164,7 +163,6 @@ function Page({
               width="100%"
               delayIndex={index % 10}
               todo={todo}
-              colorClass={colorClass}
               onDelete={onDeleteTodo}
               onToggle={onToggleTodo}
               onClick={onTodoClick}

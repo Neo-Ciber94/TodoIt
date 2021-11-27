@@ -5,14 +5,12 @@ import { useEffect } from "react";
 import { NavLink } from "./NavLink";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { usePageColor } from "src/contexts/PageColorContext";
 
 export interface TodoNoteProps {
   todo: ITodo;
   height?: number | string;
   width?: number | string;
   delayIndex?: number;
-  colorClass?: string;
   onClick?: (todo: ITodo) => void;
   onDelete: (todo: ITodo) => void;
   onToggle: (todo: ITodo) => Promise<ITodo> | ITodo;
@@ -25,7 +23,6 @@ export default function TodoNote({
   height,
   width,
   delayIndex,
-  colorClass,
   onDelete,
   onToggle,
   onClick,
@@ -39,7 +36,6 @@ export default function TodoNote({
   const [isVisible, setIsVisible] = React.useState(false);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
-  const { setPageColor } = usePageColor();
 
   useEffect(() => {
     if (ref.current) {
@@ -53,10 +49,10 @@ export default function TodoNote({
   return (
     <Paper
       ref={ref}
-      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer ${colorClass} ${
+      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer ${
         isVisible ? "note-appear-anim" : ""
       }`}
-      sx={{ width, height }}
+      sx={{ width, height, backgroundColor: todo.color }}
       onClick={() => {
         if (onClick) {
           onClick(todo);
