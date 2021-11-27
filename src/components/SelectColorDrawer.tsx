@@ -12,11 +12,15 @@ export function SelectColorDrawer(props: SelectColorDrawerProps) {
   const { open, colors, onClose, onColorSelected } = props;
 
   return (
-    <Drawer anchor="bottom" open={open} onClose={onClose}>
-      <div
-        className="flex flex-row justify-center items-center bg-gray-800 p-8"
-        style={{ height: "100%" }}
-      >
+    <Drawer
+      PaperProps={{
+        className: "bg-gray-800",
+      }}
+      anchor="bottom"
+      open={open}
+      onClose={onClose}
+    >
+      <div className="flex flex-row justify-center items-center p-8 h-full w-full">
         {colors.map((color) => (
           <IconButton
             key={color}
@@ -30,7 +34,7 @@ export function SelectColorDrawer(props: SelectColorDrawerProps) {
             <CircleIcon
               sx={{
                 color,
-                fontSize: 70,
+                fontSize: [30, 40, 50, 60, 70],
               }}
             />
           </IconButton>
