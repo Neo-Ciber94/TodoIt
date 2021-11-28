@@ -1,6 +1,6 @@
 import { InferGetServerSidePropsType } from "next";
 import TodoNote from "src/components/TodoNote";
-import { Container, Box, CircularProgress, Button, Grow } from "@mui/material";
+import { Container, Box, CircularProgress, Button } from "@mui/material";
 import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
@@ -12,27 +12,9 @@ import Link from "next/link";
 import { PageTitle } from "src/components/PageTitle";
 import { ITodo } from "@shared/models/todo.model";
 import { useRouter } from "next/router";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import { TransitionProps } from "@mui/material/transitions";
-import { PASTEL_COLORS } from "@shared/config";
 
 const PAGE_SIZE = 30;
 const todoClient = new TodoApiClient();
-
-type DialogTransitionProps = TransitionProps & {
-  children: React.ReactElement<any, any>;
-};
-
-const Transition = React.forwardRef(function Transition(
-  props: DialogTransitionProps,
-  ref
-) {
-  return <Grow ref={ref} {...props} timeout={200} />;
-});
 
 export const getServerSideProps = async () => {
   const pageResult = await todoClient.getAll({
@@ -55,18 +37,7 @@ function Page({
   const [isLoading, setIsLoading] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const firstRender = React.useRef(true);
-  const [dialogColor, setDialogColor] = React.useState("");
-  const [selectedTodo, setSelectedTodo] = React.useState<ITodo | null>(null);
-  const [open, setOpen] = React.useState(false);
   const router = useRouter();
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
     try {
@@ -186,67 +157,7 @@ function Page({
           <Loading />
         </Box>
       )}
-
-      <DeleteTodoDialog
-        open={open}
-        onClose={handleClose}
-        color={dialogColor}
-        todo={selectedTodo!}
-      />
     </Container>
-  );
-}
-
-interface DeleteTodoDialogProps {
-  open: boolean;
-  todo: ITodo;
-  color?: string;
-  onClose: () => void;
-}
-
-function DeleteTodoDialog({
-  open,
-  onClose,
-  todo,
-  color,
-}: DeleteTodoDialogProps) {
-  return (
-    <Dialog
-      open={open}
-      TransitionComponent={Transition}
-      keepMounted
-      onClose={onClose}
-      aria-describedby="alert-dialog-slide-description"
-      PaperProps={
-        {
-          // sx: {
-          //   background: color,
-          // },
-        }
-      }
-    >
-      <DialogTitle>Delete Todo?</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          {`Are you sure about deleting `}
-          <strong>{todo?.title}</strong>?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={onClose}
-          className="text-black hover:bg-black font-bold hover:bg-opacity-10"
-        >
-          Delete
-        </Button>
-        <Button
-          onClick={onClose}
-          className="text-black hover:bg-black font-bold hover:bg-opacity-10"
-        >
-          Cancel
-        </Button>
-      </DialogActions>
-    </Dialog>
   );
 }
 
