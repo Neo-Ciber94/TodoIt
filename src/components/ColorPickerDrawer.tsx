@@ -1,14 +1,14 @@
 import CircleIcon from "@mui/icons-material/Circle";
 import { IconButton, Drawer } from "@mui/material";
 
-export interface SelectColorDrawerProps {
+export interface ColorPickerDrawerProps {
   open: boolean;
   colors: string[];
   onClose?: () => void;
   onColorSelected: (color: string) => void;
 }
 
-export function SelectColorDrawer(props: SelectColorDrawerProps) {
+export function ColorPickerDrawer(props: ColorPickerDrawerProps) {
   const { open, colors, onClose, onColorSelected } = props;
 
   return (

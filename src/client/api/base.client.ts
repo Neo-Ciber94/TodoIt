@@ -63,4 +63,9 @@ export class BaseApiClient<T, TKey> {
     const result = await this.client.patch(`/${id}`, item, config);
     return result.data;
   }
+
+  async delete(id: TKey, config: AxiosRequestConfig<T> = {}): Promise<T> {
+    const result = await this.client.delete(`/${id}`, config);
+    return result.data;
+  }
 }

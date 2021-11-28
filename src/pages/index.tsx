@@ -1,12 +1,6 @@
 import { InferGetServerSidePropsType } from "next";
 import TodoNote from "src/components/TodoNote";
-import {
-  Container,
-  Box,
-  CircularProgress,
-  Button,
-  Grow,
-} from "@mui/material";
+import { Container, Box, CircularProgress, Button, Grow } from "@mui/material";
 import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
@@ -26,6 +20,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { TransitionProps } from "@mui/material/transitions";
 import { PASTEL_COLORS } from "@shared/config";
 
+const PAGE_SIZE = 30;
 const todoClient = new TodoApiClient();
 
 type DialogTransitionProps = TransitionProps & {
@@ -39,18 +34,10 @@ const Transition = React.forwardRef(function Transition(
   return <Grow ref={ref} {...props} timeout={200} />;
 });
 
-// Currently heights are hardcored
-const HEIGHTS = [200, 300, 400, 200, 500, 200, 190, 200, 400, 200, 300];
-const CLASS_COLORS = [
-  "bg-yellow-100",
-  "bg-green-100",
-  "bg-red-100",
-  "bg-blue-100",
-  "bg-pink-100",
-];
-
 export const getServerSideProps = async () => {
-  const pageResult = await todoClient.getAll();
+  const pageResult = await todoClient.getAll({
+    pageSize: PAGE_SIZE,
+  });
   return { props: { pageResult } };
 };
 
@@ -82,13 +69,12 @@ function Page({
   };
 
   const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
-    const { id } = todo;
-    const colorIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-    const color = PASTEL_COLORS[colorIndex % PASTEL_COLORS.length];
-
-    handleClickOpen();
-    setDialogColor(color);
-    setSelectedTodo(todo);
+    try {
+      await todoClient.delete(todo.id);
+      setTodos(todos.filter((t) => t.id !== todo.id));
+    } catch (e) {
+      console.error(e);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -113,7 +99,10 @@ function Page({
     setIsLoading(true);
     const searchTodos = async () => {
       try {
-        const result = await todoClient.search({ search: searchString });
+        const result = await todoClient.search({
+          search: searchString,
+          pageSize: PAGE_SIZE,
+        });
         setTodos(result.data);
       } finally {
         setIsLoading(false);
@@ -153,13 +142,9 @@ function Page({
       {isLoading && <Loading />}
       <MasonryGrid>
         {todos.map((todo, index) => {
-          const { id } = todo;
-          const colorIndex = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-          const colorClass = CLASS_COLORS[colorIndex % CLASS_COLORS.length];
-
           return (
             <TodoNote
-              key={id}
+              key={todo.id}
               width="100%"
               delayIndex={index % 10}
               todo={todo}
@@ -177,11 +162,17 @@ function Page({
               setIsMoreLoading(true);
 
               try {
-                const newTodos = await todoClient.getAll({ page: page + 1 });
+                const newTodos = await todoClient.search({
+                  search: searchString,
+                  page: page + 1,
+                  pageSize: PAGE_SIZE,
+                });
                 await new Promise((resolve) => setTimeout(resolve, 1000));
 
                 setTodos([...todos, ...newTodos.data]);
                 setPage(newTodos.currentPage);
+              } catch (e) {
+                console.error(e);
               } finally {
                 setIsMoreLoading(false);
               }

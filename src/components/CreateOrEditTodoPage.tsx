@@ -5,10 +5,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
 import PaletteIcon from "@mui/icons-material/Palette";
 import React, { useState } from "react";
-import { PASTEL_COLORS, randomPastelColor } from "@shared/config";
-import { usePageColor } from "src/contexts/PageColorContext";
 import { ITodo } from "@shared/models/todo.model";
-import { SelectColorDrawer } from "src/components/SelectColorDrawer";
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
@@ -23,10 +20,7 @@ export function CreateOrEditTodoPage({
   title: pageTitleText,
   submitText: submitButtonText,
 }: CreateOrEditTodoPageProps) {
-  const [openColorSelector, setOpenColorSelector] = useState(false);
-  const { pageColor, setPageColor } = usePageColor(
-    todo?.color || randomPastelColor()
-  );
+  const [openColorPicker, setOpenColorPicker] = useState(false);
 
   return (
     <>
@@ -44,7 +38,7 @@ export function CreateOrEditTodoPage({
           <IconButton
             title="Change Color"
             onClick={() => {
-              setOpenColorSelector(true);
+              setOpenColorPicker(true);
             }}
           >
             <PaletteIcon sx={{ color: "black" }} />
@@ -59,25 +53,11 @@ export function CreateOrEditTodoPage({
         <TodoForm
           initialValue={todo}
           buttonText={submitButtonText}
-          onSubmit={(data) => {
-            onSubmit({
-              ...todo,
-              ...data,
-              color: pageColor,
-            });
-          }}
+          openColorPicker={openColorPicker}
+          onCloseColorPicker={() => setOpenColorPicker(false)}
+          onSubmit={(data) => onSubmit(data)}
         />
       </Container>
-      <SelectColorDrawer
-        colors={PASTEL_COLORS}
-        open={openColorSelector}
-        onClose={() => {
-          setOpenColorSelector(false);
-        }}
-        onColorSelected={(color) => {
-          setPageColor(color);
-        }}
-      />
     </>
   );
 }
