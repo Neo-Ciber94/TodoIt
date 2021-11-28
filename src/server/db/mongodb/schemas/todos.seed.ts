@@ -1,7 +1,6 @@
 import { randomPastelColor } from "@shared/config";
 import fs from "fs";
 import path from "path";
-import { connectMongoDb } from "../connectMongoDb";
 import Todo from "./todo.schema";
 import { TodoDocument } from "./todo.types";
 
