@@ -1,15 +1,17 @@
-import CircleIcon from "@mui/icons-material/Circle";
-import { IconButton, Drawer } from "@mui/material";
+import { IconButton, Drawer, Box } from "@mui/material";
 
 export interface ColorPickerDrawerProps {
   open: boolean;
+  selectedColor?: string;
   colors: string[];
   onClose?: () => void;
   onColorSelected: (color: string) => void;
 }
 
 export function ColorPickerDrawer(props: ColorPickerDrawerProps) {
-  const { open, colors, onClose, onColorSelected } = props;
+  const { open, selectedColor, colors, onClose, onColorSelected } = props;
+
+  const circleSizes = [30, 40, 50, 60, 70];
 
   return (
     <Drawer
@@ -31,12 +33,17 @@ export function ColorPickerDrawer(props: ColorPickerDrawerProps) {
               }
             }}
           >
-            <CircleIcon
+            <Box
+              className={`${
+                selectedColor === color ? "ring-[5px] ring-gray-500" : ""
+              }`}
               sx={{
-                color,
-                fontSize: [30, 40, 50, 60, 70],
+                backgroundColor: color,
+                width: circleSizes,
+                height: circleSizes,
+                borderRadius: "50%",
               }}
-            />
+            ></Box>
           </IconButton>
         ))}
       </div>

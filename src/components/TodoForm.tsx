@@ -57,7 +57,7 @@ export function TodoForm({
     defaultValues: initialValue,
   });
 
-  const { setPageColor } = usePageColor(
+  const { pageColor, setPageColor } = usePageColor(
     initialValue?.color || randomPastelColor()
   );
   const showLoading = isSubmitting || isSubmitSuccessful;
@@ -108,8 +108,9 @@ export function TodoForm({
         </Button>
       </form>
       <ColorPickerDrawer
-        colors={PASTEL_COLORS}
         open={openColorPicker}
+        selectedColor={pageColor}
+        colors={PASTEL_COLORS}
         onClose={onCloseColorPicker}
         onColorSelected={(color) => {
           setPageColor(color);
