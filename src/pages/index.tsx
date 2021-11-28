@@ -90,7 +90,7 @@ function Page({
         <Link href="/todos/add" passHref>
           <Button
             variant="contained"
-            className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left"
+            className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left w-full sm:w-auto"
           >
             <AddIcon />
             New Todo
