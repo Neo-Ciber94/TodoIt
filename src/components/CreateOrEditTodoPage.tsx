@@ -6,6 +6,7 @@ import Link from "next/link";
 import PaletteIcon from "@mui/icons-material/Palette";
 import React, { useState } from "react";
 import { ITodo } from "@shared/models/todo.model";
+import { useAnimationClasses } from "src/hooks/useAnimationClasses";
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
@@ -21,6 +22,7 @@ export function CreateOrEditTodoPage({
   submitText: submitButtonText,
 }: CreateOrEditTodoPageProps) {
   const [openColorPicker, setOpenColorPicker] = useState(false);
+  const animations = useAnimationClasses();
 
   return (
     <>
@@ -29,7 +31,7 @@ export function CreateOrEditTodoPage({
           <Link href="/" passHref>
             <Button
               variant="contained"
-              className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left"
+              className={`bg-black hover:bg-gray-800 ${animations.slideLeftFadeIn}`}
             >
               <ArrowBackIcon />
               Back

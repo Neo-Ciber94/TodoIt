@@ -7,9 +7,14 @@ import {
 } from "@mui/material";
 import { PASTEL_COLORS, randomPastelColor } from "@shared/config";
 import { ITodo } from "@shared/models/todo.model";
+import { ArrayUtils } from "@shared/utils/ArrayUtils";
 import { useForm } from "react-hook-form";
 import { usePageColor } from "src/contexts/PageColorContext";
+import { useAnimationClasses } from "src/hooks/useAnimationClasses";
 import { ColorPickerDrawer } from "./ColorPickerDrawer";
+
+const delayMs = ArrayUtils.range(1, 3).map((i) => i * 100);
+const delay = delayMs.map((ms) => `${ms}ms !important`);
 
 type TodoFormData = Partial<ITodo>;
 
@@ -57,6 +62,7 @@ export function TodoForm({
     defaultValues: initialValue,
   });
 
+  const animations = useAnimationClasses();
   const { pageColor, setPageColor } = usePageColor(
     initialValue?.color || randomPastelColor()
   );
@@ -70,7 +76,8 @@ export function TodoForm({
       >
         <FormControl
           variant="standard"
-          className="mt-8 mb-2 translate-x-[-180%] animate-slide-left"
+          sx={{ animationDelay: delay[0] }}
+          className={`mt-8 mb-2 ${animations.slideLeftFadeIn}`}
         >
           <StyledTextField
             label="Title"
@@ -83,7 +90,8 @@ export function TodoForm({
 
         <FormControl
           variant="standard"
-          className="mt-8 mb-2 translate-x-[-220%] animate-slide-left"
+          sx={{ animationDelay: delay[1] }}
+          className={`mt-8 mb-2 ${animations.slideLeftFadeIn}`}
         >
           <StyledTextField
             label="Content"
@@ -99,7 +107,8 @@ export function TodoForm({
           type="submit"
           variant="contained"
           disabled={showLoading}
-          className="flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2 translate-x-[-260%] animate-slide-left"
+          sx={{ animationDelay: delay[2] }}
+          className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2 ${animations.slideLeftFadeIn}`}
         >
           {buttonText}
           {showLoading && (

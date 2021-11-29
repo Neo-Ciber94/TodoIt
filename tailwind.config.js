@@ -9,15 +9,8 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
-      keyframes: {
-        slideLeft: {
-          "0%": { transform: "translateX(initial)", opacity: 0 },
-          "100%": { transform: "translateX(0%)", opacity: 1 },
-        },
-      },
-      animation: {
-        "slide-left": "slideLeft 0.5s ease forwards",
-      },
+      keyframes: {},
+      animation: {},
     },
     colors: {
       ...colors,
@@ -26,7 +19,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [
-    require('@tailwindcss/line-clamp')
-  ],
+  plugins: [require("@tailwindcss/line-clamp")],
 };
