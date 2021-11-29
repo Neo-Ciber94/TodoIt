@@ -1,6 +1,12 @@
 import { InferGetServerSidePropsType } from "next";
 import TodoNote from "src/components/TodoNote";
-import { Container, Box, CircularProgress, Button } from "@mui/material";
+import {
+  Container,
+  Box,
+  CircularProgress,
+  Button,
+  Typography,
+} from "@mui/material";
 import React, { useEffect } from "react";
 import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
@@ -12,6 +18,7 @@ import Link from "next/link";
 import { PageTitle } from "src/components/PageTitle";
 import { ITodo } from "@shared/models/todo.model";
 import { useRouter } from "next/router";
+import { Center } from "src/components/Center";
 
 const PAGE_SIZE = 30;
 const todoClient = new TodoApiClient();
@@ -29,15 +36,25 @@ function Page({
   const { data, currentPage, totalPages } = pageResult;
   const hasMoreItems = currentPage < totalPages;
 
-  //const swal = useSwal();
   const [todos, setTodos] = React.useState(data);
   const [searchTerm, setSearchTerm] = React.useState("");
   const searchString = useDebounce(searchTerm, 500);
-  const [isMoreLoading, setIsMoreLoading] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const firstRender = React.useRef(true);
   const router = useRouter();
+
+  const NoTodosText = () => {
+    if (data.length === 0) {
+      return <CenterText text="No Todos" />;
+    }
+
+    if (todos.length === 0) {
+      return <CenterText text="No Todos Found" />;
+    }
+
+    return <></>;
+  };
 
   const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
     try {
@@ -85,7 +102,7 @@ function Page({
   }, [searchString]);
 
   return (
-    <Container className="pt-4 pb-16">
+    <Container className="pt-4">
       <div className="flex flex-row justify-start">
         <Link href="/todos/add" passHref>
           <Button
@@ -110,7 +127,7 @@ function Page({
           onSearch={setSearchTerm}
         />
       </div>
-      {isLoading && <Loading />}
+      {!isLoading && <NoTodosText />}
       <MasonryGrid>
         {todos.map((todo, index) => {
           return (
@@ -129,8 +146,8 @@ function Page({
       <ViewInterceptor
         inView={async (inView) => {
           if (inView) {
-            if (hasMoreItems && !isMoreLoading) {
-              setIsMoreLoading(true);
+            if (hasMoreItems && !isLoading) {
+              setIsLoading(true);
 
               try {
                 const newTodos = await todoClient.search({
@@ -145,19 +162,41 @@ function Page({
               } catch (e) {
                 console.error(e);
               } finally {
-                setIsMoreLoading(false);
+                setIsLoading(false);
               }
             }
           }
         }}
       />
 
-      {isMoreLoading && (
-        <Box className="flex flex-row justify-center p-3 fixed bottom-0 left-0 right-0">
-          <Loading />
-        </Box>
-      )}
+      <Box
+        className={`flex flex-row justify-center py-8 ${
+          isLoading ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <Loading />
+      </Box>
     </Container>
+  );
+}
+
+interface CenterTextProps {
+  text: string;
+}
+
+function CenterText({ text }: CenterTextProps) {
+  return (
+    <Center>
+      <Typography
+        variant="h4"
+        sx={{
+          userSelect: "none",
+          opacity: 0.3,
+        }}
+      >
+        {text}
+      </Typography>
+    </Center>
   );
 }
 
