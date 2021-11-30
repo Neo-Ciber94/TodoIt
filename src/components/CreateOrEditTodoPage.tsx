@@ -1,12 +1,11 @@
 import { TodoForm } from "src/components/TodoForm";
-import { Button, Container, IconButton } from "@mui/material";
+import { Box, Button, Container, IconButton } from "@mui/material";
 import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
 import PaletteIcon from "@mui/icons-material/Palette";
 import React, { useState } from "react";
 import { ITodo } from "@shared/models/todo.model";
-import { useAnimationClasses } from "src/hooks/useAnimationClasses";
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
@@ -22,7 +21,6 @@ export function CreateOrEditTodoPage({
   submitText: submitButtonText,
 }: CreateOrEditTodoPageProps) {
   const [openColorPicker, setOpenColorPicker] = useState(false);
-  const animations = useAnimationClasses();
 
   return (
     <>
@@ -31,7 +29,8 @@ export function CreateOrEditTodoPage({
           <Link href="/" passHref>
             <Button
               variant="contained"
-              className={`bg-black hover:bg-gray-800 ${animations.slideLeftFadeIn}`}
+              sx={{ animationDelay: "100ms !important" }}
+              className={`bg-black hover:bg-gray-800 slideLeftFadeIn`}
             >
               <ArrowBackIcon />
               Back
@@ -47,11 +46,13 @@ export function CreateOrEditTodoPage({
           </IconButton>
         </div>
 
-        <PageTitle
-          title={pageTitleText}
-          center
-          className="translate-x-[-140%] animate-slide-left"
-        />
+        <Box
+          className="slideLeftFadeIn"
+          sx={{ animationDelay: "200ms !important" }}
+        >
+          <PageTitle title={pageTitleText} center />
+        </Box>
+
         <TodoForm
           initialValue={todo}
           buttonText={submitButtonText}

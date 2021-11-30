@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { ChangeEvent } from "react";
-import { TextField } from "@mui/material";
+import { Theme, TextField, SxProps } from "@mui/material";
 
 const StyledTextField = styled(TextField)({
   "& label.Mui-focused": {
@@ -26,15 +26,17 @@ export interface SearchTextFieldProps {
   value: string;
   onSearch: (term: string) => void;
   className?: string;
+  sx?: SxProps<Theme>
 }
 
-export function SearchTextField({ value, onSearch, className }: SearchTextFieldProps) {
+export function SearchTextField({ sx, value, onSearch, className }: SearchTextFieldProps) {
   return (
     <StyledTextField
       label="Search"
       variant="standard"
       className={`w-full md:w-1/2 ${className || ""}`}
       value={value}
+      sx={sx}
       onKeyPress={(e) => {
         if (e.key === "Enter") {
           onSearch(value);

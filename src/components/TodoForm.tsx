@@ -10,7 +10,6 @@ import { ITodo } from "@shared/models/todo.model";
 import { ArrayUtils } from "@shared/utils/ArrayUtils";
 import { useForm } from "react-hook-form";
 import { usePageColor } from "src/contexts/PageColorContext";
-import { useAnimationClasses } from "src/hooks/useAnimationClasses";
 import { ColorPickerDrawer } from "./ColorPickerDrawer";
 
 const delayMs = ArrayUtils.range(1, 3).map((i) => i * 100);
@@ -62,7 +61,6 @@ export function TodoForm({
     defaultValues: initialValue,
   });
 
-  const animations = useAnimationClasses();
   const { pageColor, setPageColor } = usePageColor(
     initialValue?.color || randomPastelColor()
   );
@@ -77,7 +75,7 @@ export function TodoForm({
         <FormControl
           variant="standard"
           sx={{ animationDelay: delay[0] }}
-          className={`mt-8 mb-2 ${animations.slideLeftFadeIn}`}
+          className={`mt-8 mb-2 slideLeftFadeIn`}
         >
           <StyledTextField
             label="Title"
@@ -91,7 +89,7 @@ export function TodoForm({
         <FormControl
           variant="standard"
           sx={{ animationDelay: delay[1] }}
-          className={`mt-8 mb-2 ${animations.slideLeftFadeIn}`}
+          className={`mt-8 mb-2 slideLeftFadeIn`}
         >
           <StyledTextField
             label="Content"
@@ -108,7 +106,7 @@ export function TodoForm({
           variant="contained"
           disabled={showLoading}
           sx={{ animationDelay: delay[2] }}
-          className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2 ${animations.slideLeftFadeIn}`}
+          className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2 slideLeftFadeIn`}
         >
           {buttonText}
           {showLoading && (

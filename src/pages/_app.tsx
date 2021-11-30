@@ -1,4 +1,5 @@
 import "../styles/globals.css";
+import "../styles/animations.css";
 import "../styles/TodoNote.css";
 import type { AppProps } from "next/app";
 import { Layout } from "src/components/Layout";

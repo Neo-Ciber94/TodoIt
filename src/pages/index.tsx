@@ -107,22 +107,25 @@ function Page({
         <Link href="/todos/add" passHref>
           <Button
             variant="contained"
-            className="bg-black hover:bg-gray-800 translate-x-[-100%] animate-slide-left w-full sm:w-auto"
+            sx={{ animationDelay: "100ms !important" }}
+            className={`bg-black hover:bg-gray-800 w-full sm:w-auto slideLeftFadeIn`}
           >
             <AddIcon />
             New Todo
           </Button>
         </Link>
       </div>
-      <PageTitle
-        title="Todos"
-        className="translate-x-[-140%] animate-slide-left"
-        center
-      />
+      <Box
+        sx={{ animationDelay: "200ms !important" }}
+        className="slideLeftFadeIn"
+      >
+        <PageTitle title="Todos" center />
+      </Box>
       <div className="flex flex-row justify-center p-3 mb-4">
         <SearchTextField
           key={"search-input"}
-          className="translate-x-[-180%] animate-slide-left"
+          sx={{ animationDelay: "300ms !important" }}
+          className="slideLeftFadeIn"
           value={searchTerm}
           onSearch={setSearchTerm}
         />
