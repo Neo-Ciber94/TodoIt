@@ -6,6 +6,8 @@ import Link from "next/link";
 import PaletteIcon from "@mui/icons-material/Palette";
 import React, { useState } from "react";
 import { ITodo } from "@shared/models/todo.model";
+import { useSpring, animated } from "react-spring";
+import { animationSprings } from "src/animations/springs";
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
@@ -21,21 +23,25 @@ export function CreateOrEditTodoPage({
   submitText: submitButtonText,
 }: CreateOrEditTodoPageProps) {
   const [openColorPicker, setOpenColorPicker] = useState(false);
+  const backButtonSpring = useSpring(animationSprings.slideLeftFadeIn(0));
+  const titleSpring = useSpring(animationSprings.slideLeftFadeIn(100));
 
   return (
     <>
       <Container className="pt-4">
         <div className="sm:px-40 px-0 flex flex-row justify-between">
-          <Link href="/" passHref>
-            <Button
-              variant="contained"
-              sx={{ animationDelay: "100ms !important" }}
-              className={`bg-black hover:bg-gray-800 slideLeftFadeIn`}
-            >
-              <ArrowBackIcon />
-              Back
-            </Button>
-          </Link>
+          <animated.div style={backButtonSpring}>
+            <Link href="/" passHref>
+              <Button
+                variant="contained"
+                className={`bg-black hover:bg-gray-800`}
+              >
+                <ArrowBackIcon />
+                Back
+              </Button>
+            </Link>
+          </animated.div>
+
           <IconButton
             title="Change Color"
             onClick={() => {
@@ -46,12 +52,9 @@ export function CreateOrEditTodoPage({
           </IconButton>
         </div>
 
-        <Box
-          className="slideLeftFadeIn"
-          sx={{ animationDelay: "200ms !important" }}
-        >
+        <animated.div style={titleSpring}>
           <PageTitle title={pageTitleText} center />
-        </Box>
+        </animated.div>
 
         <TodoForm
           initialValue={todo}

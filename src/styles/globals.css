@@ -1,53 +1,6 @@
-@import "@sweetalert2/theme-material-ui/material-ui.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer utilities {
-  .line-clamp-7 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 7;
-  }
-
-  .line-clamp-8 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 8;
-  }
-
-  .line-clamp-9 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 9;
-  }
-
-  .line-clamp-10 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 10;
-  }
-
-  .line-clamp-15 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 15;
-  }
-
-  .line-clamp-20 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 20;
-  }
-}
-
 
 body.swal2-shown {
   overflow: auto !important;

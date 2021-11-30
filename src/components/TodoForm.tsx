@@ -11,9 +11,10 @@ import { ArrayUtils } from "@shared/utils/ArrayUtils";
 import { useForm } from "react-hook-form";
 import { usePageColor } from "src/contexts/PageColorContext";
 import { ColorPickerDrawer } from "./ColorPickerDrawer";
+import { useSprings, animated } from "react-spring";
+import { animationSprings } from "src/animations/springs";
 
-const delayMs = ArrayUtils.range(1, 3).map((i) => i * 100);
-const delay = delayMs.map((ms) => `${ms}ms !important`);
+const AnimatedFormControl = animated(FormControl);
 
 type TodoFormData = Partial<ITodo>;
 
@@ -61,6 +62,9 @@ export function TodoForm({
     defaultValues: initialValue,
   });
 
+  const [springs, _] = useSprings(3, (index) =>
+    animationSprings.slideLeftFadeIn((index + 2) * 100)
+  );
   const { pageColor, setPageColor } = usePageColor(
     initialValue?.color || randomPastelColor()
   );
@@ -72,47 +76,40 @@ export function TodoForm({
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col sm:px-40 px-0"
       >
-        <FormControl
-          variant="standard"
-          sx={{ animationDelay: delay[0] }}
-          className={`mt-8 mb-2 slideLeftFadeIn`}
-        >
-          <StyledTextField
-            label="Title"
-            variant="standard"
-            {...register("title", { required: true })}
-            error={!!errors.title}
-            helperText={errors.title && "Title is required"}
-          />
-        </FormControl>
+          <AnimatedFormControl style={springs[0]} variant="standard" className={`mt-8 mb-2`}>
+            <StyledTextField
+              label="Title"
+              variant="standard"
+              {...register("title", { required: true })}
+              error={!!errors.title}
+              helperText={errors.title && "Title is required"}
+            />
+          </AnimatedFormControl>
 
-        <FormControl
-          variant="standard"
-          sx={{ animationDelay: delay[1] }}
-          className={`mt-8 mb-2 slideLeftFadeIn`}
-        >
-          <StyledTextField
-            label="Content"
-            variant="outlined"
-            multiline
-            minRows={4}
-            maxRows={8}
-            {...register("content")}
-          />
-        </FormControl>
+          <AnimatedFormControl style={springs[1]} variant="standard" className={`mt-8 mb-2`}>
+            <StyledTextField
+              label="Content"
+              variant="outlined"
+              multiline
+              minRows={4}
+              maxRows={8}
+              {...register("content")}
+            />
+          </AnimatedFormControl>
 
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={showLoading}
-          sx={{ animationDelay: delay[2] }}
-          className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2 slideLeftFadeIn`}
-        >
-          {buttonText}
-          {showLoading && (
-            <CircularProgress className="text-white mx-4" size={20} />
-          )}
-        </Button>
+        <animated.div style={springs[2]}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={showLoading}
+            className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2`}
+          >
+            {buttonText}
+            {showLoading && (
+              <CircularProgress className="text-white mx-4" size={20} />
+            )}
+          </Button>
+        </animated.div>
       </form>
       <ColorPickerDrawer
         open={openColorPicker}

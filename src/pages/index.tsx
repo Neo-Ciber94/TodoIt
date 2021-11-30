@@ -19,6 +19,8 @@ import { PageTitle } from "src/components/PageTitle";
 import { ITodo } from "@shared/models/todo.model";
 import { useRouter } from "next/router";
 import { Center } from "src/components/Center";
+import { useSprings, animated } from "react-spring";
+import { animationSprings } from "src/animations/springs";
 
 const PAGE_SIZE = 30;
 const todoClient = new TodoApiClient();
@@ -35,6 +37,9 @@ function Page({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { data, currentPage, totalPages } = pageResult;
   const hasMoreItems = currentPage < totalPages;
+  const [springs, _] = useSprings(3, (index) =>
+    animationSprings.slideLeftFadeIn(index * 100)
+  );
 
   const [todos, setTodos] = React.useState(data);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -105,31 +110,30 @@ function Page({
     <Container className="pt-4">
       <div className="flex flex-row justify-start">
         <Link href="/todos/add" passHref>
-          <Button
-            variant="contained"
-            sx={{ animationDelay: "100ms !important" }}
-            className={`bg-black hover:bg-gray-800 w-full sm:w-auto slideLeftFadeIn`}
-          >
-            <AddIcon />
-            New Todo
-          </Button>
+          <animated.div style={springs[0]}>
+            <Button
+              variant="contained"
+              className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
+            >
+              <AddIcon />
+              New Todo
+            </Button>
+          </animated.div>
         </Link>
       </div>
-      <Box
-        sx={{ animationDelay: "200ms !important" }}
-        className="slideLeftFadeIn"
-      >
+      <animated.div style={springs[1]}>
         <PageTitle title="Todos" center />
-      </Box>
-      <div className="flex flex-row justify-center p-3 mb-4">
-        <SearchTextField
-          key={"search-input"}
-          sx={{ animationDelay: "300ms !important" }}
-          className="slideLeftFadeIn"
-          value={searchTerm}
-          onSearch={setSearchTerm}
-        />
-      </div>
+      </animated.div>
+      <animated.div style={springs[2]}>
+        <div className="flex flex-row justify-center p-3 mb-4">
+          <SearchTextField
+            key={"search-input"}
+            value={searchTerm}
+            onSearch={setSearchTerm}
+          />
+        </div>
+      </animated.div>
+
       {!isLoading && <NoTodosText />}
       <MasonryGrid>
         {todos.map((todo, index) => {
