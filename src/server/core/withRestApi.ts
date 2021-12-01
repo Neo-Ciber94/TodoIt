@@ -1,4 +1,4 @@
-import { mongodb } from "@server/db/mongodb/middleware";
+import mongodb from "@server/db/mongodb/middleware";
 import morgan from "morgan";
 import { IRepository, PageResult } from "@server/repositories/base/repository";
 import { buildPaginationOptions } from "@server/repositories/utils";

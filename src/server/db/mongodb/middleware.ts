@@ -7,7 +7,7 @@ import { connectMongoDb } from "./connectMongoDb";
  * A middleware to connect to the MongoDB database.
  * @returns {Middleware} A mongodb connection middleware.
  */
-export function mongodb() : Middleware<NextApiRequest, NextApiResponse> {
+export default function mongodb() : Middleware<NextApiRequest, NextApiResponse> {
   return async (_req, _res, next) => {
     await connectMongoDb();
     next();
