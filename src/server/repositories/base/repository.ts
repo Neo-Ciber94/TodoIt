@@ -1,3 +1,10 @@
+export const EMPTY_PAGE_RESULT: PageResult<any> = Object.freeze({
+  data: [],
+  totalItems: 0,
+  currentPage: 0,
+  pageSize: 0,
+  totalPages: 0,
+});
 export interface PageResult<T> {
   data: T[];
   totalItems: number;
@@ -37,6 +44,7 @@ export interface IReadRepository<TEntity> {
 
 export interface IWriteRepository<TEntity> {
   create(entity: Partial<TEntity>): Promise<TEntity>;
+  createMany(entities: Partial<TEntity>[]): Promise<TEntity[]>;
   update(id: string, entity: Partial<TEntity>): Promise<TEntity>;
   partialUpdate(id: string, entity: Partial<TEntity>): Promise<TEntity>;
   delete(id: string): Promise<TEntity>;

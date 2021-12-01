@@ -21,6 +21,7 @@ import { useRouter } from "next/router";
 import { Center } from "src/components/Center";
 import { useSprings, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 const PAGE_SIZE = 30;
 const todoClient = new TodoApiClient();
@@ -108,18 +109,27 @@ function Page({
 
   return (
     <Container className="pt-4">
-      <div className="flex flex-row justify-start">
+      <div className="flex flex-row justify-start gap-2">
         <Link href="/todos/add" passHref>
           <animated.div style={springs[0]}>
             <Button
               variant="contained"
               className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
             >
-              <AddIcon />
-              New Todo
+              <AddIcon className="mr-2" />
+              <span>New Todo</span>
             </Button>
           </animated.div>
         </Link>
+        <animated.div style={springs[0]}>
+          <Button
+            variant="contained"
+            className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
+          >
+            <FilterListIcon className="mr-4" />
+            <span>Filter</span>
+          </Button>
+        </animated.div>
       </div>
       <animated.div style={springs[1]}>
         <PageTitle title="Todos" center />
