@@ -1,7 +1,7 @@
 import { mongodb } from "@server/db/mongodb/middleware";
 import morgan from "morgan";
 import { IRepository, PageResult } from "@server/repositories/base/repository";
-import { buildPaginationOptions } from "@server/repositories/helper";
+import { buildPaginationOptions } from "@server/repositories/utils";
 import { NextApiResponse } from "next";
 import { ErrorHandler, Middleware } from "next-connect";
 import withApiRoutes, {
