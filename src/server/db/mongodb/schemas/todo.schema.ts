@@ -1,7 +1,6 @@
-import { model, Schema } from "mongoose";
-import * as Mongoose from "mongoose";
+import mongoose, { Schema, SchemaTypes } from "mongoose";
 import { TodoDocument, TodoModel } from "./todo.types";
-import { PASTEL_COLORS, randomPastelColor } from "@shared/config";
+import { PASTEL_COLORS } from "@shared/config";
 
 const todoSchema = new Schema(
   {
@@ -23,6 +22,17 @@ const todoSchema = new Schema(
     completed: {
       type: Boolean,
       default: false,
+      required: true,
+    },
+    tags: {
+      type: [SchemaTypes.ObjectId],
+      required: true,
+      ref: "Tag",
+      default: [],
+    },
+    user: {
+      type: SchemaTypes.ObjectId,
+      ref: "User",
       required: true,
     },
     createdAt: {
@@ -62,5 +72,5 @@ todoSchema.methods.toggleComplete = function (
 };
 
 // prettier-ignore
-const Todo = Mongoose.models.Todo as TodoModel || model<TodoDocument, TodoModel>("Todo", todoSchema);
+const Todo = mongoose.models.Todo as TodoModel || mongoose.model<TodoDocument, TodoModel>("Todo", todoSchema);
 export default Todo;
