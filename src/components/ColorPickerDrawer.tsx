@@ -22,7 +22,7 @@ export function ColorPickerDrawer(props: ColorPickerDrawerProps) {
       open={open}
       onClose={onClose}
     >
-      <div className="flex flex-row justify-center items-center p-8 h-full w-full">
+      <div className="flex flex-row justify-center p-8 h-full w-full sm:px-auto px-48">
         {colors.map((color) => (
           <IconButton
             key={color}

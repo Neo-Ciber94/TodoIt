@@ -127,7 +127,7 @@ function Page({
             className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
           >
             <FilterListIcon className="mr-4" />
-            <span>Filter</span>
+            <span>Advance</span>
           </Button>
         </animated.div>
       </div>
