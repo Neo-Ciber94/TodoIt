@@ -2,7 +2,6 @@ import { ActionType, Middleware, ObjectType } from "./types";
 
 export interface ControllerMetadata {
   target: ObjectType<any>;
-  // pattern?: string | RegExp;
 }
 
 export interface ControllerActionMetadata {

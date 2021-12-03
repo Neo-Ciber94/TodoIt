@@ -5,7 +5,7 @@ import {
   NextApiRequestWithParams,
   UseMiddleware,
   withController,
-} from "src/decorators";
+} from "src/next-controllers";
 
 abstract class ApiController {
     @Get()

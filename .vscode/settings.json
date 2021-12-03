@@ -1,5 +1,6 @@
 {
     "exportall.config.folderListener": [
-        "/src/lib/rest-api"
+        "/src/lib/rest-api",
+        "/src/next-controllers/decorators"
     ]
 }

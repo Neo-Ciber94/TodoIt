@@ -1,4 +1,5 @@
 import { NextApiResponse } from "next";
+import { getValue } from "./utils";
 import path from "path";
 import {
   ErrorHandler,
@@ -173,8 +174,4 @@ function defaultErrorHandler<
   });
 
   next();
-}
-
-function getValue<T>(target: any, key: string): T {
-  return target[key];
 }
