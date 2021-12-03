@@ -1,28 +1,31 @@
 import { ActionType, Middleware, ObjectType } from "./types";
 
-export interface ControllerMetadata {
+interface ControllerMetadata {
   target: ObjectType<any>;
 }
 
-export interface ControllerActionMetadata {
+interface ControllerActionMetadata {
   target: ObjectType<any>;
   pattern?: string | RegExp;
   method: ActionType;
   methodName: string;
 }
 
-export interface ControllerErrorHandlerMetadata {
+interface ControllerErrorHandlerMetadata {
   target: ObjectType<any>;
   methodName: string;
 }
 
-export interface ControllerMiddlewareMetadata {
+interface ControllerMiddlewareMetadata {
   target: ObjectType<any>;
   methodName?: string;
   handler: Middleware<any, any>;
 }
 
-export class ControllerMetadataStorage {
+/**
+ * Stores all the metadata to be used by the controllers.
+ */
+class ControllerMetadataStorage {
   // prettier-ignore
   private readonly controllersMetadata = new Map<ObjectType<any>, ControllerMetadata>();
 
@@ -132,6 +135,9 @@ export class ControllerMetadataStorage {
 
 const metadataStorage = new ControllerMetadataStorage();
 
+/**
+ * Gets the metadata for all the stored controllers.
+ */
 export function getMetadataStorage(): ControllerMetadataStorage {
   return metadataStorage;
 }

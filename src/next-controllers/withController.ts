@@ -20,6 +20,16 @@ interface ControllerRoute<Req, Res> {
   middlewares: Middleware<Req, Res>[];
 }
 
+/**
+ * Creates a function from the given controller that handles the requests for this route.
+ * 
+ * @example
+ * ```
+ * ```
+ * 
+ * @param target The target type to create the route controller.
+ * @returns A controller for this route.
+ */
 export function withController<
   Req extends NextApiRequestWithParams = NextApiRequestWithParams,
   Res extends NextApiResponse = NextApiResponse
