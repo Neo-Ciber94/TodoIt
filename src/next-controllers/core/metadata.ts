@@ -80,7 +80,7 @@ class ControllerMetadataStorage {
       const controllers = Array.from(this.controllersMetadata.entries());
 
       for (const [target, controller] of controllers) {
-        if (target === type || type.prototype instanceof target) {
+        if (type.prototype instanceof target) {
           return controller;
         }
       }
@@ -90,11 +90,11 @@ class ControllerMetadataStorage {
   }
 
   getActions(type: ObjectType<any>): ControllerActionMetadata[] {
-    const result: ControllerActionMetadata[] = [];
+    const result: ControllerActionMetadata[] = this.actionMetadata.get(type) || [];
     const actionsMetadata = Array.from(this.actionMetadata.entries());
 
     for (const [target, actions] of actionsMetadata) {
-      if (target === type || type.prototype instanceof target) {
+      if (type.prototype instanceof target) {
         result.push(...actions);
       }
     }
@@ -110,7 +110,7 @@ class ControllerMetadataStorage {
       const errorHandlers = Array.from(this.controllerErrorHandler.entries());
 
       for (const [target, errorHandler] of errorHandlers) {
-        if (target === type || type.prototype instanceof target) {
+        if (type.prototype instanceof target) {
           return errorHandler;
         }
       }
@@ -120,11 +120,11 @@ class ControllerMetadataStorage {
   }
 
   getMiddlewares(type: ObjectType<any>): ControllerMiddlewareMetadata[] {
-    const result: ControllerMiddlewareMetadata[] = [];
+    const result: ControllerMiddlewareMetadata[] = this.middlewaresMetadata.get(type) || [];
     const middlewaresMetadata = Array.from(this.middlewaresMetadata.entries());
 
     for (const [target, middlewares] of middlewaresMetadata) {
-      if (target === type || type.prototype instanceof target) {
+      if (type.prototype instanceof target) {
         result.push(...middlewares);
       }
     }
