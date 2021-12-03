@@ -1,4 +1,4 @@
-import { HttpVerb, Middleware, ObjectType } from "./types";
+import { ActionType, Middleware, ObjectType } from "./types";
 
 export interface ControllerMetadata {
   target: ObjectType<any>;
@@ -8,7 +8,7 @@ export interface ControllerMetadata {
 export interface ControllerActionMetadata {
   target: ObjectType<any>;
   pattern?: string | RegExp;
-  method: HttpVerb;
+  method: ActionType;
   methodName: string;
 }
 
