@@ -47,7 +47,7 @@ export class ControllerMetadataStorage {
       for (const action of actions) {
         // prettier-ignore
         if (action.method === actionMetadata.method && action.pattern === actionMetadata.pattern) {
-          throw new Error(`Confliting route path: ${action.method} "${action.pattern}"`);
+          throw new Error(`Conflicting route path: ${action.method} "${action.pattern}"`);
         }
       }
 
@@ -72,21 +72,62 @@ export class ControllerMetadataStorage {
   }
 
   getControllers(type: ObjectType<any>): ControllerMetadata | undefined {
-    return this.controllersMetadata.get(type);
+    const result = this.controllersMetadata.get(type);
+
+    if (!result) {
+      const controllers = Array.from(this.controllersMetadata.entries());
+
+      for (const [target, controller] of controllers) {
+        if (target === type || type.prototype instanceof target) {
+          return controller;
+        }
+      }
+    }
+
+    return result;
   }
 
   getActions(type: ObjectType<any>): ControllerActionMetadata[] {
-    return this.actionMetadata.get(type) || [];
+    const result: ControllerActionMetadata[] = [];
+    const actionsMetadata = Array.from(this.actionMetadata.entries());
+
+    for (const [target, actions] of actionsMetadata) {
+      if (target === type || type.prototype instanceof target) {
+        result.push(...actions);
+      }
+    }
+
+    return result;
   }
 
-  getErrorHandler(
-    type: ObjectType<any>
-  ): ControllerErrorHandlerMetadata | undefined {
-    return this.controllerErrorHandler.get(type);
+  // prettier-ignore
+  getErrorHandler(type: ObjectType<any>): ControllerErrorHandlerMetadata | undefined {
+    const result = this.controllerErrorHandler.get(type);
+
+    if (!result) {
+      const errorHandlers = Array.from(this.controllerErrorHandler.entries());
+
+      for (const [target, errorHandler] of errorHandlers) {
+        if (target === type || type.prototype instanceof target) {
+          return errorHandler;
+        }
+      }
+    }
+
+    return result;
   }
 
   getMiddlewares(type: ObjectType<any>): ControllerMiddlewareMetadata[] {
-    return this.middlewaresMetadata.get(type) || [];
+    const result: ControllerMiddlewareMetadata[] = [];
+    const middlewaresMetadata = Array.from(this.middlewaresMetadata.entries());
+
+    for (const [target, middlewares] of middlewaresMetadata) {
+      if (target === type || type.prototype instanceof target) {
+        result.push(...middlewares);
+      }
+    }
+
+    return result;
   }
 }
 
