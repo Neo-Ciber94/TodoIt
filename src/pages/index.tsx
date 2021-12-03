@@ -22,6 +22,7 @@ import { Center } from "src/components/Center";
 import { useSprings, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import { TodosFiltersDrawer } from "src/components/TodosFilterDrawer";
 
 const PAGE_SIZE = 30;
 const todoClient = new TodoApiClient();
@@ -46,6 +47,7 @@ function Page({
   const [searchTerm, setSearchTerm] = React.useState("");
   const searchString = useDebounce(searchTerm, 500);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [openFiltersMenu, setOpenFiltersMenu] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const firstRender = React.useRef(true);
   const router = useRouter();
@@ -60,6 +62,10 @@ function Page({
     }
 
     return <></>;
+  };
+
+  const onCloseFiltersMenu = () => {
+    setOpenFiltersMenu(false);
   };
 
   const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
@@ -108,92 +114,102 @@ function Page({
   }, [searchString]);
 
   return (
-    <Container className="pt-4">
-      <div className="flex flex-row justify-start gap-2">
-        <Link href="/todos/add" passHref>
+    <>
+      <Container className="pt-4">
+        <div className="flex flex-row justify-start gap-2">
+          <Link href="/todos/add" passHref>
+            <animated.div style={springs[0]}>
+              <Button
+                variant="contained"
+                className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
+              >
+                <AddIcon className="mr-2" />
+                <span>New Todo</span>
+              </Button>
+            </animated.div>
+          </Link>
           <animated.div style={springs[0]}>
             <Button
               variant="contained"
               className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
+              onClick={() => setOpenFiltersMenu(true)}
             >
-              <AddIcon className="mr-2" />
-              <span>New Todo</span>
+              <FilterListIcon className="mr-4" />
+              <span>Filter</span>
             </Button>
           </animated.div>
-        </Link>
-        <animated.div style={springs[0]}>
-          <Button
-            variant="contained"
-            className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
-          >
-            <FilterListIcon className="mr-4" />
-            <span>Advance</span>
-          </Button>
-        </animated.div>
-      </div>
-      <animated.div style={springs[1]}>
-        <PageTitle title="Todos" center />
-      </animated.div>
-      <animated.div style={springs[2]}>
-        <div className="flex flex-row justify-center p-3 mb-4">
-          <SearchTextField
-            key={"search-input"}
-            value={searchTerm}
-            onSearch={setSearchTerm}
-          />
         </div>
-      </animated.div>
-
-      {!isLoading && <NoTodosText />}
-      <MasonryGrid>
-        {todos.map((todo, index) => {
-          return (
-            <TodoNote
-              key={todo.id}
-              width="100%"
-              delayIndex={index % 10}
-              todo={todo}
-              onDelete={onDeleteTodo}
-              onToggle={onToggleTodo}
-              onClick={onTodoClick}
+        {/* <animated.div style={springs[1]}>
+        <PageTitle title="Todos" center />
+      </animated.div> */}
+        <animated.div style={springs[2]}>
+          <div className="flex flex-row justify-center p-3 mb-4">
+            <SearchTextField
+              key={"search-input"}
+              value={searchTerm}
+              onSearch={setSearchTerm}
             />
-          );
-        })}
-      </MasonryGrid>
-      <ViewInterceptor
-        inView={async (inView) => {
-          if (inView) {
-            if (hasMoreItems && !isLoading) {
-              setIsLoading(true);
+          </div>
+        </animated.div>
 
-              try {
-                const newTodos = await todoClient.search({
-                  search: searchString,
-                  page: page + 1,
-                  pageSize: PAGE_SIZE,
-                });
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+        {!isLoading && <NoTodosText />}
+        <MasonryGrid>
+          {todos.map((todo, index) => {
+            return (
+              <TodoNote
+                key={todo.id}
+                width="100%"
+                delayIndex={index % 10}
+                todo={todo}
+                onDelete={onDeleteTodo}
+                onToggle={onToggleTodo}
+                onClick={onTodoClick}
+              />
+            );
+          })}
+        </MasonryGrid>
+        <ViewInterceptor
+          inView={async (inView) => {
+            if (inView) {
+              if (hasMoreItems && !isLoading) {
+                setIsLoading(true);
 
-                setTodos([...todos, ...newTodos.data]);
-                setPage(newTodos.currentPage);
-              } catch (e) {
-                console.error(e);
-              } finally {
-                setIsLoading(false);
+                try {
+                  const newTodos = await todoClient.search({
+                    search: searchString,
+                    page: page + 1,
+                    pageSize: PAGE_SIZE,
+                  });
+                  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                  setTodos([...todos, ...newTodos.data]);
+                  setPage(newTodos.currentPage);
+                } catch (e) {
+                  console.error(e);
+                } finally {
+                  setIsLoading(false);
+                }
               }
             }
-          }
+          }}
+        />
+
+        <Box
+          className={`flex flex-row justify-center py-8 ${
+            isLoading ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Loading />
+        </Box>
+      </Container>
+      <TodosFiltersDrawer
+        open={openFiltersMenu}
+        onClose={onCloseFiltersMenu}
+        onFilters={(filters) => {
+          console.log(filters);
         }}
       />
-
-      <Box
-        className={`flex flex-row justify-center py-8 ${
-          isLoading ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <Loading />
-      </Box>
-    </Container>
+    </>
   );
 }
 

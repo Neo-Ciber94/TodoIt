@@ -8,6 +8,8 @@ const tagSchema = new Schema<TagDocument, TagModel>(
       required: true,
       unique: true,
       trim: true,
+      minlength: 1,
+      maxLength: 25,
     },
     createdAt: {
       type: Date,

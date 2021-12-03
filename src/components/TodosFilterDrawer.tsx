@@ -3,16 +3,26 @@ import { Drawer, List, ListItem, ListItemText } from "@mui/material";
 export interface TodosFiltersProps {
   open: boolean;
   onClose: () => void;
-  selectedColors?: string[];
-  onSelectColor?: (color: string) => void;
+  onFilters: (filters: TodosFilters) => void;
 }
 
-export const TodosFilters: React.FC<TodosFiltersProps> = ({
+export enum TodoState {
+  Any, Completed, Incompleted
+}
+
+export interface TodosFilters {
+  todos: TodoState;
+  colors: string[];
+  tags: string[];
+}
+
+export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   open,
+  onClose,
   ...rest
 }) => {
   return (
-    <Drawer anchor={"left"} open={open}>
+    <Drawer anchor={"left"} open={open} onClose={onClose}>
       <List>
         <ListItem button onClick={() => {}}>
           <ListItemText primary="All" />
