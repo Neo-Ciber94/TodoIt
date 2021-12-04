@@ -8,7 +8,11 @@ import {
   NextApiContext,
 } from "src/next-controllers";
 
-@RouteController({
+type State = {
+  count: number;
+};
+
+@RouteController<State>({
   state: { count: 0 },
 })
 @UseMiddleware(morgan("dev"))
@@ -24,13 +28,13 @@ class HelloController {
   // }
 
   @Post("/count")
-  count(context: NextApiContext) {
+  count(context: NextApiContext<State>) {
     context.state.count += 1;
     return context.state;
   }
 
   @Get("/count")
-  getCount(context: NextApiContext) {
+  getCount(context: NextApiContext<State>) {
     console.log(context.state);
     return context.state;
   }

@@ -29,7 +29,7 @@ export interface RouteControllerConfig<T = any> {
 /**
  * Register a route controller.
  */
-export function RouteController(config?: Partial<RouteControllerConfig>) {
+export function RouteController<T>(config?: Partial<RouteControllerConfig<T>>) {
   return function (constructor: ObjectType<any>) {
     getMetadataStorage().addController({
       target: constructor,
