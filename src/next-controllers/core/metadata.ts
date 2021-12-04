@@ -1,8 +1,10 @@
 import { Middleware, ObjectType } from "./types";
 import { ActionType } from "./ActionType";
+import { RouteControllerConfig } from "..";
 
 interface ControllerMetadata {
   target: ObjectType<any>;
+  config: RouteControllerConfig;
 }
 
 interface ControllerActionMetadata {
@@ -74,7 +76,7 @@ class ControllerMetadataStorage {
     }
   }
 
-  getControllers(type: ObjectType<any>): ControllerMetadata | undefined {
+  getController(type: ObjectType<any>): ControllerMetadata | undefined {
     const result = this.controllersMetadata.get(type);
 
     if (!result) {
@@ -91,7 +93,8 @@ class ControllerMetadataStorage {
   }
 
   getActions(type: ObjectType<any>): ControllerActionMetadata[] {
-    const result: ControllerActionMetadata[] = this.actionMetadata.get(type) || [];
+    const result: ControllerActionMetadata[] =
+      this.actionMetadata.get(type) || [];
     const actionsMetadata = Array.from(this.actionMetadata.entries());
 
     for (const [target, actions] of actionsMetadata) {
@@ -121,7 +124,8 @@ class ControllerMetadataStorage {
   }
 
   getMiddlewares(type: ObjectType<any>): ControllerMiddlewareMetadata[] {
-    const result: ControllerMiddlewareMetadata[] = this.middlewaresMetadata.get(type) || [];
+    const result: ControllerMiddlewareMetadata[] =
+      this.middlewaresMetadata.get(type) || [];
     const middlewaresMetadata = Array.from(this.middlewaresMetadata.entries());
 
     for (const [target, middlewares] of middlewaresMetadata) {

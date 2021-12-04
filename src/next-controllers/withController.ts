@@ -11,6 +11,8 @@ import {
   ObjectType,
   Middleware,
   RoutePath,
+  DEFAULT_CONTROLLER_CONFIG,
+  RouteControllerConfig,
 } from ".";
 
 interface ControllerRoute<Req, Res> {
@@ -39,6 +41,9 @@ export function withController<
   const controllerMiddlewares = allMiddlewares
     .filter((m) => m.methodName == null)
     .map((m) => m.handler);
+
+  const controllerConfig =
+    metadataStore.getController(target)?.config || DEFAULT_CONTROLLER_CONFIG;
 
   for (const action of actions) {
     const pattern: string | RegExp = action.pattern || "/";
@@ -115,9 +120,8 @@ export function withController<
           return;
         }
 
-        return await handleRequest(route, req, res);
-      } 
-      catch (err: any) {
+        return await handleRequest(route, controllerConfig, req, res);
+      } catch (err: any) {
         next(err);
       }
     }
@@ -163,7 +167,12 @@ function getBasePath() {
 async function handleRequest<
   Req extends NextApiRequestWithParams,
   Res extends NextApiResponse
->(route: ControllerRoute<Req, Res>, req: Req, res: Res) {
+>(
+  route: ControllerRoute<Req, Res>,
+  config: RouteControllerConfig,
+  req: Req,
+  res: Res
+) {
   const result = await route.handler(req, res);
 
   // A response was already written
@@ -172,19 +181,18 @@ async function handleRequest<
   }
 
   if (result === null) {
-    return res.status(404).end();
+    return res.status(config.statusCodeOnNull).end();
   }
 
-  if (result != null) {
-    if (typeof result === "object" || Array.isArray(result)) {
-      return res.json(result);
-    }
-
-    return res.send(result);
+  if (result === undefined) {
+    return res.status(config.statusCodeOnUndefined).end();
   }
 
-  // Fallback
-  return res.status(200);
+  if (typeof result === "object" || Array.isArray(result)) {
+    return res.json(result);
+  }
+
+  return res.send(result);
 }
 
 function defaultErrorHandler<
