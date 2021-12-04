@@ -44,13 +44,13 @@ export class HttpContext<
    * Returns the params of the request.
    */
   get requestParams(): Params {
-    return this.request.params;
+    return this.request.params || {};
   }
 
   /**
    * Returns the query params of the request
    */
   get requestQuery(): Record<string, string | string[]> {
-    return this.request.query;
+    return this.request.query || {};
   }
 }

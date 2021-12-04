@@ -238,7 +238,7 @@ function defaultErrorHandler<
 // This cannot capture all the routes for errors, but it should be enough for most cases.
 function assertIsValidApiFileName() {
   const fileName = path.basename(__filename, path.extname(__filename));
-  const pattern = /\[\[\.\.\.(.+)\]\]/;
+  const pattern = /\[\[\.\.\.(.+)\]\]/g;
 
   if (!pattern.test(fileName)) {
     throw new Error(

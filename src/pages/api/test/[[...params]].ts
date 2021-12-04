@@ -20,12 +20,12 @@ class HelloController {
   }
 
   // @Get("/:name")
-  // sayHelloTo(req: NextApiRequestWithParams) {
-  //   return `Hello ${req.params.name}!`;
+  // sayHelloTo() {
+  //   return `Hello ${this.context.requestParams.name}!`;
   // }
 
   @Post("/count")
-  count(req: NextApiRequestWithParams) {
+  count() {
     this.context.state.count += 1;
     return this.context.state;
   }
