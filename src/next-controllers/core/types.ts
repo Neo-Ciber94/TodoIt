@@ -2,6 +2,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { HttpContext } from "..";
 
 /**
+ * Specialization of `HttpContext` type for NextJS.
+ */
+export type NextApiContext<
+  TState extends object = Record<string, any>,
+  Req extends NextApiRequestWithParams = NextApiRequestWithParams,
+  Res extends NextApiResponse = NextApiResponse
+> = HttpContext<TState, Req, Res>;
+
+/**
  * Represents an object type that can be instantiate.
  */
 export type ObjectType<T> = Function & { new (...args: any[]): T };
@@ -9,10 +18,9 @@ export type ObjectType<T> = Function & { new (...args: any[]): T };
 /**
  * Represents a route handler.
  */
-export type Handler<
-  Req extends NextApiRequestWithParams,
-  Res extends NextApiResponse
-> = (context: HttpContext<any, Req, Res>) => Promise<any> | any;
+export type Handler<Req, Res> = (
+  context: HttpContext<any, Req, Res>
+) => Promise<any> | any;
 
 /**
  * A handler for call the next action.
@@ -22,10 +30,7 @@ export type NextHandler = (err?: any) => void;
 /**
  * A handler for the errors.
  */
-export type ErrorHandler<
-  Req extends NextApiRequestWithParams,
-  Res extends NextApiResponse
-> = (
+export type ErrorHandler<Req, Res> = (
   err: any,
   context: HttpContext<any, Req, Res>,
   next: NextHandler

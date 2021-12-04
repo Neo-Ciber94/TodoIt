@@ -2,12 +2,10 @@ import morgan from "morgan";
 import {
   withController,
   Get,
-  NextApiRequestWithParams,
   Post,
-  Context,
-  HttpContext,
   UseMiddleware,
   RouteController,
+  NextApiContext,
 } from "src/next-controllers";
 
 @RouteController({ state: { count: 0 } })
@@ -24,14 +22,14 @@ class HelloController {
   // }
 
   @Post("/count")
-  count(context: HttpContext) {
+  count(context: NextApiContext) {
     context.state.count += 1;
     return context.state;
   }
 
   @Get("/count")
-  getCount(context: HttpContext) {
-    console.log(context.state)
+  getCount(context: NextApiContext) {
+    console.log(context.state);
     return context.state;
   }
 }

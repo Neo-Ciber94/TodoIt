@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   HttpContext,
+  NextApiContext,
   OnError,
   Patch,
   Post,
@@ -27,13 +28,13 @@ export class ApiController<T> {
   // protected readonly context!: HttpContext;
 
   @Get("/")
-  async getAll({ request }: HttpContext): Promise<PageResult<T>> {
+  async getAll({ request }: NextApiContext): Promise<PageResult<T>> {
     const options = buildPaginationOptions<T>(request);
     return this.repository.findWithPagination(options);
   }
 
   @Get("/:id")
-  async getById({ request }: HttpContext): Promise<T | null> {
+  async getById({ request }: NextApiContext): Promise<T | null> {
     const { id = "" } = request.params;
     let result: T | null = null;
 
@@ -51,14 +52,14 @@ export class ApiController<T> {
   }
 
   @Post("/")
-  async create({ request }: HttpContext): Promise<T> {
+  async create({ request }: NextApiContext): Promise<T> {
     const entity: Partial<T> = request.body;
     const result = await this.repository.create(entity);
     return result;
   }
 
   @Put("/:id")
-  async update({ request }: HttpContext): Promise<T> {
+  async update({ request }: NextApiContext): Promise<T> {
     const { id = "" } = request.params;
     const entity: Partial<T> = request.body;
     const result = await this.repository.update(String(id), entity);
@@ -66,7 +67,7 @@ export class ApiController<T> {
   }
 
   @Patch("/:id")
-  async partialUpdate({ request }: HttpContext): Promise<T> {
+  async partialUpdate({ request }: NextApiContext): Promise<T> {
     const { id = "" } = request.params;
     const entity: Partial<T> = request.body;
     const result = await this.repository.update(id, entity);
@@ -74,24 +75,20 @@ export class ApiController<T> {
   }
 
   @Delete("/:id")
-  async delete({ request }: HttpContext): Promise<T> {
+  async delete({ request }: NextApiContext): Promise<T> {
     const { id = "" } = request.params;
     const result = await this.repository.delete(id);
     return result;
   }
 
   @OnError()
-  async onError(
-    error: any,
-    _req: unknown,
-    res: NextApiResponse
-  ): Promise<void> {
+  async onError(error: any, context: NextApiContext): Promise<void> {
     const message = error.message ?? error;
 
     if (error instanceof ValidationError) {
-      return res.status(400).json({ message });
+      return context.response.status(400).json({ message });
     } else {
-      return res.status(500).json({ message });
+      return context.response.status(500).json({ message });
     }
   }
 }

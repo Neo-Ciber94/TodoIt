@@ -17,11 +17,11 @@ import {
   HTTP_STATUS_CODES,
 } from ".";
 
-interface ControllerRoute {
+interface ControllerRoute<Req, Res> {
   path: RoutePath;
   method: ActionType;
-  handler: Handler<any, any>;
-  middlewares: Middleware<any, any>[];
+  handler: Handler<Req, Res>;
+  middlewares: Middleware<Req, Res>[];
 }
 
 /**
@@ -38,7 +38,7 @@ export function withController<
 
   const basePath = getBasePath();
   const controller = new target();
-  const controllerRoutes: ControllerRoute[] = [];
+  const controllerRoutes: ControllerRoute<Req, Res>[] = [];
   const metadataStore = getMetadataStorage();
   const actions = metadataStore.getActions(target);
   const allMiddlewares = metadataStore.getMiddlewares(target);
@@ -183,8 +183,8 @@ function getBasePath() {
 function findRouteHandler(
   url: string,
   req: NextApiRequestWithParams,
-  routes: ControllerRoute[]
-): ControllerRoute | null {
+  routes: ControllerRoute<any, any>[]
+): ControllerRoute<any, any> | null {
   for (const route of routes) {
     const matches = route.path.match(url);
 
@@ -205,7 +205,7 @@ async function handleRequest<
   Req extends NextApiRequestWithParams,
   Res extends NextApiResponse
 >(
-  route: ControllerRoute,
+  route: ControllerRoute<Req, Res>,
   config: RouteControllerConfig,
   context: HttpContext<any, Req, Res>
 ) {

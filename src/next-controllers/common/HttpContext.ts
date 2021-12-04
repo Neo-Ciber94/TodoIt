@@ -1,14 +1,7 @@
-import { NextApiResponse } from "next";
-import { NextApiRequestWithParams } from "..";
-
 /**
  * Represents the context of a current http request.
  */
-export class HttpContext<
-  TState extends object = Record<string, any>,
-  Req extends NextApiRequestWithParams = NextApiRequestWithParams,
-  Res extends NextApiResponse = NextApiResponse
-> {
+export class HttpContext<TState, Req, Res> {
   private readonly _state: TState;
   private readonly _request: Req;
   private readonly _response: Res;
