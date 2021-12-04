@@ -1,23 +1,33 @@
 import { getMetadataStorage, Middleware } from "..";
 
 /**
- * Register a middleware for a given route or entire controller.
- * @param middleware The middleware to register.
+ * Register a middleware or collection of middlewares for a given route or controller.
+ * @param middlewares The middlewares to register.
  */
-export function UseMiddleware<Req, Res>(middleware: Middleware<Req, Res>) {
+// prettier-ignore
+export function UseMiddleware<Req, Res>(middlewares: Middleware<Req, Res> | Middleware<Req, Res>[]) {
   return function (target: any, methodName?: string) {
-    // If the target is no a method but a class, methodName will be undefined
-    if (methodName) {
-      getMetadataStorage().addMiddleware({
-        target: target.constructor,
-        methodName,
-        handler: middleware,
-      });
+    if (Array.isArray(middlewares)) {
+      middlewares.forEach((m) => addMiddlewareToStorage(target, methodName, m));
     } else {
-      getMetadataStorage().addMiddleware({
-        target,
-        handler: middleware,
-      });
+      addMiddlewareToStorage(target, methodName, middlewares);
     }
   };
+}
+
+// prettier-ignore
+function addMiddlewareToStorage(target: any, methodName: string | undefined, handler: Middleware<any, any>) {
+  // If the target is no a method but a class, methodName will be undefined
+  if (methodName) {
+    getMetadataStorage().addMiddleware({
+      target: target.constructor,
+      methodName,
+      handler,
+    });
+  } else {
+    getMetadataStorage().addMiddleware({
+      target,
+      handler,
+    });
+  }
 }

@@ -63,7 +63,7 @@ export function withController<
     controllerRoutes.push({
       path: new RoutePath(pattern as any), // FIXME: Typescript is not detecting string|RegExp
       method: action.method,
-      handler: method,
+      handler: method.bind(controller),
       middlewares: routeMiddlewares,
     });
   }
