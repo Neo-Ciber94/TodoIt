@@ -58,3 +58,8 @@ export type Params = {
 export type NextApiRequestWithParams = NextApiRequest & {
   params: Params;
 };
+
+/**
+ * Represents anything that resolves into a value of type `T`.
+ */
+export type ValueOrPromise<T> = T | Promise<T> | (() => T | Promise<T>);

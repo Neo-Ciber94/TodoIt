@@ -8,7 +8,9 @@ import {
   NextApiContext,
 } from "src/next-controllers";
 
-@RouteController({ state: { count: 0 } })
+@RouteController({
+  state: { count: 0},
+})
 @UseMiddleware(morgan("dev"))
 class HelloController {
   @Get()

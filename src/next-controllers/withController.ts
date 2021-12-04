@@ -49,7 +49,8 @@ export function withController<
   // prettier-ignore
   const controllerConfig = metadataStore.getController(target)?.config || DEFAULT_CONTROLLER_CONFIG;
   const httpContextMetadata = metadataStore.getContext(target);
-  const contextState = controllerConfig.state || {};
+  const stateOrPromise = controllerConfig.state || {};
+  let contextState: any = controllerConfig.state || {};
 
   // prettier-ignore
   // Binds the 'onError' callback
@@ -87,6 +88,13 @@ export function withController<
 
   // Returns a handler to the request
   return async function (req: Req, res: Res) {
+    // Initialize `HttpContext` state
+    if (typeof stateOrPromise === "function") {
+      contextState = await stateOrPromise();
+    } else {
+      contextState = await stateOrPromise;
+    }
+
     let url = req.url || "/";
 
     if (!url.startsWith(basePath)) {

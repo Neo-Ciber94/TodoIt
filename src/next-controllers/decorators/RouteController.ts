@@ -1,4 +1,8 @@
-import { getMetadataStorage, ObjectType } from "..";
+import {
+  getMetadataStorage,
+  ObjectType,
+  ValueOrPromise,
+} from "..";
 
 export const DEFAULT_CONTROLLER_CONFIG: RouteControllerConfig = Object.freeze({
   statusCodeOnNull: 404,
@@ -23,7 +27,7 @@ export interface RouteControllerConfig<T extends object = Record<string, any>> {
   /**
    * Initial state of the `HttpContext` for this controller.
    */
-  state: T;
+  state: ValueOrPromise<T>;
 }
 
 /**
