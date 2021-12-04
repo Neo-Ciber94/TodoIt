@@ -13,6 +13,7 @@ import {
   DEFAULT_CONTROLLER_CONFIG,
   RouteControllerConfig,
   Results,
+  HttpContext,
 } from ".";
 
 interface ControllerRoute<Req, Res> {
@@ -103,6 +104,35 @@ export function withController<
       }
 
       return true;
+    }
+
+    // Inject the context
+    if (!!controllerConfig.context) {
+      if (!controller.context) {
+        throw new Error(`Controller ${target.name} does not have a context property.
+        
+        When using "RouteController({ injectContext: true })" you must expose a public property
+        named "context" which will receive the request context "HttpContext" object.`);
+      }
+
+      let context: HttpContext<any, Req, Res> | undefined = controller.context;
+
+      if (context == null) {
+        const state =
+          typeof controllerConfig.context === "object"
+            ? controllerConfig.context
+            : {};
+
+        context = {
+          state,
+          request: req,
+          response: res,
+        };
+      }
+
+      context.request = req;
+      context.response = res;
+      controller.context = context;
     }
 
     // Run all the middlewares of this controller

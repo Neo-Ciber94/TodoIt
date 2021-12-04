@@ -1,9 +1,9 @@
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 
 /**
  * Represents an object type that can be instantiate.
  */
-export type ObjectType<T> = Function & { new (): T };
+export type ObjectType<T> = Function & { new (...args: any[]): T };
 
 /**
  * Represents a route handler.
@@ -34,6 +34,9 @@ export type Middleware<Req, Res> = (
   next: NextHandler
 ) => Promise<any> | any;
 
+/**
+ * Params object.
+ */
 export type Params = {
   [key: string]: string | undefined;
 };
@@ -44,3 +47,27 @@ export type Params = {
 export type NextApiRequestWithParams = NextApiRequest & {
   params: Params;
 };
+
+/**
+ * Context for the current request.
+ */
+export interface HttpContext<
+  TState extends Record<string, any> = Record<string, any>,
+  Req = NextApiRequestWithParams,
+  Res = NextApiResponse
+> {
+  /**
+   * Shared state for this current request.
+   */
+  state: TState;
+
+  /**
+   * The request object.
+   */
+  request: Req;
+
+  /**
+   * The response object.
+   */
+  response: Res;
+}
