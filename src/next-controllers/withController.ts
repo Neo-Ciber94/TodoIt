@@ -78,6 +78,7 @@ export function withController<
     const onError = errorHandler ?? defaultErrorHandler;
     let done = false;
 
+    // The next action handler
     const next = (err?: any) => {
       done = true;
 
@@ -86,6 +87,7 @@ export function withController<
       }
     };
 
+    // Run the middlewares
     async function runMiddlewares(middlewares: Middleware<Req, Res>[]) {
       for (const middleware of middlewares) {
         await middleware(req, res, next);
@@ -98,31 +100,24 @@ export function withController<
       return true;
     }
 
+    // Run all the middlewares of this controller
     if (!(await runMiddlewares(controllerMiddlewares))) {
       return;
     }
 
-    for (const route of controllerRoutes) {
-      const matches = route.path.match(url);
+    // Finds the route this request is going to
+    const route = findRouteHandler(url, req, controllerRoutes);
 
-      if ((route.method !== "ALL" && route.method !== req.method) || !matches) {
-        continue;
-      }
-
-      if (!matches) {
-        continue;
-      }
-
-      // Attach params
-      req.params = matches;
-
+    if (route) {
       try {
+        // Run this route middlewares
         if (!(await runMiddlewares(route.middlewares))) {
           return;
         }
 
         return await handleRequest(route, req, res);
-      } catch (err: any) {
+      } 
+      catch (err: any) {
         next(err);
       }
     }
@@ -130,6 +125,27 @@ export function withController<
     // Not found
     return res.status(404).end();
   };
+}
+
+function findRouteHandler(
+  url: string,
+  req: NextApiRequestWithParams,
+  routes: ControllerRoute<any, any>[]
+): ControllerRoute<any, any> | null {
+  for (const route of routes) {
+    const matches = route.path.match(url);
+
+    if ((route.method !== "ALL" && route.method !== req.method) || !matches) {
+      continue;
+    }
+
+    // Attach params
+    req.params = matches;
+
+    return route;
+  }
+
+  return null;
 }
 
 function getBasePath() {
