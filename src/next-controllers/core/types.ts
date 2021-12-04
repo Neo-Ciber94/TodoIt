@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
 
 /**
  * Represents an object type that can be instantiate.
