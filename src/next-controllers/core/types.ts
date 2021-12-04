@@ -34,9 +34,13 @@ export type Middleware<Req, Res> = (
   next: NextHandler
 ) => Promise<any> | any;
 
+export type Params = {
+  [key: string]: string | undefined;
+};
+
 /**
  * Represents the request object with the params.
  */
 export type NextApiRequestWithParams = NextApiRequest & {
-  params: Record<string, string>;
+  params: Params;
 };
