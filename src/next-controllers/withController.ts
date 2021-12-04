@@ -9,11 +9,11 @@ import {
   NextHandler,
   ObjectType,
   Middleware,
-  RoutePath,
   DEFAULT_CONTROLLER_CONFIG,
   RouteControllerConfig,
   Results,
   HttpContext,
+  RoutePath,
 } from ".";
 
 interface ControllerRoute<Req, Res> {

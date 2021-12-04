@@ -18,7 +18,7 @@ class HelloController {
 
   @Get()
   sayHello() {
-    return null;
+    return "Hello World!";
   }
 
   // @Get("/:name")
