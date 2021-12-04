@@ -1,4 +1,5 @@
-import { ActionType, Middleware, ObjectType } from "./types";
+import { Middleware, ObjectType } from "./types";
+import { ActionType } from "./ActionType";
 
 interface ControllerMetadata {
   target: ObjectType<any>;

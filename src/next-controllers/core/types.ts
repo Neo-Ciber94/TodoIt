@@ -19,18 +19,6 @@ export type Middleware<Req, Res> = (
   next: NextHandler
 ) => Promise<any> | any;
 
-export type ActionType =
-  | "ALL"
-  | "GET"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "PATCH"
-  | "HEAD"
-  | "OPTIONS"
-  | "CONNECT"
-  | "TRACE";
-
 export type NextApiRequestWithParams = NextApiRequest & {
   params: Record<string, string>;
 };
