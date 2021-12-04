@@ -5,6 +5,9 @@ type RegexParamResult = {
   pattern: RegExp;
 };
 
+/**
+ * Creates a route path.
+ */
 export class RoutePath {
   private matches: RegexParamResult;
 
@@ -18,6 +21,11 @@ export class RoutePath {
     }
   }
 
+  /**
+   * Matches this route path against a given url.
+   * @param url The url to match.
+   * @returns The matched parameters or null if this route do not match.
+   */
   public match(url: string): Record<string, string> | null {
     const result = this.matches.pattern.exec(url);
 

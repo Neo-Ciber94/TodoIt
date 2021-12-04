@@ -7,8 +7,10 @@ import {
   Context,
   HttpContext,
   UseMiddleware,
+  RouteController,
 } from "src/next-controllers";
 
+@RouteController()
 @UseMiddleware(morgan('dev'))
 class HelloController {
   @Context({ state: { count: 0 } })
@@ -16,7 +18,7 @@ class HelloController {
 
   @Get()
   sayHello() {
-    return "Hello World!";
+    return null;
   }
 
   // @Get("/:name")

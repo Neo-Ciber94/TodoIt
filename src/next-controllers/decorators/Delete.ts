@@ -1,4 +1,4 @@
-import { getMetadataStorage } from "../core/metadata";
+import { getMetadataStorage } from "../core/getMetadataStorage";
 
 /**
  * Register a handler for 'DELETE' requests.
