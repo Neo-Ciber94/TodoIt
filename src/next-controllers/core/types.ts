@@ -47,27 +47,3 @@ export type Params = {
 export type NextApiRequestWithParams = NextApiRequest & {
   params: Params;
 };
-
-/**
- * Context for the current request.
- */
-export interface HttpContext<
-  TState extends Record<string, any> = Record<string, any>,
-  Req = NextApiRequestWithParams,
-  Res = NextApiResponse
-> {
-  /**
-   * Shared state for this current request.
-   */
-  state: TState;
-
-  /**
-   * The request object.
-   */
-  request: Req;
-
-  /**
-   * The response object.
-   */
-  response: Res;
-}

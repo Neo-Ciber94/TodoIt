@@ -1,10 +1,9 @@
 import { getMetadataStorage, ObjectType } from "..";
 
-export const DEFAULT_CONTROLLER_CONFIG: RouteControllerConfig = {
+export const DEFAULT_CONTROLLER_CONFIG: RouteControllerConfig = Object.freeze({
   statusCodeOnNull: 404,
   statusCodeOnUndefined: 404,
-  context: false,
-};
+});
 
 /**
  * Configuration for an ``@RouteController`` decorator.
@@ -19,11 +18,6 @@ export interface RouteControllerConfig {
    * Status code to return when `undefined` is returned from the controller method, default is `404`.
    */
   statusCodeOnUndefined: number;
-
-  /**
-   * If `true` will inject a `HttpContext` to this controller.
-   */
-  context: boolean | Record<string, any>;
 }
 
 /**

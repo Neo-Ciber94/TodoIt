@@ -1,6 +1,6 @@
 import { Middleware, ObjectType } from "./types";
 import { ActionType } from "./ActionType";
-import { RouteControllerConfig } from "..";
+import { ContextConfig, RouteControllerConfig } from "..";
 
 interface ControllerMetadata {
   target: ObjectType<any>;
@@ -25,6 +25,12 @@ interface ControllerMiddlewareMetadata {
   handler: Middleware<any, any>;
 }
 
+interface ControllerHttpContextMetadata {
+  target: ObjectType<any>;
+  propertyName: string;
+  config: ContextConfig;
+}
+
 /**
  * Stores all the metadata to be used by the controllers.
  */
@@ -36,10 +42,13 @@ class ControllerMetadataStorage {
   private readonly actionMetadata = new Map<ObjectType<any>, ControllerActionMetadata[]>();
 
   // prettier-ignore
-  private readonly controllerErrorHandler = new Map<ObjectType<any>, ControllerErrorHandlerMetadata>();
+  private readonly errorHandlers = new Map<ObjectType<any>, ControllerErrorHandlerMetadata>();
 
   // prettier-ignore
   private readonly middlewaresMetadata = new Map<ObjectType<any>, ControllerMiddlewareMetadata[]>();
+
+  // prettier-ignore
+  private readonly contextMetadata = new Map<ObjectType<any>, ControllerHttpContextMetadata[]>();
 
   addController(controllerMetadata: ControllerMetadata) {
     this.controllersMetadata.set(controllerMetadata.target, controllerMetadata);
@@ -52,7 +61,7 @@ class ControllerMetadataStorage {
       for (const action of actions) {
         // prettier-ignore
         if (action.method === actionMetadata.method && action.pattern === actionMetadata.pattern) {
-          throw new Error(`Conflicting route path: ${action.method} "${action.pattern}"`);
+          throw new Error(`Conflicting route path: ${action.method} "${action.pattern || "/"}"`);
         }
       }
 
@@ -63,7 +72,7 @@ class ControllerMetadataStorage {
   }
 
   addErrorHandler(errorHandler: ControllerErrorHandlerMetadata) {
-    this.controllerErrorHandler.set(errorHandler.target, errorHandler);
+    this.errorHandlers.set(errorHandler.target, errorHandler);
   }
 
   addMiddleware(middleware: ControllerMiddlewareMetadata) {
@@ -73,6 +82,16 @@ class ControllerMetadataStorage {
       middlewares.push(middleware);
     } else {
       this.middlewaresMetadata.set(middleware.target, [middleware]);
+    }
+  }
+
+  addContext(context: ControllerHttpContextMetadata) {
+    const contexts = this.contextMetadata.get(context.target);
+
+    if (contexts) {
+      contexts.push(context);
+    } else {
+      this.contextMetadata.set(context.target, [context]);
     }
   }
 
@@ -108,10 +127,10 @@ class ControllerMetadataStorage {
 
   // prettier-ignore
   getErrorHandler(type: ObjectType<any>): ControllerErrorHandlerMetadata | undefined {
-    const result = this.controllerErrorHandler.get(type);
+    const result = this.errorHandlers.get(type);
 
     if (!result) {
-      const errorHandlers = Array.from(this.controllerErrorHandler.entries());
+      const errorHandlers = Array.from(this.errorHandlers.entries());
 
       for (const [target, errorHandler] of errorHandlers) {
         if (type.prototype instanceof target) {
@@ -131,6 +150,20 @@ class ControllerMetadataStorage {
     for (const [target, middlewares] of middlewaresMetadata) {
       if (type.prototype instanceof target) {
         result.push(...middlewares);
+      }
+    }
+
+    return result;
+  }
+
+  getContext(type: ObjectType<any>): ControllerHttpContextMetadata[] {
+    const result: ControllerHttpContextMetadata[] =
+      this.contextMetadata.get(type) || [];
+    const contextMetadata = Array.from(this.contextMetadata.entries());
+
+    for (const [target, contexts] of contextMetadata) {
+      if (type.prototype instanceof target) {
+        result.push(...contexts);
       }
     }
 

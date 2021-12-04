@@ -33,6 +33,8 @@ export function withController<
   Req extends NextApiRequestWithParams = NextApiRequestWithParams,
   Res extends NextApiResponse = NextApiResponse
 >(target: ObjectType<any>) {
+  assertIsValidApiFileName();
+
   const basePath = getBasePath();
   const controller = new target();
   const controllerRoutes: ControllerRoute<Req, Res>[] = [];
@@ -43,8 +45,9 @@ export function withController<
     .filter((m) => m.methodName == null)
     .map((m) => m.handler);
 
-  const controllerConfig =
-    metadataStore.getController(target)?.config || DEFAULT_CONTROLLER_CONFIG;
+  // prettier-ignore
+  const controllerConfig = metadataStore.getController(target)?.config || DEFAULT_CONTROLLER_CONFIG;
+  const httpContexts = metadataStore.getContext(target);
 
   for (const action of actions) {
     const pattern: string | RegExp = action.pattern || "/";
@@ -69,6 +72,7 @@ export function withController<
     });
   }
 
+  // Returns a handler to the request
   return async function (req: Req, res: Res) {
     let url = req.url || "/";
 
@@ -83,12 +87,15 @@ export function withController<
     const errorHandler = metadataStore.getErrorHandler(target) as ErrorHandler<Req, Res> | undefined;
     const onError = errorHandler ?? defaultErrorHandler;
     let done = false;
+    let hasError = false;
 
     // The next action handler
     const next = (err?: any) => {
       done = true;
 
-      if (err) {
+      // Check if there was an error to avoid overflow
+      if (!hasError && err) {
+        hasError = true;
         return onError(err, req, res, next);
       }
     };
@@ -103,40 +110,25 @@ export function withController<
         }
       }
 
+      // Reset the state
+      done = false;
       return true;
     }
 
     // Inject the context
-    if (!!controllerConfig.context) {
-      if (!controller.context) {
-        throw new Error(`Controller ${target.name} does not have a context property.
-        
-        When using "RouteController({ injectContext: true })" you must expose a public property
-        named "context" which will receive the request context "HttpContext" object.`);
-      }
-
-      let context: HttpContext<any, Req, Res> | undefined = controller.context;
-
-      if (context == null) {
-        const state =
-          typeof controllerConfig.context === "object"
-            ? controllerConfig.context
-            : {};
-
-        context = {
-          state,
-          request: req,
-          response: res,
-        };
-      }
-
-      context.request = req;
-      context.response = res;
-      controller.context = context;
+    for (const context of httpContexts) {
+      const currentContext = controller[context.propertyName];
+      const state = currentContext?.state || context.config.state || {};
+      controller[context.propertyName] = new HttpContext(state, req, res);
     }
 
     // Run all the middlewares of this controller
     if (!(await runMiddlewares(controllerMiddlewares))) {
+      return;
+    }
+
+    // A response was already written
+    if (res.writableEnded) {
       return;
     }
 
@@ -161,6 +153,18 @@ export function withController<
   };
 }
 
+function getBasePath() {
+  const dirname = __dirname.split(path.sep);
+
+  const idx = dirname.indexOf("api");
+
+  if (idx === -1) {
+    throw new Error(`Could not find "api/" folder`);
+  }
+
+  return "/" + dirname.slice(idx).join("/");
+}
+
 function findRouteHandler(
   url: string,
   req: NextApiRequestWithParams,
@@ -180,18 +184,6 @@ function findRouteHandler(
   }
 
   return null;
-}
-
-function getBasePath() {
-  const dirname = __dirname.split(path.sep);
-
-  const idx = dirname.indexOf("api");
-
-  if (idx === -1) {
-    throw new Error(`Could not find "api/" folder`);
-  }
-
-  return "/" + dirname.slice(idx).join("/");
 }
 
 async function handleRequest<
@@ -240,4 +232,18 @@ function defaultErrorHandler<
   });
 
   next();
+}
+
+// Check if the file is valid for an /api route.
+// This cannot capture all the routes for errors, but it should be enough for most cases.
+function assertIsValidApiFileName() {
+  const fileName = path.basename(__filename, path.extname(__filename));
+  const pattern = /\[\[\.\.\.[.+]\]\]/;
+
+  console.log("Matching... ", fileName);
+  if (!pattern.test(fileName)) {
+    throw new Error(
+      `Api endpoint filename must match the pattern "[[...params]]" to capture all request but was "${fileName}"`
+    );
+  }
 }
