@@ -1,5 +1,4 @@
 import { NextApiResponse } from "next";
-import { getValue } from "./utils";
 import path from "path";
 import {
   ErrorHandler,
@@ -13,6 +12,7 @@ import {
   RoutePath,
   DEFAULT_CONTROLLER_CONFIG,
   RouteControllerConfig,
+  Results,
 } from ".";
 
 interface ControllerRoute<Req, Res> {
@@ -57,7 +57,7 @@ export function withController<
       .map((m) => m.handler);
 
     // prettier-ignore
-    const method = getValue<Handler<Req, Res>>(controller, action.methodName)!;
+    const method = controller[action.methodName] as Handler<Req, Res>;
     console.assert(method != null, `Method ${action.methodName} not found`);
 
     controllerRoutes.push({
@@ -186,6 +186,10 @@ async function handleRequest<
 
   if (result === undefined) {
     return res.status(config.statusCodeOnUndefined).end();
+  }
+
+  if (result instanceof Results) {
+    return await result.resolve(res);
   }
 
   if (typeof result === "object" || Array.isArray(result)) {

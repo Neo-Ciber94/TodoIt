@@ -1,4 +1,9 @@
-import { withController, Get, NextApiRequestWithParams } from "src/next-controllers";
+import {
+  withController,
+  Get,
+  NextApiRequestWithParams,
+  Results,
+} from "src/next-controllers";
 
 class HelloController {
   @Get()
@@ -6,9 +11,14 @@ class HelloController {
     return "Hello World!";
   }
 
-  @Get("/:name")
-  sayHelloTo(req: NextApiRequestWithParams) {
-    return `Hello ${req.params.name}!`;
+  // @Get("/:name")
+  // sayHelloTo(req: NextApiRequestWithParams) {
+  //   return `Hello ${req.params.name}!`;
+  // }
+
+  @Get("/file")
+  getFile() {
+    return Results.download("/public/tomato.jpg", "image/jpg", "tmt.jpg");
   }
 }
 
