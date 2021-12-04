@@ -10,12 +10,9 @@ import {
   RouteController,
 } from "src/next-controllers";
 
-@RouteController()
-@UseMiddleware(morgan('dev'))
+@RouteController({ state: { count: 0 } })
+@UseMiddleware(morgan("dev"))
 class HelloController {
-  @Context({ state: { count: 0 } })
-  context!: HttpContext;
-
   @Get()
   sayHello() {
     return "Hello World!";
@@ -27,14 +24,15 @@ class HelloController {
   // }
 
   @Post("/count")
-  count() {
-    this.context.state.count += 1;
-    return this.context.state;
+  count(context: HttpContext) {
+    context.state.count += 1;
+    return context.state;
   }
 
   @Get("/count")
-  getCount() {
-    return this.context.state;
+  getCount(context: HttpContext) {
+    console.log(context.state)
+    return context.state;
   }
 }
 

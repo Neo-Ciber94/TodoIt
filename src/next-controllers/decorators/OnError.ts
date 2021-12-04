@@ -7,9 +7,9 @@ import { getMetadataStorage, ObjectType } from "..";
  * ```
  */
 export function OnError() {
-  return function (target: ObjectType<any>, methodName: string) {
+  return function (target: any, methodName: string) {
     getMetadataStorage().addErrorHandler({
-      target: target,
+      target: target.constructor,
       methodName,
     });
   };

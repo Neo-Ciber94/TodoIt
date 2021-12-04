@@ -28,7 +28,6 @@ interface ControllerMiddlewareMetadata {
 interface ControllerHttpContextMetadata {
   target: ObjectType<any>;
   propertyName: string;
-  config: ContextConfig;
 }
 
 /**

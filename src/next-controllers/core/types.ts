@@ -1,4 +1,5 @@
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
+import { HttpContext } from "..";
 
 /**
  * Represents an object type that can be instantiate.
@@ -8,7 +9,10 @@ export type ObjectType<T> = Function & { new (...args: any[]): T };
 /**
  * Represents a route handler.
  */
-export type Handler<Req, Res> = (req: Req, res: Res) => Promise<any> | any;
+export type Handler<
+  Req extends NextApiRequestWithParams,
+  Res extends NextApiResponse
+> = (context: HttpContext<any, Req, Res>) => Promise<any> | any;
 
 /**
  * A handler for call the next action.
@@ -18,10 +22,12 @@ export type NextHandler = (err?: any) => void;
 /**
  * A handler for the errors.
  */
-export type ErrorHandler<Req, Res> = (
+export type ErrorHandler<
+  Req extends NextApiRequestWithParams,
+  Res extends NextApiResponse
+> = (
   err: any,
-  req: Req,
-  res: Res,
+  context: HttpContext<any, Req, Res>,
   next: NextHandler
 ) => Promise<any> | any;
 

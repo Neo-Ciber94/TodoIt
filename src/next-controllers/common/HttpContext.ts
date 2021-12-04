@@ -1,5 +1,5 @@
 import { NextApiResponse } from "next";
-import { NextApiRequestWithParams, Params } from "..";
+import { NextApiRequestWithParams } from "..";
 
 /**
  * Represents the context of a current http request.
@@ -20,7 +20,7 @@ export class HttpContext<
   }
 
   /**
-   * An state object to share data within the controller.
+   * An state object to share data in the controller.
    */
   get state(): TState {
     return this._state;
@@ -38,26 +38,5 @@ export class HttpContext<
    */
   get response(): Res {
     return this._response;
-  }
-
-  /**
-   * Returns the params of the request.
-   */
-  get requestParams(): Params {
-    return this.request.params || {};
-  }
-
-  /**
-   * Returns the query params of the request
-   */
-  get requestQuery(): Record<string, string | string[]> {
-    return this.request.query || {};
-  }
-
-  /**
-   * Returns the body of the request.
-   */
-  get requestBody(): any {
-    return this.request.body;
   }
 }

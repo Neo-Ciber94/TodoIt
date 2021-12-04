@@ -14,13 +14,14 @@ import {
   Results,
   HttpContext,
   RoutePath,
+  HTTP_STATUS_CODES,
 } from ".";
 
-interface ControllerRoute<Req, Res> {
+interface ControllerRoute {
   path: RoutePath;
   method: ActionType;
-  handler: Handler<Req, Res>;
-  middlewares: Middleware<Req, Res>[];
+  handler: Handler<any, any>;
+  middlewares: Middleware<any, any>[];
 }
 
 /**
@@ -37,7 +38,7 @@ export function withController<
 
   const basePath = getBasePath();
   const controller = new target();
-  const controllerRoutes: ControllerRoute<Req, Res>[] = [];
+  const controllerRoutes: ControllerRoute[] = [];
   const metadataStore = getMetadataStorage();
   const actions = metadataStore.getActions(target);
   const allMiddlewares = metadataStore.getMiddlewares(target);
@@ -47,8 +48,20 @@ export function withController<
 
   // prettier-ignore
   const controllerConfig = metadataStore.getController(target)?.config || DEFAULT_CONTROLLER_CONFIG;
-  const httpContexts = metadataStore.getContext(target);
+  const httpContextMetadata = metadataStore.getContext(target);
+  const contextState = controllerConfig.state || {};
 
+  // prettier-ignore
+  // Binds the 'onError' callback
+  const errorHandlerMetadata = metadataStore.getErrorHandler(target);
+  const errorHandler = errorHandlerMetadata
+    ? controller[errorHandlerMetadata.methodName]
+    : null;
+
+  // prettier-ignore
+  const onError = (errorHandler?.bind(controller) ?? defaultErrorHandler) as ErrorHandler<Req, Res>;
+
+  // Register all the routes of this controller
   for (const action of actions) {
     const pattern: string | RegExp = action.pattern || "/";
 
@@ -83,9 +96,9 @@ export function withController<
     // Slice the base path
     url = url.slice(basePath.length);
 
-    // prettier-ignore
-    const errorHandler = metadataStore.getErrorHandler(target) as ErrorHandler<Req, Res> | undefined;
-    const onError = errorHandler ?? defaultErrorHandler;
+    // HttpContext for the current request
+    const httpContext = new HttpContext(contextState, req, res);
+
     let done = false;
     let hasError = false;
 
@@ -96,7 +109,7 @@ export function withController<
       // Check if there was an error to avoid overflow
       if (!hasError && err) {
         hasError = true;
-        return onError(err, req, res, next);
+        return onError(err, httpContext, next);
       }
     };
 
@@ -116,15 +129,17 @@ export function withController<
     }
 
     // Inject the context
-    for (const context of httpContexts) {
-      const currentContext = controller[context.propertyName];
-      const state = currentContext?.state || context.config.state || {};
-      controller[context.propertyName] = new HttpContext(state, req, res);
+    for (const context of httpContextMetadata) {
+      controller[context.propertyName] = httpContext;
     }
 
-    // Run all the middlewares of this controller
-    if (!(await runMiddlewares(controllerMiddlewares))) {
-      return;
+    try {
+      // Run all the middlewares of this controller
+      if (!(await runMiddlewares(controllerMiddlewares))) {
+        return;
+      }
+    } catch (err: any) {
+      return next(err);
     }
 
     // A response was already written
@@ -142,9 +157,9 @@ export function withController<
           return;
         }
 
-        return await handleRequest(route, controllerConfig, req, res);
+        return await handleRequest(route, controllerConfig, httpContext);
       } catch (err: any) {
-        next(err);
+        return next(err);
       }
     }
 
@@ -168,8 +183,8 @@ function getBasePath() {
 function findRouteHandler(
   url: string,
   req: NextApiRequestWithParams,
-  routes: ControllerRoute<any, any>[]
-): ControllerRoute<any, any> | null {
+  routes: ControllerRoute[]
+): ControllerRoute | null {
   for (const route of routes) {
     const matches = route.path.match(url);
 
@@ -190,47 +205,45 @@ async function handleRequest<
   Req extends NextApiRequestWithParams,
   Res extends NextApiResponse
 >(
-  route: ControllerRoute<Req, Res>,
+  route: ControllerRoute,
   config: RouteControllerConfig,
-  req: Req,
-  res: Res
+  context: HttpContext<any, Req, Res>
 ) {
-  const result = await route.handler(req, res);
+  const result = await route.handler(context);
 
   // A response was already written
-  if (res.writableEnded) {
+  if (context.response.writableEnded) {
     return;
   }
 
   if (result === null) {
-    return res.status(config.statusCodeOnNull).end();
+    return context.response.status(config.statusCodeOnNull).end();
   }
 
   if (result === undefined) {
-    return res.status(config.statusCodeOnUndefined).end();
+    return context.response.status(config.statusCodeOnUndefined).end();
   }
 
   if (result instanceof Results) {
-    return await result.resolve(res);
+    return await result.resolve(context.response);
   }
 
   if (typeof result === "object" || Array.isArray(result)) {
-    return res.json(result);
+    return context.response.json(result);
   }
 
-  return res.send(result);
+  return context.response.send(result);
 }
 
 function defaultErrorHandler<
   Req extends NextApiRequestWithParams,
   Res extends NextApiResponse
->(err: any, _: Req, res: Res, next: NextHandler) {
+>(err: any, { response }: HttpContext<any, Req, Res>, next: NextHandler) {
   console.error(err);
 
-  res.status(500).json({
-    message: err.message || "Internal Server Error",
+  response.status(500).json({
+    message: err.message || HTTP_STATUS_CODES[500],
   });
-
   next();
 }
 

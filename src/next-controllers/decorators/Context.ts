@@ -1,28 +1,14 @@
 import { getMetadataStorage } from "..";
 
-export const DEFAULT_CONTEXT_CONFIG: ContextConfig = Object.freeze({
-  state: {},
-});
 
 /**
- * Configuration for the context decorator.
+ * Injects the `HttpContext` in a property.
  */
-export interface ContextConfig<TState extends object = Record<string, any>> {
-  /**
-   * Initial state of the context.
-   */
-  state: TState;
-}
-
-export function Context(config?: Partial<ContextConfig>) {
+export function Context() {
   return function (target: any, propertyKey: string) {
     getMetadataStorage().addContext({
       target: target.constructor,
-      propertyName: propertyKey,
-      config: {
-        ...DEFAULT_CONTEXT_CONFIG,
-        ...config,
-      },
+      propertyName: propertyKey
     });
   };
 }
