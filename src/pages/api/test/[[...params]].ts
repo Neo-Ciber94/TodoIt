@@ -18,7 +18,7 @@ class HelloController {
 
   @Get("/file")
   getFile() {
-    return Results.download("/public/tomato.jpg", "image/jpg", "red-tom");
+    return Results.download("/public/tomato.jpg", "image", "red-tom");
   }
 }
 
