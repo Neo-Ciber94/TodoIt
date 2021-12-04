@@ -5,7 +5,7 @@ import { HttpContext } from "..";
  * Specialization of `HttpContext` type for NextJS.
  */
 export type NextApiContext<
-  TState extends object = Record<string, any>,
+  TState = any,
   Req extends NextApiRequestWithParams = NextApiRequestWithParams,
   Res extends NextApiResponse = NextApiResponse
 > = HttpContext<TState, Req, Res>;

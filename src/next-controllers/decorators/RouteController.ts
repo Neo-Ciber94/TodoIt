@@ -1,8 +1,4 @@
-import {
-  getMetadataStorage,
-  ObjectType,
-  ValueOrPromise,
-} from "..";
+import { getMetadataStorage, ObjectType, ValueOrPromise } from "..";
 
 export const DEFAULT_CONTROLLER_CONFIG: RouteControllerConfig = Object.freeze({
   statusCodeOnNull: 404,
@@ -13,7 +9,7 @@ export const DEFAULT_CONTROLLER_CONFIG: RouteControllerConfig = Object.freeze({
 /**
  * Configuration for an ``@RouteController`` decorator.
  */
-export interface RouteControllerConfig<T extends object = Record<string, any>> {
+export interface RouteControllerConfig<T = any> {
   /**
    * Status code to return when `null` is returned from the controller method, default is `404`.
    */
