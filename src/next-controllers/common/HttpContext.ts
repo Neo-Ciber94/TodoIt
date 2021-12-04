@@ -53,4 +53,11 @@ export class HttpContext<
   get requestQuery(): Record<string, string | string[]> {
     return this.request.query || {};
   }
+
+  /**
+   * Returns the body of the request.
+   */
+  get requestBody(): any {
+    return this.request.body;
+  }
 }
