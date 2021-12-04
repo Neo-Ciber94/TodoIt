@@ -25,18 +25,40 @@ export abstract class Results {
     })();
   }
 
+  /**
+   * Creates a `Result` for a json response.
+   * @param data The data to send.
+   * @returns A result for a json response.
+   */
   static json(data: any): Results {
     return Results.fn((res) => res.json(data));
   }
 
+  /**
+   * Creates a `Result` for a text response.
+   * @param text The text to send.
+   * @returns A result for a text response.
+   */
   static text(text: string): Results {
     return Results.fn((res) => res.send(text));
   }
 
+  /**
+   * Creates a `Result` for a file response.
+   * @param filePath The path of the file relative to the root directory.
+   * @param contentType The mime-type of the file.
+   * @returns A result for a file.
+   */
   static file(filePath: string, contentType: string): Results {
     return new ResultsWithFile(filePath, contentType);
   }
 
+  /**
+   * Creates a `Result` for that downloads a file.
+   * @param filePath The path of the file relative to the root directory.
+   * @param contentType The mime-type of the file.
+   * @returns A result for a file download.
+   */
   static download(
     filePath: string,
     contentType: string,
@@ -45,14 +67,30 @@ export abstract class Results {
     return new ResultsWithDownload(filePath, contentType, filename);
   }
 
-  static bytes(stream: Buffer): Results {
-    return Results.fn((res) => res.write(stream));
+  /**
+   * Creates a `Result` for a byte stream.
+   * @param buffer The stream of bytes to send.
+   * @returns A result for a stream.
+   */
+  static bytes(buffer: Buffer): Results {
+    return Results.fn((res) => res.write(buffer));
   }
 
+  /**
+   * Creates a `Result` for a byte stream.
+   * @param stream The stream of bytes to send.
+   * @returns A result for a stream.
+   */
   static stream(stream: fs.ReadStream): Results {
     return Results.fn((res) => stream.pipe(res));
   }
 
+  /**
+   * Creates a `Result` with a status code.
+   * @param statusCode The status code of the response.
+   * @param message The custom message, if not specified, the default message is used.
+   * @returns A result for a status code.
+   */
   static statusCode(
     statusCode: keyof typeof HTTP_STATUS_CODES,
     message?: string
@@ -60,38 +98,83 @@ export abstract class Results {
     return new ResultsWithStatusCode(statusCode, message);
   }
 
+  /**
+   * Creates a `Result` for a 200 (OK) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 200 (OK) response.
+   */
   static ok(message?: string): Results {
     return ResultsWithStatusCode.create(200, message);
   }
 
-  static accepted(message?: string): Results {
-    return ResultsWithStatusCode.create(202, message);
-  }
-
-  static noContent(message?: string): Results {
-    return ResultsWithStatusCode.create(204, message);
-  }
-
+  /**
+   * Creates a `Result` for a 201 (Created) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 201 (Created) response.
+   */
   static created(obj: any, uri: string): Results {
     return new ResultsWithStatusCodeCreated(obj, uri);
   }
 
+  /**
+   * Creates a `Result` for a 202 (Accepted) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 202 (Accepted) response.
+   */
+  static accepted(message?: string): Results {
+    return ResultsWithStatusCode.create(202, message);
+  }
+
+  /**
+   * Creates a `Result` for a 204 (No Content) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 204 (No Content) response.
+   */
+  static noContent(message?: string): Results {
+    return ResultsWithStatusCode.create(204, message);
+  }
+
+  /**
+   * Creates a `Result` for a 400 (Bad Request) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 400 (Bad Request) response.
+   */
   static badRequest(message?: string): Results {
     return ResultsWithStatusCode.create(400, message);
   }
 
+  /**
+   * Creates a `Result` for a 401 (Unauthorized) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 401 (Unauthorized) response.
+   */
   static unauthorized(message?: string): Results {
     return ResultsWithStatusCode.create(401, message);
   }
 
+  /**
+   * Creates a `Result` for a 403 (Forbidden) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 403 (Forbidden) response.
+   */
   static forbidden(message?: string): Results {
     return ResultsWithStatusCode.create(403, message);
   }
 
+  /**
+   * Creates a `Result` for a 404 (Not Found) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 404 (Not Found) response.
+   */
   static notFound(message?: string): Results {
     return ResultsWithStatusCode.create(404, message);
   }
 
+  /**
+   * Creates a `Result` for a 500 (Internal Server Error) response.
+   * @param message A custom message, if not specified, the default message is used.
+   * @returns A result for an 500 (Internal Server Error) response.
+   */
   static internalServerError(message?: string): Results {
     return ResultsWithStatusCode.create(500, message);
   }
