@@ -1,6 +1,9 @@
 import { getMetadataStorage } from "../core/metadata";
 
-
+/**
+ * Register a handler for 'POST' requests.
+ * @param pattern Pattern for matching the route.
+ */
 export function Post(pattern?: string | RegExp) {
   return function (target: any, methodName: string) {
     getMetadataStorage().addAction({

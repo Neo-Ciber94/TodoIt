@@ -22,11 +22,7 @@ interface ControllerRoute<Req, Res> {
 
 /**
  * Creates a function from the given controller that handles the requests for this route.
- * 
- * @example
- * ```
- * ```
- * 
+ *
  * @param target The target type to create the route controller.
  * @returns A controller for this route.
  */
@@ -56,7 +52,9 @@ export function withController<
       .map((m) => m.handler);
 
     // prettier-ignore
-    const method = getValue<Handler<Req, Res>>(controller, action.methodName);
+    const method = getValue<Handler<Req, Res>>(controller, action.methodName)!;
+    console.assert(method != null, `Method ${action.methodName} not found`);
+
     controllerRoutes.push({
       path: new RoutePath(pattern as any), // FIXME: Typescript is not detecting string|RegExp
       method: action.method,
