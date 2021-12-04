@@ -1,11 +1,19 @@
+import morgan from "morgan";
 import {
   withController,
   Get,
   NextApiRequestWithParams,
-  Results,
+  Post,
+  Context,
+  HttpContext,
+  UseMiddleware,
 } from "src/next-controllers";
 
+@UseMiddleware(morgan('dev'))
 class HelloController {
+  @Context({ state: { count: 0 } })
+  context!: HttpContext;
+
   @Get()
   sayHello() {
     return "Hello World!";
@@ -16,9 +24,15 @@ class HelloController {
   //   return `Hello ${req.params.name}!`;
   // }
 
-  @Get("/file")
-  getFile() {
-    return Results.download("/public/tomato.jpg", "image", "red-tom");
+  @Post("/count")
+  count(req: NextApiRequestWithParams) {
+    this.context.state.count += 1;
+    return this.context.state;
+  }
+
+  @Get("/count")
+  getCount() {
+    return this.context.state;
   }
 }
 

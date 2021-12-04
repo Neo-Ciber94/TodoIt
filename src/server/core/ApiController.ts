@@ -15,9 +15,7 @@ import {
 } from "src/next-controllers";
 import Put from "src/next-controllers/decorators/Put";
 
-@RouteController({
-  context: true,
-})
+@RouteController()
 export class ApiController<T> {
   constructor(private readonly repository: IRepository<T>) {}
 

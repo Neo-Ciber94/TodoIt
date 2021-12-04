@@ -238,9 +238,8 @@ function defaultErrorHandler<
 // This cannot capture all the routes for errors, but it should be enough for most cases.
 function assertIsValidApiFileName() {
   const fileName = path.basename(__filename, path.extname(__filename));
-  const pattern = /\[\[\.\.\.[.+]\]\]/;
+  const pattern = /\[\[\.\.\.(.+)\]\]/;
 
-  console.log("Matching... ", fileName);
   if (!pattern.test(fileName)) {
     throw new Error(
       `Api endpoint filename must match the pattern "[[...params]]" to capture all request but was "${fileName}"`
