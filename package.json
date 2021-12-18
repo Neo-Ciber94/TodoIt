@@ -13,7 +13,6 @@
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.0",
     "@mui/material": "^5.2.2",
-    "@tailwindcss/line-clamp": "^0.2.2",
     "@types/imagesloaded": "^4.1.2",
     "axios": "^0.24.0",
     "imagesloaded": "^4.1.4",
