@@ -1,20 +1,18 @@
 import morgan from "morgan";
 import {
-  withController,
   Get,
-  Post,
-  UseMiddleware,
-  RouteController,
   NextApiContext,
-} from "src/next-controllers";
+  Post,
+  RouteController,
+  UseMiddleware,
+  withController,
+} from "next-controllers";
 
 type State = {
   count: number;
 };
 
-@RouteController<State>({
-  state: { count: 0 },
-})
+@RouteController<State>({ state: { count: 0 } })
 @UseMiddleware(morgan("dev"))
 class HelloController {
   @Get()
