@@ -1,5 +1,5 @@
-import seedTodos from "@server/db/mongodb/schemas/todos.seed";
 import * as Mongoose from "mongoose";
+import seedTodos from "../schemas/todos.seed";
 
 let connection: Mongoose.Connection;
 

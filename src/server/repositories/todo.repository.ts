@@ -1,7 +1,7 @@
-import Todo from "@server/db/mongodb/schemas/todo.schema";
-import { TodoDocument, TodoModel } from "@server/db/mongodb/schemas/todo.types";
+import Todo from "@server/db/schemas/todo.schema";
+import { TodoDocument, TodoModel } from "@server/db/schemas/todo.types";
 import { FilterQuery } from "mongoose";
-import { MongoRepository } from "./base/mongo.repository";
+import { BaseRepository } from "./base/repository.base";
 import { IRepository, PageResult, PaginationOptions } from "./base/repository";
 
 export type TodoPaginationOptions = Omit<
@@ -16,7 +16,7 @@ export interface ITodoRepository extends IRepository<TodoDocument> {
 }
 
 export class TodoRepository
-  extends MongoRepository<TodoDocument, TodoModel>
+  extends BaseRepository<TodoDocument, TodoModel>
   implements ITodoRepository
 {
   constructor() {

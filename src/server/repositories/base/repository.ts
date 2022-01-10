@@ -1,3 +1,5 @@
+import { FilterQuery } from "mongoose";
+
 export const EMPTY_PAGE_RESULT: PageResult<any> = Object.freeze({
   data: [],
   totalItems: 0,
@@ -22,21 +24,17 @@ export type PageSorting<T> = {
   [P in keyof T]?: SortDirection;
 };
 
-export type Query<T> = {
-  [P in keyof T]?: any;
-};
-
 export interface PaginationOptions<T> {
   page?: number;
   pageSize?: number;
   sorting?: PageSorting<T>;
-  query?: Query<T>;
+  query?: FilterQuery<T>;
 }
 
 export interface IReadRepository<TEntity> {
   findById(id: string): Promise<TEntity | null>;
-  findOne(query: Query<TEntity>): Promise<TEntity | null>;
-  find(query: Query<TEntity>): Promise<TEntity[]>;
+  findOne(query: FilterQuery<TEntity>): Promise<TEntity | null>;
+  find(query: FilterQuery<TEntity>): Promise<TEntity[]>;
 
   // prettier-ignore
   findWithPagination(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>>;

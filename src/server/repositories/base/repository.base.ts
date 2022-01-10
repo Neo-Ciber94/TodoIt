@@ -10,7 +10,7 @@ import { ValidationError } from "@server/utils/errors";
 const DEFAULT_MAX_PAGE_SIZE = 10;
 const NO_FOUND_ERROR_MESSAGE = "Resourse not found";
 
-export abstract class MongoRepository<TEntity, TModel extends Model<TEntity>>
+export abstract class BaseRepository<TEntity, TModel extends Model<TEntity>>
   implements IRepository<TEntity>
 {
   constructor(protected readonly model: TModel) {}
@@ -20,7 +20,7 @@ export abstract class MongoRepository<TEntity, TModel extends Model<TEntity>>
   ): Promise<PageResult<TEntity>> {
     const currentPage = Math.max(1, options.page || 1);
     const pageSize = Math.max(1, options.pageSize || DEFAULT_MAX_PAGE_SIZE);
-    const query = (options.query || {}) as FilterQuery<TEntity>;
+    const query = options.query || {};
     const count = await this.model.countDocuments(query);
     const totalPages = Math.ceil(count / pageSize);
 
@@ -57,14 +57,12 @@ export abstract class MongoRepository<TEntity, TModel extends Model<TEntity>>
     });
   }
 
-  async find(query: Partial<TEntity> = {}): Promise<TEntity[]> {
-    const filterQuery = query as FilterQuery<TEntity>;
-    return await this.model.find(filterQuery);
+  async find(query: FilterQuery<TEntity> = {}): Promise<TEntity[]> {
+    return await this.model.find(query);
   }
 
-  async findOne(query: Partial<TEntity> = {}): Promise<TEntity | null> {
-    const filterQuery = query as FilterQuery<TEntity>;
-    const result = await this.model.findOne(filterQuery);
+  async findOne(query: FilterQuery<TEntity> = {}): Promise<TEntity | null> {
+    const result = await this.model.findOne(query);
     return result;
   }
 
