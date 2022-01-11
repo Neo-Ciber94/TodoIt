@@ -1,3 +1,8 @@
+import {
+  getAccessToken,
+  getSession,
+  withApiAuthRequired,
+} from "@auth0/nextjs-auth0";
 import authMiddleware from "@server/middlewares/auth";
 import mongoDbMiddleware from "@server/middlewares/mongodb";
 import {
@@ -9,11 +14,11 @@ import { AppApiContext } from "@server/types";
 import { Validate } from "@server/utils/validate";
 import { ITodo } from "@shared/models/todo.model";
 import morgan from "morgan";
+import { NextApiRequest, NextApiResponse } from "next";
 import {
   Get,
   Post,
   Put,
-  Patch,
   Delete,
   UseMiddleware,
   withController,
@@ -32,7 +37,8 @@ class TodoController {
       options.search = String(request.query.search);
     }
 
-    return this.todoRepository.search(options);
+    const userId = request.userId;
+    return this.todoRepository.search(options, userId);
   }
 
   @Post("/")
@@ -44,25 +50,11 @@ class TodoController {
       Validate.isNonBlankString(content);
     }
 
-    const userId = request.userId;
-    return this.todoRepository.create({ title, content, color, userId });
+    const creatorUserId = request.userId;
+    return this.todoRepository.create({ title, content, color, creatorUserId });
   }
 
   @Put("/:id")
-  update({ request }: AppApiContext) {
-    const { title, content, completed, color } = request.body;
-    Validate.isBoolean(completed);
-    Validate.isNonBlankString(title);
-
-    if (content) {
-      Validate.isNonBlankString(content);
-    }
-
-    const id = String(request.params.id);
-    return this.todoRepository.update(id, { title, content, completed, color });
-  }
-
-  @Patch("/:id")
   patch({ request }: AppApiContext) {
     const { title, content, completed, color } = request.body;
 
@@ -79,7 +71,10 @@ class TodoController {
     }
 
     const id = String(request.params.id);
-    return this.todoRepository.partialUpdate(id, {
+    const creatorUserId = request.userId;
+    return this.todoRepository.update({
+      id,
+      creatorUserId,
       title,
       content,
       completed,
@@ -90,7 +85,8 @@ class TodoController {
   @Post("/:id/toggle")
   async toggle({ request }: AppApiContext) {
     const id = String(request.params.id);
-    const todo = await this.todoRepository.findById(id);
+    const userId = request.userId;
+    const todo = await this.todoRepository.findById(id, userId);
 
     if (todo == null) {
       return null;
@@ -100,9 +96,16 @@ class TodoController {
   }
 
   @Delete("/:id")
-  delete({ request }: AppApiContext) {
+  async delete({ request }: AppApiContext) {
     const id = String(request.params.id);
-    return this.todoRepository.delete(id);
+    const userId = request.userId;
+    const todo = await this.todoRepository.findById(id, userId);
+
+    if (todo == null) {
+      return null;
+    }
+
+    return this.todoRepository.delete(todo);
   }
 }
 

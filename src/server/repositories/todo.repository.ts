@@ -1,8 +1,8 @@
 import Todo from "@server/database/schemas/todo.schema";
 import { TodoDocument, TodoModel } from "@server/database/schemas/todo.types";
 import { FilterQuery } from "mongoose";
-import { BaseRepository } from "./base/repository.base";
 import { IRepository, PageResult, PaginationOptions } from "./base/repository";
+import { RepositoryWithCreator } from "./base/repository.base";
 
 // prettier-ignore
 export type TodoPaginationOptions = Omit<PaginationOptions<TodoDocument>, "query"> & {
@@ -10,18 +10,25 @@ export type TodoPaginationOptions = Omit<PaginationOptions<TodoDocument>, "query
 };
 
 export interface ITodoRepository extends IRepository<TodoDocument> {
-  search(options: TodoPaginationOptions): Promise<PageResult<TodoDocument>>;
+  search(
+    options: TodoPaginationOptions,
+    userId: string
+  ): Promise<PageResult<TodoDocument>>;
 }
 
 // prettier-ignore
-export class TodoRepository extends BaseRepository<TodoDocument, TodoModel> implements ITodoRepository {
+export class TodoRepository extends RepositoryWithCreator<TodoDocument, TodoModel> implements ITodoRepository {
   constructor() {
     super(Todo);
   }
 
-  search(options: TodoPaginationOptions): Promise<PageResult<TodoDocument>> {
+  search(options: TodoPaginationOptions, userId?: string): Promise<PageResult<TodoDocument>> {
+    if (userId == null) {
+      throw new Error("User id is required");
+    }
+
     if (options.search == null) {
-      return this.findWithPagination(options);
+      return super.findWithPagination(options, userId);
     }
 
     const query: FilterQuery<TodoDocument> = {
@@ -30,9 +37,8 @@ export class TodoRepository extends BaseRepository<TodoDocument, TodoModel> impl
         { content: { $regex: options.search, $options: "i" } },
       ],
     };
-
-    // SAFETY: Merge the search query with the existing query
+ 
     const newOptions = { ...options, query };
-    return this.findWithPagination(newOptions);
+    return super.findWithPagination(newOptions, userId);
   }
 }

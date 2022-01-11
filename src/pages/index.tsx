@@ -15,7 +15,6 @@ import { SearchTextField } from "src/components/SearchTextField";
 import { MasonryGrid } from "src/components/MasonryGrid";
 import AddIcon from "@mui/icons-material/Add";
 import Link from "next/link";
-import { PageTitle } from "src/components/PageTitle";
 import { ITodo } from "@shared/models/todo.model";
 import { useRouter } from "next/router";
 import { Center } from "src/components/Center";
@@ -23,9 +22,19 @@ import { useSprings, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { TodosFiltersDrawer } from "src/components/TodosFilterDrawer";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 const PAGE_SIZE = 30;
 const todoClient = new TodoApiClient();
+
+// export const getServerSideProps = withPageAuthRequired({
+//   getServerSideProps: async () => {
+//     const pageResult = await todoClient.getAll({
+//       pageSize: PAGE_SIZE,
+//     });
+//     return { props: { pageResult } };
+//   },
+// });
 
 export const getServerSideProps = async () => {
   const pageResult = await todoClient.getAll({
@@ -34,9 +43,9 @@ export const getServerSideProps = async () => {
   return { props: { pageResult } };
 };
 
-function Page({
-  pageResult,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+
+function Page({ pageResult }: PageProps) {
   const { data, currentPage, totalPages } = pageResult;
   const hasMoreItems = currentPage < totalPages;
   const [springs, _] = useSprings(3, (index) =>

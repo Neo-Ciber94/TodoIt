@@ -1,59 +1,27 @@
-import {
-  IRepository,
-  PageResult,
-  PaginationOptions,
-  SortDirection,
-} from "./repository";
+import { IRepository, PageResult, PaginationOptions } from "./repository";
 import { Model, FilterQuery } from "mongoose";
 import { ValidationError } from "@server/utils/errors";
+import { IEntityBase } from "@server/types";
+import { createPagination, NO_FOUND_ERROR_MESSAGE } from "../utils";
 
-const DEFAULT_MAX_PAGE_SIZE = 10;
-const NO_FOUND_ERROR_MESSAGE = "Resourse not found";
+/**
+ * An entity with a creator.
+ */
+export type EntityWithCreator = IEntityBase & { creatorUserId: string };
 
-export abstract class BaseRepository<TEntity, TModel extends Model<TEntity>>
-  implements IRepository<TEntity>
+/**
+ * A base repository with the basic operations.
+ */
+export abstract class Repository<
+  TEntity extends IEntityBase,
+  TModel extends Model<TEntity>
+> implements IRepository<TEntity>
 {
   constructor(protected readonly model: TModel) {}
 
   // prettier-ignore
-  async findWithPagination(options: PaginationOptions<TEntity> = {}): Promise<PageResult<TEntity>> {
-    const currentPage = Math.max(1, options.page || 1);
-    const pageSize = Math.max(1, options.pageSize || DEFAULT_MAX_PAGE_SIZE);
-    const query = options.query || {};
-    const count = await this.model.countDocuments(query);
-    const totalPages = Math.ceil(count / pageSize);
-
-    let sorting = options.sorting || {};
-
-    if (Object.entries(sorting).length === 0) {
-      sorting = { _id: SortDirection.Descending };
-    }
-
-    // Quick path
-    if (currentPage > totalPages) {
-      return pageData({
-        currentPage,
-        totalPages,
-        pageSize,
-        totalItems: count,
-        data: [],
-      });
-    }
-
-    const data = await this.model
-      .find(query)
-      .sort(sorting)
-      .skip((currentPage - 1) * pageSize)
-      .limit(pageSize)
-      .exec();
-
-    return pageData({
-      currentPage,
-      totalPages,
-      pageSize,
-      totalItems: count,
-      data,
-    });
+  findWithPagination(options: PaginationOptions<TEntity> = {}): Promise<PageResult<TEntity>> {
+    return createPagination(this.model, options);
   }
 
   async find(query: FilterQuery<TEntity> = {}): Promise<TEntity[]> {
@@ -79,20 +47,8 @@ export abstract class BaseRepository<TEntity, TModel extends Model<TEntity>>
     return result;
   }
 
-  async update(id: string, entity: Partial<TEntity>): Promise<TEntity> {
-    let entityToUpdate = await this.model.findById(id);
-
-    if (!entityToUpdate) {
-      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
-    }
-
-    entityToUpdate.set(entity);
-    entityToUpdate.save();
-    return entityToUpdate;
-  }
-
-  async partialUpdate(id: string, entity: Partial<TEntity>): Promise<TEntity> {
-    const entityToUpdate = await this.model.findById(id);
+  async update(entity: Partial<TEntity>): Promise<TEntity> {
+    const entityToUpdate = await this.model.findById(entity.id);
 
     if (!entityToUpdate) {
       throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
@@ -110,77 +66,73 @@ export abstract class BaseRepository<TEntity, TModel extends Model<TEntity>>
     return entityToUpdate;
   }
 
-  delete(id: string): Promise<TEntity>;
-  delete(entity: TEntity): Promise<TEntity>;
-  async delete(entityOrId: string | TEntity): Promise<TEntity> {
-    if (typeof entityOrId === "string") {
-      const entityToDelete = await this.model.findById(entityOrId);
-      if (!entityToDelete) {
-        throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
-      }
+  async delete(entity: TEntity): Promise<TEntity> {
+    const entityToDelete = await this.model.findById(entity.id);
 
-      await entityToDelete.remove();
-      return entityToDelete;
-    } else {
-      const result = await this.model.deleteOne(entityOrId);
-      
-      if (result.deletedCount === 0) {
-        throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
-      }
-
-      return entityOrId;
-    }
-  }
-
-  // prettier-ignore
-  protected async findWithQuery(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>> {
-    const currentPage = Math.max(1, options.page || 1);
-    const pageSize = Math.max(1, options.pageSize || DEFAULT_MAX_PAGE_SIZE);
-    const query = (options.query || {}) as FilterQuery<TEntity>;
-    const count = await this.model.countDocuments(query);
-    const totalPages = Math.ceil(count / pageSize);
-
-    let sorting = options.sorting || {};
-
-    if (Object.entries(sorting).length === 0) {
-      sorting = { _id: SortDirection.Descending };
+    if (!entityToDelete) {
+      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
     }
 
-    // Quick path
-    if (currentPage > totalPages) {
-      return pageData({
-        currentPage,
-        totalPages,
-        pageSize,
-        totalItems: count,
-        data: [],
-      });
-    }
-
-    const data = await this.model
-      .find(query)
-      .sort(sorting)
-      .skip((currentPage - 1) * pageSize)
-      .limit(pageSize)
-      .exec();
-
-    return pageData({
-      currentPage,
-      totalPages,
-      pageSize,
-      totalItems: count,
-      data,
-    });
+    await entityToDelete.remove();
+    return entityToDelete;
   }
 }
 
-// prettier-ignore
-function pageData<T>({ data, pageSize, currentPage, totalPages, totalItems }: PageResult<T>): PageResult<T> {
-  return {
-    currentPage,
-    pageSize,
-    totalPages,
-    totalItems,
-    data,
-  };
+/**
+ * A repository whose entities have a creator.
+ */
+export abstract class RepositoryWithCreator<
+  TEntity extends EntityWithCreator,
+  TModel extends Model<TEntity>
+> extends Repository<TEntity, TModel> {
+  async findWithPagination(
+    options?: PaginationOptions<TEntity>,
+    creatorUserId?: string
+  ): Promise<PageResult<TEntity>> {
+    options = options || {};
+    const query: FilterQuery<TEntity> = options.query || {};
+    const result = await createPagination(this.model, {
+      ...options,
+      query: { ...query, creatorUserId },
+    });
+    return result;
+  }
+
+  override async findById(
+    id: string,
+    userId?: string
+  ): Promise<TEntity | null> {
+    if (userId == null) {
+      throw new ValidationError("User id is required");
+    }
+
+    const result = await this.model.findById(id);
+
+    if (result?.creatorUserId !== userId) {
+      return null;
+    }
+
+    return result;
+  }
+
+  async find(
+    query?: FilterQuery<TEntity>,
+    userId?: string
+  ): Promise<TEntity[]> {
+    query = query || {};
+    const result = await this.model.find({ ...query, creatorUserId: userId });
+    return result;
+  }
+
+  async findOne(
+    query?: FilterQuery<TEntity>,
+    userId?: string
+  ): Promise<TEntity | null> {
+    query = query || {};
+    const result = await this.model.findOne({
+      ...query,
+      creatorUserId: userId,
+    });
+    return result;
+  }
 }

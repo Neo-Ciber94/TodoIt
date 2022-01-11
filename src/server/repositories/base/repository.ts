@@ -1,12 +1,5 @@
 import { FilterQuery } from "mongoose";
 
-export const EMPTY_PAGE_RESULT: PageResult<any> = Object.freeze({
-  data: [],
-  totalItems: 0,
-  currentPage: 0,
-  pageSize: 0,
-  totalPages: 0,
-});
 export interface PageResult<T> {
   data: T[];
   totalItems: number;
@@ -31,22 +24,19 @@ export interface PaginationOptions<T> {
   query?: FilterQuery<T>;
 }
 
+// prettier-ignore
 export interface IReadRepository<TEntity> {
   findById(id: string): Promise<TEntity | null>;
   findOne(query: FilterQuery<TEntity>): Promise<TEntity | null>;
   find(query: FilterQuery<TEntity>): Promise<TEntity[]>;
-
-  // prettier-ignore
   findWithPagination(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>>;
 }
 
 // prettier-ignore
-export interface IWriteRepository<TEntity, TCreate = Partial<TEntity>, TUpdate = Partial<TEntity>> {
-  create(entity: TCreate): Promise<TEntity>;
-  createMany(entities: TCreate[]): Promise<TEntity[]>;
-  update(id: string, entity: TUpdate): Promise<TEntity>;
-  partialUpdate(id: string, entity: TUpdate): Promise<TEntity>;
-  delete(id: string): Promise<TEntity>;
+export interface IWriteRepository<TEntity> {
+  create(entity: Partial<TEntity>): Promise<TEntity>;
+  createMany(entities: Partial<TEntity>[]): Promise<TEntity[]>;
+  update(entity: Partial<TEntity>): Promise<TEntity>;
   delete(entity: TEntity): Promise<TEntity>;
 }
 

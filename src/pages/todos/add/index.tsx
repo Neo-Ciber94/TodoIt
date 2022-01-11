@@ -3,10 +3,11 @@ import { useRouter } from "next/router";
 import { PromiseUtils } from "@shared/utils/PromiseUtilts";
 import React from "react";
 import { CreateOrEditTodoPage } from "src/components/CreateOrEditTodoPage";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 const todoClient = new TodoApiClient();
 
-export default function CreateTodo() {
+function CreateTodo() {
   const router = useRouter();
 
   return (
@@ -26,3 +27,5 @@ export default function CreateTodo() {
     />
   );
 }
+
+export default withPageAuthRequired(CreateTodo);

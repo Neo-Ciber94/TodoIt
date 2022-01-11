@@ -11,6 +11,11 @@ const tagSchema = new Schema<TagDocument, TagModel>(
       minlength: 1,
       maxLength: 25,
     },
+    creatorUserId: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     createdAt: {
       type: Date,
       immutable: true,

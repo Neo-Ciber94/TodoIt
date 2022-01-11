@@ -2,7 +2,7 @@ import mongoose, { Schema, SchemaTypes } from "mongoose";
 import { TodoDocument, TodoModel } from "./todo.types";
 import { PASTEL_COLORS } from "@shared/config";
 
-const todoSchema = new Schema(
+const todoSchema = new Schema<TodoDocument, TodoModel>(
   {
     title: {
       type: String,
@@ -30,7 +30,7 @@ const todoSchema = new Schema(
       ref: "Tag",
       default: [],
     },
-    userId: {
+    creatorUserId: {
       type: String,
       trim: true,
       unique: true,
