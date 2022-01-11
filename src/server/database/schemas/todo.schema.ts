@@ -30,9 +30,10 @@ const todoSchema = new Schema(
       ref: "Tag",
       default: [],
     },
-    user: {
-      type: SchemaTypes.ObjectId,
-      ref: "User",
+    userId: {
+      type: String,
+      trim: true,
+      unique: true,
       required: true,
     },
     createdAt: {

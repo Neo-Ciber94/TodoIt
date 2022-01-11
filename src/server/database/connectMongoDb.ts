@@ -30,7 +30,7 @@ export async function connectMongoDb(): Promise<Mongoose.Connection> {
     connection = Mongoose.connection;
 
     // Run an initialization routine
-    await initialize();
+    // await initialize();
 
     console.log("Connected to MongoDB");
   } catch (error) {

@@ -3,6 +3,7 @@ export interface ITodo {
   title: string;
   content: string;
   color: string;
+  userId: string;
   completed: boolean;
   createdAt: Date;
   updatedAt: Date;
