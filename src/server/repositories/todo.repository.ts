@@ -4,10 +4,8 @@ import { FilterQuery } from "mongoose";
 import { BaseRepository } from "./base/repository.base";
 import { IRepository, PageResult, PaginationOptions } from "./base/repository";
 
-export type TodoPaginationOptions = Omit<
-  PaginationOptions<TodoDocument>,
-  "query"
-> & {
+// prettier-ignore
+export type TodoPaginationOptions = Omit<PaginationOptions<TodoDocument>, "query"> & {
   search?: string;
 };
 
@@ -15,10 +13,8 @@ export interface ITodoRepository extends IRepository<TodoDocument> {
   search(options: TodoPaginationOptions): Promise<PageResult<TodoDocument>>;
 }
 
-export class TodoRepository
-  extends BaseRepository<TodoDocument, TodoModel>
-  implements ITodoRepository
-{
+// prettier-ignore
+export class TodoRepository extends BaseRepository<TodoDocument, TodoModel> implements ITodoRepository {
   constructor() {
     super(Todo);
   }

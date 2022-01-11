@@ -15,9 +15,8 @@ export abstract class BaseRepository<TEntity, TModel extends Model<TEntity>>
 {
   constructor(protected readonly model: TModel) {}
 
-  async findWithPagination(
-    options: PaginationOptions<TEntity> = {}
-  ): Promise<PageResult<TEntity>> {
+  // prettier-ignore
+  async findWithPagination(options: PaginationOptions<TEntity> = {}): Promise<PageResult<TEntity>> {
     const currentPage = Math.max(1, options.page || 1);
     const pageSize = Math.max(1, options.pageSize || DEFAULT_MAX_PAGE_SIZE);
     const query = options.query || {};

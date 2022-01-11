@@ -40,15 +40,14 @@ export interface IReadRepository<TEntity> {
   findWithPagination(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>>;
 }
 
-export interface IWriteRepository<TEntity> {
-  create(entity: Partial<TEntity>): Promise<TEntity>;
-  createMany(entities: Partial<TEntity>[]): Promise<TEntity[]>;
-  update(id: string, entity: Partial<TEntity>): Promise<TEntity>;
-  partialUpdate(id: string, entity: Partial<TEntity>): Promise<TEntity>;
+// prettier-ignore
+export interface IWriteRepository<TEntity, TCreate = Partial<TEntity>, TUpdate = Partial<TEntity>> {
+  create(entity: TCreate): Promise<TEntity>;
+  createMany(entities: TCreate[]): Promise<TEntity[]>;
+  update(id: string, entity: TUpdate): Promise<TEntity>;
+  partialUpdate(id: string, entity: TUpdate): Promise<TEntity>;
   delete(id: string): Promise<TEntity>;
 }
 
 // prettier-ignore
-export type IRepository<TEntity> = 
-  IReadRepository<TEntity > & 
-  IWriteRepository<TEntity>;
+export type IRepository<TEntity> = IReadRepository<TEntity> & IWriteRepository<TEntity>;
