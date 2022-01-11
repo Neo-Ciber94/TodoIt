@@ -47,6 +47,7 @@ export interface IWriteRepository<TEntity, TCreate = Partial<TEntity>, TUpdate =
   update(id: string, entity: TUpdate): Promise<TEntity>;
   partialUpdate(id: string, entity: TUpdate): Promise<TEntity>;
   delete(id: string): Promise<TEntity>;
+  delete(entity: TEntity): Promise<TEntity>;
 }
 
 // prettier-ignore

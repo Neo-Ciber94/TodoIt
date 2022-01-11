@@ -110,15 +110,26 @@ export abstract class BaseRepository<TEntity, TModel extends Model<TEntity>>
     return entityToUpdate;
   }
 
-  async delete(id: string): Promise<TEntity> {
-    const entityToDelete = await this.model.findById(id);
+  delete(id: string): Promise<TEntity>;
+  delete(entity: TEntity): Promise<TEntity>;
+  async delete(entityOrId: string | TEntity): Promise<TEntity> {
+    if (typeof entityOrId === "string") {
+      const entityToDelete = await this.model.findById(entityOrId);
+      if (!entityToDelete) {
+        throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+      }
 
-    if (!entityToDelete) {
-      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+      await entityToDelete.remove();
+      return entityToDelete;
+    } else {
+      const result = await this.model.deleteOne(entityOrId);
+      
+      if (result.deletedCount === 0) {
+        throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+      }
+
+      return entityOrId;
     }
-
-    await entityToDelete.remove();
-    return entityToDelete;
   }
 
   // prettier-ignore

@@ -1,32 +1,32 @@
-import mongodb from "@server/db/mongodb/middleware";
+import authMiddleware from "@server/middlewares/auth";
+import mongoDbMiddleware from "@server/middlewares/mongodb";
 import {
   TodoPaginationOptions,
   TodoRepository,
 } from "@server/repositories/todo.repository";
 import { buildPaginationOptions } from "@server/repositories/utils";
+import { AppApiContext } from "@server/types";
 import { Validate } from "@server/utils/validate";
+import { ITodo } from "@shared/models/todo.model";
 import morgan from "morgan";
 import {
-  Delete,
   Get,
-  NextApiContext,
-  Patch,
   Post,
   Put,
+  Patch,
+  Delete,
   UseMiddleware,
   withController,
 } from "next-controllers";
-import { ITodo } from "src/shared/models/todo.model";
 
-@UseMiddleware(mongodb(), morgan("dev"))
+@UseMiddleware(morgan("dev"), authMiddleware(), mongoDbMiddleware())
 class TodoController {
   private readonly todoRepository = new TodoRepository();
 
   @Get("/")
-  getAll({ request }: NextApiContext) {
-    const options = buildPaginationOptions<ITodo>(
-      request
-    ) as TodoPaginationOptions;
+  getAll({ request }: AppApiContext) {
+    // prettier-ignore
+    const options = buildPaginationOptions<ITodo>(request) as TodoPaginationOptions;
 
     if (request.query.search) {
       options.search = String(request.query.search);
@@ -36,7 +36,7 @@ class TodoController {
   }
 
   @Post("/")
-  create({ request }: NextApiContext) {
+  create({ request }: AppApiContext) {
     const { title, content, color } = request.body;
     Validate.isNonBlankString(title);
 
@@ -44,11 +44,12 @@ class TodoController {
       Validate.isNonBlankString(content);
     }
 
-    return this.todoRepository.create({ title, content, color });
+    const userId = request.userId;
+    return this.todoRepository.create({ title, content, color, userId });
   }
 
   @Put("/:id")
-  update({ request }: NextApiContext) {
+  update({ request }: AppApiContext) {
     const { title, content, completed, color } = request.body;
     Validate.isBoolean(completed);
     Validate.isNonBlankString(title);
@@ -62,7 +63,7 @@ class TodoController {
   }
 
   @Patch("/:id")
-  patch({ request }: NextApiContext) {
+  patch({ request }: AppApiContext) {
     const { title, content, completed, color } = request.body;
 
     if (completed) {
@@ -87,7 +88,7 @@ class TodoController {
   }
 
   @Post("/:id/toggle")
-  async toggle({ request }: NextApiContext) {
+  async toggle({ request }: AppApiContext) {
     const id = String(request.params.id);
     const todo = await this.todoRepository.findById(id);
 
@@ -99,7 +100,7 @@ class TodoController {
   }
 
   @Delete("/:id")
-  delete({ request }: NextApiContext) {
+  delete({ request }: AppApiContext) {
     const id = String(request.params.id);
     return this.todoRepository.delete(id);
   }
