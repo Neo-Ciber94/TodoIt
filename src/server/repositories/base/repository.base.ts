@@ -12,7 +12,7 @@ export type EntityWithCreator = IEntityBase & { creatorUserId: string };
 /**
  * A base repository with the basic operations.
  */
-export abstract class Repository<
+export class Repository<
   TEntity extends IEntityBase,
   TModel extends Model<TEntity>
 > implements IRepository<TEntity>
@@ -81,7 +81,7 @@ export abstract class Repository<
 /**
  * A repository whose entities have a creator.
  */
-export abstract class RepositoryWithCreator<
+export class RepositoryWithCreator<
   TEntity extends EntityWithCreator,
   TModel extends Model<TEntity>
 > extends Repository<TEntity, TModel> {

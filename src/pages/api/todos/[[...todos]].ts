@@ -22,6 +22,9 @@ import {
   Delete,
   UseMiddleware,
   withController,
+  OnError,
+  Results,
+  NextApiRequestWithParams,
 } from "next-controllers";
 
 @UseMiddleware(morgan("dev"), authMiddleware(), mongoDbMiddleware())
@@ -39,6 +42,13 @@ class TodoController {
 
     const userId = request.userId;
     return this.todoRepository.search(options, userId);
+  }
+
+  @Get("/:id")
+  get({ request }: AppApiContext) {
+    const id = String(request.params.id);
+    const userId = request.userId;
+    return this.todoRepository.findById(id, userId);
   }
 
   @Post("/")

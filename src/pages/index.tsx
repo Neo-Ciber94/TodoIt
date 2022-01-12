@@ -1,4 +1,8 @@
-import { InferGetServerSidePropsType } from "next";
+import {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  NextPageContext,
+} from "next";
 import TodoNote from "src/components/TodoNote";
 import {
   Container,
@@ -23,25 +27,32 @@ import { animationSprings } from "src/animations/springs";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { TodosFiltersDrawer } from "src/components/TodosFilterDrawer";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { PageResult } from "@server/repositories/base/repository";
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 10;
 const todoClient = new TodoApiClient();
 
-// export const getServerSideProps = withPageAuthRequired({
-//   getServerSideProps: async () => {
-//     const pageResult = await todoClient.getAll({
-//       pageSize: PAGE_SIZE,
-//     });
-//     return { props: { pageResult } };
-//   },
-// });
-
-export const getServerSideProps = async () => {
-  const pageResult = await todoClient.getAll({
-    pageSize: PAGE_SIZE,
-  });
-  return { props: { pageResult } };
+type Data = {
+  pageResult: PageResult<ITodo>;
 };
+
+export const getServerSideProps = withPageAuthRequired<Data>({
+  getServerSideProps: async ({ req }) => {
+    const pageResult = await todoClient.getAll(
+      { pageSize: PAGE_SIZE },
+      { headers: { cookie: req.headers.cookie || "" } }
+    );
+    return { props: { pageResult } };
+  },
+});
+
+// export const getServerSideProps: GetServerSideProps<Data> = async ({ req }) => {
+//   const pageResult = await todoClient.getAll(
+//     { pageSize: PAGE_SIZE },
+//     { headers: { cookie: req.headers.cookie || "" } }
+//   );
+//   return { props: { pageResult } };
+// };
 
 type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 

@@ -13,9 +13,11 @@ type Data = {
 };
 
 export const getServerSideProps = withPageAuthRequired<Data>({
-  getServerSideProps: async (context) => {
+  getServerSideProps: async ({ req, ...context }) => {
     const todoId = context.params?.id;
-    const todo = await todoClient.getById(String(todoId));
+    const todo = await todoClient.getById(String(todoId), {
+      headers: { cookie: req.headers.cookie || "" },
+    });
     return {
       props: {
         todo,
