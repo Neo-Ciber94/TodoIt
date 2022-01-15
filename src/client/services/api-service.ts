@@ -7,7 +7,7 @@ import {
 } from "src/client/http-client";
 import { FetchClient } from "../http-client/fetch.client";
 
-let useAxios = false;
+let useAxios = true;
 
 // HTTP Client shared by all services.
 export let clientInstance: IHttpClient;

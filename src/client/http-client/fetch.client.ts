@@ -10,20 +10,6 @@ const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
 };
 
-async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
-
-  if (!response.ok) {
-    throw Error(await response.text());
-  }
-
-  try {
-    return await response.json();
-  } catch {
-    return (await response.text()) as unknown as T;
-  }
-}
-
 export type FetchConfig = RequestInit & RequestConfig;
 
 export interface FetchResponse extends Omit<Response, "headers"> {
@@ -80,7 +66,7 @@ export class FetchClient implements IHttpClient<FetchConfig, FetchResponse> {
   }
 
   get<T>(url: string, config: FetchConfig = {}): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), config);
+    return makeRequest(this.requestURL(url, config.params), config);
   }
 
   post<T, TBody = T>(
@@ -88,14 +74,14 @@ export class FetchClient implements IHttpClient<FetchConfig, FetchResponse> {
     data?: TBody | null,
     config: FetchConfig = {}
   ): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), {
+    return makeRequest(this.requestURL(url, config.params), {
       body: data ? JSON.stringify(data) : undefined,
       method: "POST",
+      ...config,
       headers: {
         ...DEFAULT_HEADERS,
         ...config.headers,
       },
-      ...config,
     });
   }
 
@@ -104,14 +90,14 @@ export class FetchClient implements IHttpClient<FetchConfig, FetchResponse> {
     data?: TBody | null,
     config: FetchConfig = {}
   ): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), {
+    return makeRequest(this.requestURL(url, config.params), {
       body: data ? JSON.stringify(data) : undefined,
       method: "PUT",
+      ...config,
       headers: {
         ...DEFAULT_HEADERS,
         ...config.headers,
       },
-      ...config,
     });
   }
 
@@ -120,42 +106,81 @@ export class FetchClient implements IHttpClient<FetchConfig, FetchResponse> {
     data?: TBody | null,
     config: FetchConfig = {}
   ): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), {
+    return makeRequest(this.requestURL(url, config.params), {
       body: data ? JSON.stringify(data) : undefined,
       method: "PATCH",
+      ...config,
       headers: {
         ...DEFAULT_HEADERS,
         ...config.headers,
       },
-      ...config,
     });
   }
 
   delete<T>(url: string, config: FetchConfig = {}): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), {
+    return makeRequest(this.requestURL(url, config.params), {
       method: "DELETE",
       ...config,
     });
   }
 
   options<T>(url: string, config: FetchConfig = {}): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), {
+    return makeRequest(this.requestURL(url, config.params), {
       method: "OPTIONS",
       ...config,
     });
   }
 
   head<T>(url: string, config: FetchConfig = {}): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), {
+    return makeRequest(this.requestURL(url, config.params), {
       method: "HEAD",
       ...config,
     });
   }
+}
 
-  trace<T>(url: string, config: FetchConfig = {}): Promise<T> {
-    return fetchJson(this.requestURL(url, config.params), {
-      method: "TRACE",
-      ...config,
-    });
+async function makeRequest<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(url, init);
+  const data = await getResponseData(response);
+
+  if (!response.ok) {
+    const message = data ? toString(data) : response.statusText;
+    throw new Error(message);
   }
+
+  return data as T;
+}
+
+async function getResponseData(response: Response): Promise<unknown | null> {
+  if (response.body == null) {
+    return null;
+  }
+
+  if (isJsonResponse(response)) {
+    return await response.json();
+  }
+
+  return await response.text();
+}
+
+function isJsonResponse(response: Response): boolean {
+  return (
+    response.headers.get("content-type")?.includes("application/json") ?? false
+  );
+}
+
+function toString(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
 }

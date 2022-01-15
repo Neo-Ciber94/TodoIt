@@ -129,11 +129,4 @@ export interface IHttpClient<
    * @param config The configuration of the request.
    */
   head<T>(url: string, config?: TConfig): Promise<T>;
-
-  /**
-   * Performs a `TRACE` request.
-   * @param url The url of the request.
-   * @param config The configuration of the request.
-   */
-  trace<T>(url: string, config?: TConfig): Promise<T>;
 }
