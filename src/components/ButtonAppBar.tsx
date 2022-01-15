@@ -18,10 +18,6 @@ export function ButtonAppBar() {
   const goToLogin = () => window.location.assign("/api/auth/login");
   const goToLogout = () => window.location.assign("/api/auth/logout");
 
-  if (error) {
-    console.error(error);
-  }
-
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>

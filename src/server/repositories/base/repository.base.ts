@@ -1,8 +1,8 @@
 import { IRepository, PageResult, PaginationOptions } from "./repository";
 import { Model, FilterQuery } from "mongoose";
-import { ValidationError } from "@server/utils/errors";
 import { IEntityBase } from "@server/types";
 import { createPagination, NO_FOUND_ERROR_MESSAGE } from "../utils";
+import { ValidationError } from "yup";
 
 /**
  * An entity with a creator.

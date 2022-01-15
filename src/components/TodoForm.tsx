@@ -79,7 +79,6 @@ export function TodoForm({
     try {
       await onSubmit(data);
     } catch (e: any) {
-      console.error("ERROR => ", JSON.stringify(e, null, 2));
       const message = e.message || e.error || "An error ocurred";
       showError(message);
     } finally {

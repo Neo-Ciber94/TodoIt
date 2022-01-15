@@ -1,8 +1,3 @@
-import {
-  getAccessToken,
-  getSession,
-  withApiAuthRequired,
-} from "@auth0/nextjs-auth0";
 import authMiddleware from "@server/middlewares/auth";
 import mongoDbMiddleware from "@server/middlewares/mongodb";
 import {
@@ -11,11 +6,12 @@ import {
 } from "@server/repositories/todo.repository";
 import { buildPaginationOptions } from "@server/repositories/utils";
 import { AppApiContext } from "@server/types";
-import { ValidationError } from "@server/utils/errors";
-import { Validate } from "@server/utils/validate";
+import {
+  todoCreateValidator,
+  todoUpdateValidator,
+} from "@server/validators/todos.validators";
 import { ITodo } from "@shared/models/todo.model";
 import morgan from "morgan";
-import { NextApiRequest, NextApiResponse } from "next";
 import {
   Get,
   Post,
@@ -25,8 +21,8 @@ import {
   withController,
   OnError,
   Results,
-  NextApiRequestWithParams,
 } from "next-controllers";
+import { ValidationError } from "yup";
 
 @UseMiddleware(morgan("dev"), authMiddleware(), mongoDbMiddleware())
 class TodoController {
@@ -53,33 +49,18 @@ class TodoController {
   }
 
   @Post("/")
-  create({ request }: AppApiContext) {
+  async create({ request }: AppApiContext) {
     const { title, content, color } = request.body;
-    Validate.isNonBlankString(title);
-
-    if (content) {
-      Validate.isNonBlankString(content);
-    }
+    await todoCreateValidator.validate({ title, content, color });
 
     const creatorUserId = request.userId;
     return this.todoRepository.create({ title, content, color, creatorUserId });
   }
 
   @Put("/:id")
-  patch({ request }: AppApiContext) {
+  async update({ request }: AppApiContext) {
     const { title, content, completed, color } = request.body;
-
-    if (completed) {
-      Validate.isBoolean(completed);
-    }
-
-    if (title) {
-      Validate.isNonBlankString(title);
-    }
-
-    if (content) {
-      Validate.isNonBlankString(content);
-    }
+    await todoUpdateValidator.validate({ title, content, completed, color });
 
     const id = String(request.params.id);
     const creatorUserId = request.userId;
