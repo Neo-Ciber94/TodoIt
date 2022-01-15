@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect } from "react";
-import { TodoApiClient } from "src/client/api/todos.client";
 import { useDebounce } from "src/hooks/useDebounce";
 import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
@@ -28,9 +27,10 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { TodosFiltersDrawer } from "src/components/TodosFilterDrawer";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PageResult } from "@server/repositories/base/repository";
+import { TodoApiService } from "src/client/services/todos.service";
 
 const PAGE_SIZE = 10;
-const todoClient = new TodoApiClient();
+const todoClient = new TodoApiService();
 
 type Data = {
   pageResult: PageResult<ITodo>;
@@ -38,7 +38,7 @@ type Data = {
 
 export const getServerSideProps = withPageAuthRequired<Data>({
   getServerSideProps: async ({ req }) => {
-    const pageResult = await todoClient.getAll(
+    const pageResult = await todoClient.getWithPagination(
       { pageSize: PAGE_SIZE },
       { headers: { cookie: req.headers.cookie || "" } }
     );

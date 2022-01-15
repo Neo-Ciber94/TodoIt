@@ -1,24 +1,23 @@
 import { PageResult } from "@server/repositories/base/repository";
-import { AxiosRequestConfig } from "axios";
+import { RequestConfig } from "src/client/http-client";
 import { ITodo } from "src/shared/models/todo.model";
-import { API_URL } from "../constants";
-import { ApiClient, QueryOptions } from "./base.client";
+import { ApiService, PagingOptions } from "./api-service";
 
-export type QueryTodosOptions = QueryOptions & { search?: string };
+export type QueryTodosOptions = PagingOptions & { search?: string };
 
-export class TodoApiClient extends ApiClient<ITodo, string> {
+export class TodoApiService extends ApiService<ITodo, string> {
   constructor() {
-    super(API_URL + "/todos");
+    super("/todos");
   }
 
-  async toggle(id: string, config: AxiosRequestConfig<ITodo> = {}) {
+  async toggle(id: string, config: RequestConfig = {}) {
     const result = await this.client.post<ITodo>(`/${id}/toggle`, null, config);
-    return result.data;
+    return result;
   }
 
   async search(
     options: QueryTodosOptions,
-    config: AxiosRequestConfig<ITodo> = {}
+    config: RequestConfig = {}
   ): Promise<PageResult<ITodo>> {
     const search = options.search || "";
     const page = options.page || 1;
@@ -33,6 +32,6 @@ export class TodoApiClient extends ApiClient<ITodo, string> {
       },
     });
 
-    return result.data;
+    return result;
   }
 }

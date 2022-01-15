@@ -2,13 +2,13 @@ import { Button, Container } from "@mui/material";
 import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
-import { TodoApiClient } from "src/client/api/todos.client";
 import { InferGetServerSidePropsType } from "next";
 import { ITodo } from "@shared/models/todo.model";
 import { TodoView } from "src/components/TodoView";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { TodoApiService } from "src/client/services/todos.service";
 
-const todoClient = new TodoApiClient();
+const todoClient = new TodoApiService();
 
 type Data = {
   todo: ITodo;

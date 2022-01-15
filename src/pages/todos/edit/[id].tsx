@@ -1,12 +1,12 @@
 import { useRouter } from "next/router";
-import { TodoApiClient } from "src/client/api/todos.client";
 import { InferGetServerSidePropsType } from "next";
 import { ITodo } from "@shared/models/todo.model";
 import { PromiseUtils } from "@shared/utils/PromiseUtilts";
 import { CreateOrEditTodoPage } from "src/components/CreateOrEditTodoPage";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { TodoApiService } from "src/client/services/todos.service";
 
-const todoClient = new TodoApiClient();
+const todoClient = new TodoApiService();
 
 type Data = {
   todo: ITodo;
