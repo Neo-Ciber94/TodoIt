@@ -1,3 +1,5 @@
+// Self type
+type Self<Type> = ThisType<Type> & Type;
 
 /**
  * Headers of a request.
@@ -24,7 +26,23 @@ export interface RequestConfig {
   [key: string]: any;
 }
 
-type Self<Type> = ThisType<Type> & Type;
+/**
+ * A request message.
+ */
+export type RequestMessage<T> = RequestConfig & {
+  method: string;
+  body?: T;
+};
+
+/**
+ * The response of a request.
+ */
+type RequestResponse<T> = {
+  headers: Record<string, string>;
+  status: number;
+  statusText: string;
+  data: T;
+};
 
 /**
  * A base http client.
@@ -35,6 +53,16 @@ export interface IHttpClient<TConfig extends RequestConfig = RequestConfig> {
    * @param baseUrl The base url of the http client.
    */
   create(baseUrl: string): Self<IHttpClient<TConfig>>;
+
+  /**
+   * Sends a request.
+   * @param url The url of the request.
+   * @param message The message of the request.
+   */
+  send<TBody = {}, T = {}>(
+    url: string,
+    message: RequestMessage<TBody>
+  ): Promise<RequestResponse<T>>;
 
   /**
    * Performs a `GET` request.

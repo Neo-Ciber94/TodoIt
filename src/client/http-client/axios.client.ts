@@ -1,5 +1,10 @@
-import axios, { Axios, AxiosRequestConfig } from "axios";
-import { IHttpClient } from "./http-client";
+import axios, {
+  Method as AxiosMethod,
+  Axios,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
+import { IHttpClient, RequestMessage } from "./http-client";
 
 export class AxiosApiClient implements IHttpClient<AxiosRequestConfig<any>> {
   constructor(
@@ -13,6 +18,21 @@ export class AxiosApiClient implements IHttpClient<AxiosRequestConfig<any>> {
 
   create(baseURL: string): AxiosApiClient {
     return new AxiosApiClient(this.requestURL(baseURL), this.client);
+  }
+
+  send<TBody = {}, T = unknown>(
+    url: string,
+    message: RequestMessage<TBody>
+  ): Promise<AxiosResponse<T>> {
+    const { body: data, method, headers, params, ...config } = message;
+    return this.client.request<T>({
+      url,
+      data,
+      headers,
+      params,
+      method: message.method as AxiosMethod,
+      ...config,
+    });
   }
 
   async get<T>(url: string, config: AxiosRequestConfig<T> = {}): Promise<T> {
