@@ -15,14 +15,9 @@ function CreateTodo() {
       title={"Create Todo"}
       submitText="Create Todo"
       onSubmit={async (data) => {
-        try {
-          await todoClient.create(data);
-          await PromiseUtils.delay(1000);
-          router.push("/");
-        } catch (e) {
-          // TODO: Shows the error to the user
-          console.error(e);
-        }
+        await PromiseUtils.delay(1000);
+        await todoClient.create(data);
+        router.push("/");
       }}
     />
   );
