@@ -7,9 +7,16 @@ import {
 } from "src/client/http-client";
 import { FetchClient } from "../http-client/fetch.client";
 
+let useAxios = false;
+
 // HTTP Client shared by all services.
-export const clientInstance: IHttpClient = new AxiosApiClient(API_URL);
-//export const clientInstance: IHttpClient = new FetchClient(API_URL);
+export let clientInstance: IHttpClient;
+
+if (useAxios) {
+  clientInstance = new AxiosApiClient(API_URL);
+} else {
+  clientInstance = new FetchClient(API_URL);
+}
 
 export interface PagingOptions {
   page?: number;

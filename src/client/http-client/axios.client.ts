@@ -61,7 +61,15 @@ export class AxiosApiClient implements IHttpClient<AxiosRequestConfig<any>, Axio
     data?: TBody,
     config: AxiosRequestConfig<T> = {}
   ): Promise<T> {
-    const result = await this.client.put<T>(this.requestURL(url), data, config);
+    // try {
+    //   const result = await this.client.put<T>(this.requestURL(url), data, config)
+    //   return result.data;
+    // }
+    // catch (e: any) {
+    //   throw new Error(e.response.data);
+    // }
+
+    const result = await this.client.put<T>(this.requestURL(url), data, config)
     return result.data;
   }
 

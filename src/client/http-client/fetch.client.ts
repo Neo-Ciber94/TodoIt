@@ -11,8 +11,17 @@ const DEFAULT_HEADERS = {
 };
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, init);
-  return await res.json();
+  const response = await fetch(url, init);
+
+  if (!response.ok) {
+    throw Error(await response.text());
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    return (await response.text()) as unknown as T;
+  }
 }
 
 export type FetchConfig = RequestInit & RequestConfig;

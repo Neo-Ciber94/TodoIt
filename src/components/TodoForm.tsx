@@ -79,9 +79,9 @@ export function TodoForm({
     try {
       await onSubmit(data);
     } catch (e: any) {
+      console.error("ERROR => ", JSON.stringify(e, null, 2));
       const message = e.message || e.error || "An error ocurred";
       showError(message);
-      console.error("ERROR => ", e);
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +136,7 @@ export function TodoForm({
           </Button>
         </animated.div>
       </form>
-      <ToastContainer theme="colored" autoClose={1000 * 30} />
+      <ToastContainer theme="colored" />
       <ColorPickerDrawer
         open={openColorPicker}
         selectedColor={pageColor}

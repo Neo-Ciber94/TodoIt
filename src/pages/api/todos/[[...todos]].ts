@@ -11,6 +11,7 @@ import {
 } from "@server/repositories/todo.repository";
 import { buildPaginationOptions } from "@server/repositories/utils";
 import { AppApiContext } from "@server/types";
+import { ValidationError } from "@server/utils/errors";
 import { Validate } from "@server/utils/validate";
 import { ITodo } from "@shared/models/todo.model";
 import morgan from "morgan";
@@ -116,6 +117,15 @@ class TodoController {
     }
 
     return this.todoRepository.delete(todo);
+  }
+
+  @OnError()
+  onError(error: any) {
+    if (error instanceof ValidationError) {
+      return Results.badRequest(error.message);
+    }
+
+    return Results.internalServerError(error);
   }
 }
 

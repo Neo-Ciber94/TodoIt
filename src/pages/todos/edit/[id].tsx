@@ -37,15 +37,10 @@ export default function EditTodo({
       title={"Edit Todo"}
       submitText={"Edit Todo"}
       onSubmit={async (data) => {
-        try {
-          const { id } = router.query;
-          await todoClient.update(String(id), data);
-          await PromiseUtils.delay(1000);
-          router.push("/");
-        } catch (e) {
-          // TODO: Shows the error to the user
-          console.error(e);
-        }
+        const { id } = router.query;
+        await PromiseUtils.delay(1000);
+        await todoClient.update(String(id), data);
+        router.push("/");
       }}
     />
   );
