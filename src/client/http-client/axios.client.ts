@@ -6,7 +6,8 @@ import axios, {
 } from "axios";
 import { IHttpClient, RequestMessage } from "./http-client";
 
-export class AxiosApiClient implements IHttpClient<AxiosRequestConfig<any>> {
+// prettier-ignore
+export class AxiosApiClient implements IHttpClient<AxiosRequestConfig<any>, AxiosResponse> {
   constructor(
     private readonly baseURL: string = "",
     private readonly client: Axios = axios.create()
@@ -20,16 +21,18 @@ export class AxiosApiClient implements IHttpClient<AxiosRequestConfig<any>> {
     return new AxiosApiClient(this.requestURL(baseURL), this.client);
   }
 
-  send<TBody = {}, T = unknown>(
+  send<TBody = {}, T = any>(
     url: string,
     message: RequestMessage<TBody>
   ): Promise<AxiosResponse<T>> {
     const { body: data, method, headers, params, ...config } = message;
+    url = this.requestURL(url);
+    
     return this.client.request<T>({
       url,
       data,
-      headers,
       params,
+      headers,
       method: message.method as AxiosMethod,
       ...config,
     });

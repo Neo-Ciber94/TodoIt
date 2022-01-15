@@ -5,9 +5,11 @@ import {
   IHttpClient,
   RequestConfig,
 } from "src/client/http-client";
+import { FetchClient } from "../http-client/fetch.client";
 
 // HTTP Client shared by all services.
-export const clientInstance: IHttpClient = new AxiosApiClient(API_URL);
+// export const clientInstance: IHttpClient = new AxiosApiClient(API_URL);
+export const clientInstance: IHttpClient = new FetchClient(API_URL);
 
 export interface PagingOptions {
   page?: number;
