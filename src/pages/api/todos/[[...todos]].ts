@@ -121,11 +121,14 @@ class TodoController {
 
   @OnError()
   onError(error: any) {
+    console.error(error);
+    const messsage = error.message || "Something went wrong";
+
     if (error instanceof ValidationError) {
-      return Results.badRequest(error.message);
+      return Results.badRequest(messsage);
     }
 
-    return Results.internalServerError(error);
+    return Results.internalServerError(messsage);
   }
 }
 
