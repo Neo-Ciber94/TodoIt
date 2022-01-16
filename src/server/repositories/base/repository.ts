@@ -37,7 +37,7 @@ export interface IWriteRepository<TEntity> {
   create(entity: Partial<TEntity>): Promise<TEntity>;
   createMany(entities: Partial<TEntity>[]): Promise<TEntity[]>;
   update(entity: Partial<TEntity>): Promise<TEntity>;
-  delete(entity: TEntity): Promise<TEntity>;
+  delete(id: string): Promise<TEntity>;
 }
 
 // prettier-ignore

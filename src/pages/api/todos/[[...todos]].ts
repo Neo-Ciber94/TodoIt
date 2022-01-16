@@ -97,7 +97,7 @@ class TodoController {
       return null;
     }
 
-    return this.todoRepository.delete(todo);
+    return this.todoRepository.delete(id);
   }
 
   @OnError()

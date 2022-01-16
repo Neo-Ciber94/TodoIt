@@ -62,12 +62,12 @@ export class Repository<
       }
     }
 
-    entityToUpdate.save();
+    await entityToUpdate.save();
     return entityToUpdate;
   }
 
-  async delete(entity: TEntity): Promise<TEntity> {
-    const entityToDelete = await this.model.findById(entity.id);
+  async delete(id: string): Promise<TEntity> {
+    const entityToDelete = await this.model.findById(id);
 
     if (!entityToDelete) {
       throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
