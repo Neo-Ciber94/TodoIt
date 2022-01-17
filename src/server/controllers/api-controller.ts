@@ -2,7 +2,14 @@ import { IRepository, PageResult } from "@server/repositories/base/repository";
 import { buildPaginationOptions } from "@server/repositories/utils";
 import { AppApiContext, EntityInput, IEntity } from "@server/types";
 import { FilterQuery } from "mongoose";
-import { Get, Post, Put, Delete } from "next-controllers";
+import {
+  Get,
+  Post,
+  Put,
+  Delete,
+  BeforeRequest,
+  AfterRequest,
+} from "next-controllers";
 import { ControllerBase } from "./controller.base";
 import { AppControllerConfig } from "./types";
 
@@ -47,12 +54,14 @@ export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
   create({ request }: AppApiContext): Promise<T | T[]> {
     const data = request.body || {};
 
+    console.log((this as any).__setSessionData);
     if (Array.isArray(data)) {
       data.forEach((entity) => this.setSessionData(entity));
       this.beforeWrite?.("create", data);
       return this.repository.createMany(data);
     } else {
       this.setSessionData(data);
+      console.log(data);
       this.beforeWrite?.("create", data);
       return this.repository.create(data);
     }

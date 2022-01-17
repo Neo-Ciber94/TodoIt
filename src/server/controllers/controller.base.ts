@@ -5,7 +5,7 @@ import { AppControllerConfig, AppSession } from "./types";
 const USER_PROP = "creatorUserId";
 
 export class ControllerBase {
-  private _session: AppSession = {};
+  protected _session: AppSession = {};
 
   constructor(protected readonly config: AppControllerConfig) {}
 
