@@ -154,8 +154,7 @@ function Page({ pageResult }: PageProps) {
               className={`bg-black hover:bg-gray-800 w-full sm:w-auto`}
               onClick={() => setOpenFiltersMenu(true)}
             >
-              <FilterListIcon className="mr-4" />
-              <span>Filter</span>
+              <FilterListIcon />
             </Button>
           </animated.div>
         </div>

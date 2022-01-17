@@ -8,19 +8,21 @@ export default async function seedTodos(
   userId: string,
   count: number = 100
 ): Promise<boolean> {
-  const todosCount = await Todo.countDocuments();
+  // TODO: Remove harcoded `creatorUserId` prop
+  const todosCount = await Todo.count({ creatorUserId: userId });
 
   if (todosCount === 0) {
     const filePath = path.join(process.cwd(), "data/todos.json");
     const fileText = fs.readFileSync(filePath, "utf-8");
     const data = JSON.parse(fileText) as TodoDocument[];
+    const todos = takeRandom(data, count);
 
-    for (const todo of takeRandom(data, count)) {
+    for (const todo of todos) {
       todo.color = randomPastelColor();
       todo.creatorUserId = userId;
     }
 
-    await Todo.insertMany(data);
+    await Todo.insertMany(todos);
     return true;
   }
 

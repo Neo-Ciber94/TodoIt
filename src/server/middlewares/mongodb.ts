@@ -16,6 +16,7 @@ export default function mongoDbMiddleware(): Middleware<NextApiRequestWithUser, 
     if (req.userId) {
       await seedTodos(req.userId);
     }
+    
     next();
   };
 }

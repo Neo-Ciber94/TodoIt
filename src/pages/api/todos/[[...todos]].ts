@@ -1,3 +1,5 @@
+import { ApiController } from "@server/controllers/api-controller";
+import { errorHandler } from "@server/controllers/utils";
 import { TodoDocument } from "@server/database/schemas/todo.types";
 import authMiddleware from "@server/middlewares/auth";
 import mongoDbMiddleware from "@server/middlewares/mongodb";
@@ -20,6 +22,7 @@ import {
   withController,
   OnError,
   Results,
+  RouteController,
 } from "next-controllers";
 import { ValidationError } from "yup";
 
@@ -108,4 +111,53 @@ class TodoController {
   }
 }
 
-export default withController(TodoController);
+// export default withController(TodoController);
+
+@RouteController({ onError: errorHandler })
+@UseMiddleware(morgan("dev"), authMiddleware(), mongoDbMiddleware())
+class TodoApiController extends ApiController<TodoDocument> {
+  constructor() {
+    super(new TodoRepository());
+  }
+
+  async beforeWrite(
+    event: "create" | "update",
+    data: TodoDocument | TodoDocument[]
+  ) {
+    if (Array.isArray(data)) {
+      data.forEach((todo) => this.beforeWrite(event, todo));
+      return;
+    }
+
+    switch (event) {
+      case "create":
+        await todoCreateValidator.validate(data as ITodo);
+        break;
+      case "update":
+        await todoUpdateValidator.validate(data as ITodo);
+        break;
+      default:
+        break;
+    }
+  }
+
+  @Post("/:id/toggle")
+  async toggle({ request }: AppApiContext) {
+    const id = String(request.params.id);
+    const creatorUser = request.userId;
+
+    if (creatorUser == null) {
+      return null;
+    }
+
+    const todo = await this.repository.findOne({ id, creatorUser });
+
+    if (todo == null) {
+      return null;
+    }
+
+    return await todo.toggleComplete();
+  }
+}
+
+export default withController(TodoApiController);

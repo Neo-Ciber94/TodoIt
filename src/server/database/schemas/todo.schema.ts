@@ -33,7 +33,6 @@ const todoSchema = new Schema<TodoDocument, TodoModel>(
     creatorUserId: {
       type: String,
       trim: true,
-      unique: true,
       required: true,
     },
     createdAt: {

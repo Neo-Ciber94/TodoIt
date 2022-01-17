@@ -12,7 +12,7 @@ export class ControllerBase {
   /**
    * Current session data
    */
-  protected get session() {
+  protected get session(): AppSession {
     return this._session;
   }
 

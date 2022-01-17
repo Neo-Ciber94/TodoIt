@@ -14,21 +14,23 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
 
   // prettier-ignore
   findWithPagination(options: PaginationOptions<T> = {}): Promise<PageResult<T>> {
+    options.query = options.query || {};
+    this.setId(options.query, options.query.id);
     return createPagination(this.model, options);
   }
 
   async find(query: FilterQuery<T> = {}): Promise<T[]> {
+    this.setId(query, query.id);
     return await this.model.find(query);
   }
 
   async findOne(query: FilterQuery<T> = {}): Promise<T | null> {
-    const result = await this.model.findOne(query);
-    return result;
+    this.setId(query, query.id);
+    return await this.model.findOne(query);
   }
 
   async findById(id: string): Promise<T | null> {
-    const result = await this.model.findById(id);
-    return result;
+    return await this.model.findById(id);
   }
 
   async create(entity: EntityInput<T>): Promise<T> {
@@ -36,8 +38,7 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
   }
 
   async createMany(entities: EntityInput<T>[]): Promise<T[]> {
-    const result = await this.model.create(entities);
-    return result;
+    return await this.model.create(entities);
   }
 
   async updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T> {
@@ -73,7 +74,8 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
   }
 
   private setId(target: any, id?: unknown): void {
-    if (id) {
+    if (id && target) {
+      // MongoDb id is represented as `_id` but we are sending it as `id`
       target._id = id;
       delete target.id;
     }
