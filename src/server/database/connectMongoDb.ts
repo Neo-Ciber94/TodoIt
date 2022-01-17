@@ -1,5 +1,4 @@
 import * as Mongoose from "mongoose";
-import seedTodos from "./schemas/todos.seed";
 
 let connection: Mongoose.Connection;
 
@@ -29,21 +28,10 @@ export async function connectMongoDb(): Promise<Mongoose.Connection> {
     // Cache the connection
     connection = Mongoose.connection;
 
-    // Run an initialization routine
-    // await initialize();
-
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Error connecting to MongoDB", error);
   }
 
   return connection;
-}
-
-async function initialize() {
-  const result = await seedTodos();
-
-  if (result) {
-    console.log("Mongodb database was seeded");
-  }
 }

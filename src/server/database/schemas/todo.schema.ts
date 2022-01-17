@@ -56,6 +56,9 @@ const todoSchema = new Schema<TodoDocument, TodoModel>(
   }
 );
 
+// Indexes
+todoSchema.index({ title: "text", content: "text" });
+
 /// Extensions
 todoSchema.set("toJSON", {
   transform: (_doc, ret) => {

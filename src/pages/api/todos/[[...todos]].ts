@@ -35,14 +35,7 @@ class TodoController {
 
     if (request.query.search != null) {
       const search = String(request.query.search);
-
-      query = {
-        ...query,
-        $or: [
-          { title: { $regex: search, $options: "i" } },
-          { content: { $regex: search, $options: "i" } },
-        ],
-      };
+      query = { ...query, $text: { $search: search } };
     }
 
     return this.todoRepository.findWithPagination({
