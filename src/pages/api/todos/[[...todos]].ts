@@ -1,9 +1,7 @@
+import { TodoDocument } from "@server/database/schemas/todo.types";
 import authMiddleware from "@server/middlewares/auth";
 import mongoDbMiddleware from "@server/middlewares/mongodb";
-import {
-  TodoPaginationOptions,
-  TodoRepository,
-} from "@server/repositories/todo.repository";
+import { TodoRepository } from "@server/repositories/todo.repository";
 import { buildPaginationOptions } from "@server/repositories/utils";
 import { AppApiContext } from "@server/types";
 import {
@@ -11,6 +9,7 @@ import {
   todoUpdateValidator,
 } from "@server/validators/todos.validators";
 import { ITodo } from "@shared/models/todo.model";
+import { FilterQuery } from "mongoose";
 import morgan from "morgan";
 import {
   Get,
@@ -30,22 +29,33 @@ class TodoController {
 
   @Get("/")
   getAll({ request }: AppApiContext) {
-    // prettier-ignore
-    const options = buildPaginationOptions<ITodo>(request) as TodoPaginationOptions;
+    const options = buildPaginationOptions<ITodo>(request);
+    const creatorUserId = request.userId;
+    let query: FilterQuery<TodoDocument> = { creatorUserId };
 
-    if (request.query.search) {
-      options.search = String(request.query.search);
+    if (request.query.search != null) {
+      const search = String(request.query.search);
+
+      query = {
+        ...query,
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { content: { $regex: search, $options: "i" } },
+        ],
+      };
     }
 
-    const userId = request.userId;
-    return this.todoRepository.search(options, userId);
+    return this.todoRepository.findWithPagination({
+      ...options,
+      query,
+    });
   }
 
   @Get("/:id")
   get({ request }: AppApiContext) {
     const id = String(request.params.id);
     const userId = request.userId;
-    return this.todoRepository.findById(id, userId);
+    return this.todoRepository.findById(id);
   }
 
   @Post("/")
@@ -64,21 +74,20 @@ class TodoController {
 
     const id = String(request.params.id);
     const creatorUserId = request.userId;
-    return this.todoRepository.update({
-      id,
+    const updateTodo = {
       creatorUserId,
       title,
       content,
       completed,
       color,
-    });
+    };
+    return this.todoRepository.updateOne({ id }, updateTodo);
   }
 
   @Post("/:id/toggle")
   async toggle({ request }: AppApiContext) {
     const id = String(request.params.id);
-    const userId = request.userId;
-    const todo = await this.todoRepository.findById(id, userId);
+    const todo = await this.todoRepository.findById(id);
 
     if (todo == null) {
       return null;
@@ -90,14 +99,7 @@ class TodoController {
   @Delete("/:id")
   async delete({ request }: AppApiContext) {
     const id = String(request.params.id);
-    const userId = request.userId;
-    const todo = await this.todoRepository.findById(id, userId);
-
-    if (todo == null) {
-      return null;
-    }
-
-    return this.todoRepository.delete(id);
+    return this.todoRepository.deleteOne({ id });
   }
 
   @OnError()

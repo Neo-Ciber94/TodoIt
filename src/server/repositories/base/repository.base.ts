@@ -1,64 +1,58 @@
 import { IRepository, PageResult, PaginationOptions } from "./repository";
 import { Model, FilterQuery } from "mongoose";
-import { IEntityBase } from "@server/types";
+import { EntityInput, IEntity } from "@server/types";
 import { createPagination, NO_FOUND_ERROR_MESSAGE } from "../utils";
 import { ValidationError } from "yup";
 
 /**
- * An entity with a creator.
- */
-export type EntityWithCreator = IEntityBase & { creatorUserId: string };
-
-/**
  * A base repository with the basic operations.
  */
-export class Repository<
-  TEntity extends IEntityBase,
-  TModel extends Model<TEntity>
-> implements IRepository<TEntity>
+export class Repository<T extends IEntity, TModel extends Model<T>>
+  implements IRepository<T>
 {
   constructor(protected readonly model: TModel) {}
 
   // prettier-ignore
-  findWithPagination(options: PaginationOptions<TEntity> = {}): Promise<PageResult<TEntity>> {
+  findWithPagination(options: PaginationOptions<T> = {}): Promise<PageResult<T>> {
     return createPagination(this.model, options);
   }
 
-  async find(query: FilterQuery<TEntity> = {}): Promise<TEntity[]> {
+  async find(query: FilterQuery<T> = {}): Promise<T[]> {
     return await this.model.find(query);
   }
 
-  async findOne(query: FilterQuery<TEntity> = {}): Promise<TEntity | null> {
+  async findOne(query: FilterQuery<T> = {}): Promise<T | null> {
     const result = await this.model.findOne(query);
     return result;
   }
 
-  async findById(id: string): Promise<TEntity | null> {
+  async findById(id: string): Promise<T | null> {
     const result = await this.model.findById(id);
     return result;
   }
 
-  async create(entity: Partial<TEntity>): Promise<TEntity> {
+  async create(entity: EntityInput<T>): Promise<T> {
     return await this.model.create(entity);
   }
 
-  async createMany(entities: Partial<TEntity>[]): Promise<TEntity[]> {
+  async createMany(entities: EntityInput<T>[]): Promise<T[]> {
     const result = await this.model.create(entities);
     return result;
   }
 
-  async update(entity: Partial<TEntity>): Promise<TEntity> {
-    const entityToUpdate = await this.model.findById(entity.id);
+  async updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T> {
+    this.setId(query, query.id);
+    const entityToUpdate = await this.model.findOne(query);
 
     if (!entityToUpdate) {
       throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
     }
 
     for (const key in entity) {
-      const value = entity[key];
+      const value = entity[key as keyof Omit<Partial<T>, "id">];
 
       if (value !== undefined) {
-        (entityToUpdate as Partial<TEntity>)[key] = value;
+        (entityToUpdate as any)[key] = value;
       }
     }
 
@@ -66,8 +60,9 @@ export class Repository<
     return entityToUpdate;
   }
 
-  async delete(id: string): Promise<TEntity> {
-    const entityToDelete = await this.model.findById(id);
+  async deleteOne(query: FilterQuery<T>): Promise<T> {
+    this.setId(query, query.id);
+    const entityToDelete = await this.model.findOne(query);
 
     if (!entityToDelete) {
       throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
@@ -76,63 +71,11 @@ export class Repository<
     await entityToDelete.remove();
     return entityToDelete;
   }
-}
 
-/**
- * A repository whose entities have a creator.
- */
-export class RepositoryWithCreator<
-  TEntity extends EntityWithCreator,
-  TModel extends Model<TEntity>
-> extends Repository<TEntity, TModel> {
-  async findWithPagination(
-    options?: PaginationOptions<TEntity>,
-    creatorUserId?: string
-  ): Promise<PageResult<TEntity>> {
-    options = options || {};
-    const query: FilterQuery<TEntity> = options.query || {};
-    const result = await createPagination(this.model, {
-      ...options,
-      query: { ...query, creatorUserId },
-    });
-    return result;
-  }
-
-  override async findById(
-    id: string,
-    userId?: string
-  ): Promise<TEntity | null> {
-    if (userId == null) {
-      throw new ValidationError("User id is required");
+  private setId(target: any, id?: unknown): void {
+    if (id) {
+      target._id = id;
+      delete target.id;
     }
-
-    const result = await this.model.findById(id);
-
-    if (result?.creatorUserId !== userId) {
-      return null;
-    }
-
-    return result;
-  }
-
-  async find(
-    query?: FilterQuery<TEntity>,
-    userId?: string
-  ): Promise<TEntity[]> {
-    query = query || {};
-    const result = await this.model.find({ ...query, creatorUserId: userId });
-    return result;
-  }
-
-  async findOne(
-    query?: FilterQuery<TEntity>,
-    userId?: string
-  ): Promise<TEntity | null> {
-    query = query || {};
-    const result = await this.model.findOne({
-      ...query,
-      creatorUserId: userId,
-    });
-    return result;
   }
 }

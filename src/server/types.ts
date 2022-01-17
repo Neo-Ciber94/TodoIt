@@ -1,8 +1,10 @@
 import { NextApiContext, NextApiRequestWithParams } from "next-controllers";
 
-export interface IEntityBase {
+export interface IEntity {
   id: string;
 }
+
+export type EntityInput<T extends IEntity> = Omit<Partial<T>, "id">;
 
 export type NextApiRequestWithUser = NextApiRequestWithParams & {
   userId?: string;

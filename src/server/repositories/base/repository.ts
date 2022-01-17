@@ -1,3 +1,4 @@
+import { EntityInput, IEntity } from "@server/types";
 import { FilterQuery } from "mongoose";
 
 export interface PageResult<T> {
@@ -25,20 +26,20 @@ export interface PaginationOptions<T> {
 }
 
 // prettier-ignore
-export interface IReadRepository<TEntity> {
-  findById(id: string): Promise<TEntity | null>;
-  findOne(query: FilterQuery<TEntity>): Promise<TEntity | null>;
-  find(query: FilterQuery<TEntity>): Promise<TEntity[]>;
-  findWithPagination(options: PaginationOptions<TEntity>): Promise<PageResult<TEntity>>;
+export interface IReadRepository<T extends IEntity> {
+  findById(id: string): Promise<T | null>;
+  findOne(query: FilterQuery<T>): Promise<T | null>;
+  find(query: FilterQuery<T>): Promise<T[]>;
+  findWithPagination(options: PaginationOptions<T>): Promise<PageResult<T>>;
 }
 
 // prettier-ignore
-export interface IWriteRepository<TEntity> {
-  create(entity: Partial<TEntity>): Promise<TEntity>;
-  createMany(entities: Partial<TEntity>[]): Promise<TEntity[]>;
-  update(entity: Partial<TEntity>): Promise<TEntity>;
-  delete(id: string): Promise<TEntity>;
+export interface IWriteRepository<T extends IEntity> {
+  create(entity: EntityInput<T>): Promise<T>;
+  createMany(entities: EntityInput<T>[]): Promise<T[]>;
+  updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T>;
+  deleteOne(query: FilterQuery<T>): Promise<T>;
 }
 
 // prettier-ignore
-export type IRepository<TEntity> = IReadRepository<TEntity> & IWriteRepository<TEntity>;
+export type IRepository<T extends IEntity> = IReadRepository<T> & IWriteRepository<T>;
