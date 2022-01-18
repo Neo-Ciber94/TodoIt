@@ -1,3 +1,4 @@
+import { QueryParamsMapper } from "@server/controllers/types";
 import { parseRecord } from "@shared/utils";
 import { ArrayUtils } from "@shared/utils/ArrayUtils";
 import { FilterQuery, Model } from "mongoose";
@@ -72,15 +73,15 @@ export function createPageResult<T>({ data, pageSize, currentPage, totalPages, t
   };
 }
 
-export type BuildPaginationConfig = {
-  query?: boolean;
+export type BuildPaginationConfig<T> = {
+  query?: boolean | QueryParamsMapper<T>;
   search?: boolean;
   searchPropertyName?: string; // default `search`
 };
 
 export function buildPaginationOptions<T>(
   req: NextApiRequest,
-  config: BuildPaginationConfig = {}
+  config: BuildPaginationConfig<T> = {}
 ): PaginationOptions<T> {
   // prettier-ignore
   const { page, pageSize, sort, sortAscending, sortDescending, search, ...rest } = req.query;
@@ -117,8 +118,16 @@ export function buildPaginationOptions<T>(
   }
 
   // Query
-  if (config.query === true && rest) {
-    const queryData = parseRecord(rest);
+  if (config.query != null && rest) {
+    let mapper: QueryParamsMapper<T>;
+
+    if (config.query === true || typeof config.query !== "function") {
+      mapper = parseRecord;
+    } else {
+      mapper = config.query;
+    }
+
+    const queryData = mapper(rest);
     for (const [key, value] of Object.entries(queryData)) {
       (query as any)[key] = value;
     }

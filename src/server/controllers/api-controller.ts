@@ -12,7 +12,7 @@ import { ControllerConfig } from "./types";
 export class ApiReadOnlyController<T extends IEntity> extends ControllerBase {
   constructor(
     protected readonly repository: IRepository<T>,
-    config: ControllerConfig = {}
+    config: ControllerConfig<T> = {}
   ) {
     super(config);
   }

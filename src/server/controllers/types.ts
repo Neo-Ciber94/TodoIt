@@ -1,3 +1,5 @@
+import { FilterQuery } from "mongoose";
+
 /**
  * Data for the current session.
  */
@@ -9,9 +11,19 @@ export interface AppSession {
 }
 
 /**
+ * Query params of `NextJS`.
+ */
+export type NextQueryParams = { [key: string]: string | string[] };
+
+/**
+ * Converts the given query params to a mongodb `FilterQuery`.
+ */
+export type QueryParamsMapper<T> = (params: NextQueryParams) => FilterQuery<T>;
+
+/**
  * Configuration for the controller.
  */
-export interface ControllerConfig {
+export interface ControllerConfig<T = any> {
   /**
    * The name of the property to set the user id to when creating, updating, deleting or filtering entities.
    * Defaults to `creatorUserId`.
@@ -35,5 +47,5 @@ export interface ControllerConfig {
    * Enables query using the query params of the request.
    * By default is `false`.
    */
-  query?: boolean;
+  query?: boolean | QueryParamsMapper<T>;
 }
