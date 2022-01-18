@@ -1,5 +1,5 @@
 import { ArrayUtils } from "@shared/utils/ArrayUtils";
-import { Model } from "mongoose";
+import { FilterQuery, Model } from "mongoose";
 import { NextApiRequest } from "next";
 import {
   PageResult,
@@ -8,7 +8,6 @@ import {
 } from "./base/repository";
 
 export const DEFAULT_MAX_PAGE_SIZE = 10;
-export const NO_FOUND_ERROR_MESSAGE = "Resourse not found";
 
 export const EMPTY_PAGE_RESULT: PageResult<any> = Object.freeze({
   data: [],
@@ -72,10 +71,17 @@ export function createPageResult<T>({ data, pageSize, currentPage, totalPages, t
   };
 }
 
+export type BuildPaginationConfig = {
+  query?: boolean;
+  search?: boolean | string;
+};
+
 export function buildPaginationOptions<T>(
-  req: NextApiRequest
+  req: NextApiRequest,
+  config: BuildPaginationConfig = {}
 ): PaginationOptions<T> {
-  const { page, pageSize, sort, sortAscending, sortDescending } = req.query;
+  // prettier-ignore
+  const { page, pageSize, sort, sortAscending, sortDescending, search, ...rest } = req.query;
   const sorting: Record<string, SortDirection> = {};
 
   if (sort) {
@@ -96,9 +102,32 @@ export function buildPaginationOptions<T>(
     }
   }
 
+  let query: FilterQuery<T> = {};
+
+  // Search
+  if (config.search !== false) {
+    if (config.search === true && search) {
+      query.$text = { $search: String(search) };
+    }
+
+    if (typeof config.search === "string" && config.search) {
+      const search = String(rest[config.search]);
+      delete rest[config.search]; // Removed the prop
+      query.$text = { $search: String(search) };
+    }
+  }
+
+  // Query
+  if (config.query === true && rest) {
+    for (const [key, value] of Object.entries(rest)) {
+      (query as any)[key] = value;
+    }
+  }
+
   return {
     page: Number(page),
     pageSize: Number(pageSize),
     sorting,
+    query,
   };
 }

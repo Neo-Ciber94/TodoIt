@@ -1,16 +1,19 @@
 import { AppApiContext } from "@server/types";
 import { BeforeRequest } from "next-controllers";
-import { AppControllerConfig, AppSession } from "./types";
+import { ControllerConfig, AppSession } from "./types";
 
 const USER_PROP = "creatorUserId";
 
+/**
+ * The base controller for all API controllers.
+ */
 export class ControllerBase {
   protected _session: AppSession = {};
 
-  constructor(protected readonly config: AppControllerConfig) {}
+  constructor(protected readonly config: ControllerConfig) {}
 
   /**
-   * Current session data
+   * Current session data.
    */
   protected get session(): AppSession {
     return this._session;

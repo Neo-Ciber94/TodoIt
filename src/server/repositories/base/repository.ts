@@ -22,6 +22,7 @@ export interface PaginationOptions<T> {
   page?: number;
   pageSize?: number;
   sorting?: PageSorting<T>;
+  search?: string;
   query?: FilterQuery<T>;
 }
 
@@ -37,8 +38,8 @@ export interface IReadRepository<T extends IEntity> {
 export interface IWriteRepository<T extends IEntity> {
   create(entity: EntityInput<T>): Promise<T>;
   createMany(entities: EntityInput<T>[]): Promise<T[]>;
-  updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T>;
-  deleteOne(query: FilterQuery<T>): Promise<T>;
+  updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T | null>;
+  deleteOne(query: FilterQuery<T>): Promise<T | null>;
 }
 
 // prettier-ignore

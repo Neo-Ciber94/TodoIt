@@ -1,8 +1,7 @@
 import { IRepository, PageResult, PaginationOptions } from "./repository";
 import { Model, FilterQuery } from "mongoose";
 import { EntityInput, IEntity } from "@server/types";
-import { createPagination, NO_FOUND_ERROR_MESSAGE } from "../utils";
-import { ValidationError } from "yup";
+import { createPagination } from "../utils";
 
 /**
  * A base repository with the basic operations.
@@ -41,12 +40,13 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
     return await this.model.create(entities);
   }
 
-  async updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T> {
+  // prettier-ignore
+  async updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T | null> {
     this.setId(query, query.id);
     const entityToUpdate = await this.model.findOne(query);
 
     if (!entityToUpdate) {
-      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+      return null;
     }
 
     for (const key in entity) {
@@ -61,12 +61,12 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
     return entityToUpdate;
   }
 
-  async deleteOne(query: FilterQuery<T>): Promise<T> {
+  async deleteOne(query: FilterQuery<T>): Promise<T | null> {
     this.setId(query, query.id);
     const entityToDelete = await this.model.findOne(query);
 
     if (!entityToDelete) {
-      throw new ValidationError(NO_FOUND_ERROR_MESSAGE);
+      return null;
     }
 
     await entityToDelete.remove();
