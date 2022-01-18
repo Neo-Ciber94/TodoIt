@@ -1,3 +1,4 @@
+import { parseRecord } from "@shared/utils";
 import { ArrayUtils } from "@shared/utils/ArrayUtils";
 import { FilterQuery, Model } from "mongoose";
 import { NextApiRequest } from "next";
@@ -73,7 +74,8 @@ export function createPageResult<T>({ data, pageSize, currentPage, totalPages, t
 
 export type BuildPaginationConfig = {
   query?: boolean;
-  search?: boolean | string;
+  search?: boolean;
+  searchPropertyName?: string; // default `search`
 };
 
 export function buildPaginationOptions<T>(
@@ -107,42 +109,18 @@ export function buildPaginationOptions<T>(
   // Search
   if (config.search !== false) {
     if (config.search === true && search) {
-      query.$text = { $search: String(search) };
-    }
-
-    if (typeof config.search === "string" && config.search) {
-      const search = String(rest[config.search]);
-      delete rest[config.search]; // Removed the prop
+      const searchPropertyName = config.searchPropertyName || "search"; // TODO: move to const
+      const search = req.query[searchPropertyName] as string;
+      delete req.query[searchPropertyName];
       query.$text = { $search: String(search) };
     }
   }
 
-  console.log({ config, rest });
   // Query
   if (config.query === true && rest) {
-    // try {
-    //   const data = JSON.parse(JSON.stringify(rest));
-    //   console.log(data);
-    //   for (const [key, value] of Object.entries(data)) {
-    //     (query as any)[key] = value;
-    //   }
-    // } catch {
-    //   // Ignore
-    // }
-    // for (const [key, value] of Object.entries(rest)) {
-    //   (query as any)[key] = JSON.parse(value);
-    // }
-
-    console.log(rest);
-    try {
-      const data = JSON.parse(JSON.stringify(rest));
-      console.log(JSON.stringify(rest));
-      console.log({ data });
-      for (const [key, value] of Object.entries(rest)) {
-        (query as any)[key] = value;
-      }
-    } catch {
-      // Ignore
+    const queryData = parseRecord(rest);
+    for (const [key, value] of Object.entries(queryData)) {
+      (query as any)[key] = value;
     }
   }
 
@@ -153,9 +131,3 @@ export function buildPaginationOptions<T>(
     query,
   };
 }
-
-function parseRecord(record: Record<string, string | string[]>): any {
-  return null;
-}
-
-function parseString(s: string): any {}

@@ -23,7 +23,13 @@ export interface ControllerConfig {
    * By default is `false` but if enable will use the property `search`
    * of the request query.
    */
-  textSearch?: boolean | string;
+  search?: boolean;
+
+  /**
+   * The name of the property in a request query params to be used to execute a search query.
+   * Defaults to `search`.
+   */
+  searchPropertyName?: string;
 
   /**
    * Enables query using the query params of the request.

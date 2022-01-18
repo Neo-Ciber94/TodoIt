@@ -14,7 +14,7 @@ export type RequestHeaders = {
  * Query params of a request.
  */
 export type RequestParams = {
-  [key: string]: string | number | boolean;
+  [key: string]: any; // TODO: Typed?
 };
 
 /**

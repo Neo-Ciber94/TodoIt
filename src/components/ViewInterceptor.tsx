@@ -8,11 +8,14 @@ export interface InterceptorProps {
 export const ViewInterceptor: React.FC<InterceptorProps> = (props) => {
   const { ref, inView } = useInView();
   const [wasInView, setWasInView] = React.useState(inView);
+  const isFirstRender = React.useRef(true);
 
   useEffect(() => {
-    if (inView != wasInView) {
+    if ((inView && isFirstRender.current) || inView != wasInView) {
       props.inView(inView);
       setWasInView(inView);
+
+      isFirstRender.current = false;
     }
   }, [props, inView, wasInView]);
 

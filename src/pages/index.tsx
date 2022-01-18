@@ -25,8 +25,8 @@ import { useSprings, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import {
+  TodoFilters,
   TodosFiltersDrawer,
-  TodoState,
 } from "src/components/TodosFilterDrawer";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PageResult } from "@server/repositories/base/repository";
@@ -41,8 +41,6 @@ type SearchTodoOptions = {
   append?: true;
   delay?: number;
 };
-
-type TodoFilters = Partial<Pick<ITodo, "completed" | "color">>;
 
 type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -61,8 +59,7 @@ export const getServerSideProps = withPageAuthRequired<Data>({
 });
 
 function Page({ pageResult }: PageProps) {
-  const { data, currentPage, totalPages } = pageResult;
-  const hasMoreItems = currentPage < totalPages;
+  const { data, totalPages } = pageResult;
   const [springs, _] = useSprings(3, (index) =>
     animationSprings.slideLeftFadeIn(index * 100)
   );
@@ -73,7 +70,7 @@ function Page({ pageResult }: PageProps) {
   const [openFiltersMenu, setOpenFiltersMenu] = useState(false);
   const [page, setPage] = useState(1);
   const firstRender = useRef(true);
-  const [filters, setFilters] = useState<TodoFilters>({});
+  const [todoFilters, setTodoFilters] = useState<TodoFilters>({});
   const router = useRouter();
 
   const NoTodosText = () => {
@@ -88,37 +85,29 @@ function Page({ pageResult }: PageProps) {
     return <></>;
   };
 
-  const onCloseFiltersMenu = () => {
-    setOpenFiltersMenu(false);
-  };
+  const onCloseFiltersMenu = () => setOpenFiltersMenu(false);
 
-  const onDeleteTodo = useCallback(async (todo: ITodo) => {
+  const onDeleteTodo = async (todo: ITodo) => {
     try {
       await todoClient.delete(todo.id);
       setTodos(todos.filter((t) => t.id !== todo.id));
     } catch (e) {
       console.error(e);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
-  const onToggleTodo = useCallback(
-    (todo: ITodo) => todoClient.toggle(todo.id),
-    []
-  );
+  const onToggleTodo = (todo: ITodo) => todoClient.toggle(todo.id);
 
-  const onTodoClick = useCallback(
-    (todo: ITodo) => router.push(`/todos/edit/${todo.id}`),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  const onTodoClick = (todo: ITodo) => router.push(`/todos/edit/${todo.id}`);
 
-  const fetchTodos = useCallback((options: SearchTodoOptions = {}) => {
+  const fetchTodos = (options: SearchTodoOptions = {}) => {
     setIsLoading(true);
 
     // prettier-ignore
     const opts = { page: options.page, pageSize: PAGE_SIZE, search: searchString };
-    const config: RequestConfig = { params: filters };
+    const config: RequestConfig = {
+      params: { ...todoFilters },
+    };
 
     const runAsync = async () => {
       try {
@@ -128,11 +117,9 @@ function Page({ pageResult }: PageProps) {
 
         const newTodos = await todoClient.search(opts, config);
 
-        if (options.append === true) {
-          setTodos([...todos, ...newTodos.data]);
-        } else {
-          setTodos(newTodos.data);
-        }
+        options.append === true
+          ? setTodos([...todos, ...newTodos.data])
+          : setTodos(newTodos.data);
 
         if (options.page != null) {
           setPage(newTodos.currentPage);
@@ -146,8 +133,7 @@ function Page({ pageResult }: PageProps) {
 
     //
     runAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
   useEffect(() => {
     // Avoid make other request on first render
@@ -159,7 +145,7 @@ function Page({ pageResult }: PageProps) {
     fetchTodos();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchString, filters]);
+  }, [searchString, todoFilters]);
 
   return (
     <>
@@ -216,9 +202,9 @@ function Page({ pageResult }: PageProps) {
           })}
         </MasonryGrid>
         <ViewInterceptor
-          inView={async (inView) => {
-            if (inView) {
-              if (hasMoreItems && !isLoading) {
+          inView={async (isInView) => {
+            if (isInView) {
+              if (page < totalPages && !isLoading) {
                 fetchTodos({
                   append: true,
                   page: page + 1,
@@ -240,19 +226,9 @@ function Page({ pageResult }: PageProps) {
       <TodosFiltersDrawer
         open={openFiltersMenu}
         onClose={onCloseFiltersMenu}
-        onFilters={(filters) => {
-          console.log(filters);
-          let completed: boolean | undefined;
-          switch (filters.state) {
-            case TodoState.Active:
-              completed = false;
-              break;
-            case TodoState.Completed:
-              completed = true;
-              break;
-          }
-
-          setFilters({ completed });
+        filters={todoFilters}
+        setFilters={(filters) => {
+          setTodoFilters(filters);
           fetchTodos();
         }}
       />

@@ -26,7 +26,8 @@ export class ApiReadOnlyController<T extends IEntity> extends ControllerBase {
   async find(context: AppApiContext): Promise<PageResult<T>> {
     const options = buildPaginationOptions<T>(context.request, {
       query: this.config.query,
-      search: this.config.textSearch,
+      search: this.config.search,
+      searchPropertyName: this.config.searchPropertyName,
     });
     options.query = options.query || {};
     this.setSessionData(options.query);

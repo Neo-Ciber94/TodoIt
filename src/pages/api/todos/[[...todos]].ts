@@ -21,7 +21,7 @@ import {
 @UseMiddleware(morgan("dev"), authMiddleware(), mongoDbMiddleware())
 class TodoApiController extends ApiController<TodoDocument> {
   constructor() {
-    super(new TodoRepository(), { textSearch: true, query: true });
+    super(new TodoRepository(), { search: true, query: true });
   }
 
   async beforeCreate(entity: EntityInput<TodoDocument>) {
