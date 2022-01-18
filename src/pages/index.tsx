@@ -11,7 +11,7 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useDebounce } from "src/hooks/useDebounce";
 import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
@@ -24,13 +24,27 @@ import { Center } from "src/components/Center";
 import { useSprings, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { TodosFiltersDrawer } from "src/components/TodosFilterDrawer";
+import {
+  TodosFiltersDrawer,
+  TodoState,
+} from "src/components/TodosFilterDrawer";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PageResult } from "@server/repositories/base/repository";
 import { TodoApiService } from "src/client/services/todos.service";
+import { RequestConfig } from "src/client/http-client";
 
 const PAGE_SIZE = 10;
 const todoClient = new TodoApiService();
+
+type SearchTodoOptions = {
+  page?: number;
+  append?: true;
+  delay?: number;
+};
+
+type TodoFilters = Partial<Pick<ITodo, "completed" | "color">>;
+
+type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 type Data = {
   pageResult: PageResult<ITodo>;
@@ -46,30 +60,20 @@ export const getServerSideProps = withPageAuthRequired<Data>({
   },
 });
 
-// export const getServerSideProps: GetServerSideProps<Data> = async ({ req }) => {
-//   const pageResult = await todoClient.getAll(
-//     { pageSize: PAGE_SIZE },
-//     { headers: { cookie: req.headers.cookie || "" } }
-//   );
-//   return { props: { pageResult } };
-// };
-
-type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
-
 function Page({ pageResult }: PageProps) {
   const { data, currentPage, totalPages } = pageResult;
   const hasMoreItems = currentPage < totalPages;
   const [springs, _] = useSprings(3, (index) =>
     animationSprings.slideLeftFadeIn(index * 100)
   );
-
-  const [todos, setTodos] = React.useState(data);
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [todos, setTodos] = useState(data);
+  const [searchTerm, setSearchTerm] = useState("");
   const searchString = useDebounce(searchTerm, 500);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [openFiltersMenu, setOpenFiltersMenu] = React.useState(false);
-  const [page, setPage] = React.useState(1);
-  const firstRender = React.useRef(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [openFiltersMenu, setOpenFiltersMenu] = useState(false);
+  const [page, setPage] = useState(1);
+  const firstRender = useRef(true);
+  const [filters, setFilters] = useState<TodoFilters>({});
   const router = useRouter();
 
   const NoTodosText = () => {
@@ -88,7 +92,7 @@ function Page({ pageResult }: PageProps) {
     setOpenFiltersMenu(false);
   };
 
-  const onDeleteTodo = React.useCallback(async (todo: ITodo) => {
+  const onDeleteTodo = useCallback(async (todo: ITodo) => {
     try {
       await todoClient.delete(todo.id);
       setTodos(todos.filter((t) => t.id !== todo.id));
@@ -98,16 +102,52 @@ function Page({ pageResult }: PageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onToggleTodo = React.useCallback(
+  const onToggleTodo = useCallback(
     (todo: ITodo) => todoClient.toggle(todo.id),
     []
   );
 
-  const onTodoClick = React.useCallback(
+  const onTodoClick = useCallback(
     (todo: ITodo) => router.push(`/todos/edit/${todo.id}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  const fetchTodos = useCallback((options: SearchTodoOptions = {}) => {
+    setIsLoading(true);
+
+    // prettier-ignore
+    const opts = { page: options.page, pageSize: PAGE_SIZE, search: searchString };
+    const config: RequestConfig = { params: filters };
+
+    const runAsync = async () => {
+      try {
+        if (options.delay && options.delay > 0) {
+          await delayMs(options.delay);
+        }
+
+        const newTodos = await todoClient.search(opts, config);
+
+        if (options.append === true) {
+          setTodos([...todos, ...newTodos.data]);
+        } else {
+          setTodos(newTodos.data);
+        }
+
+        if (options.page != null) {
+          setPage(newTodos.currentPage);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    //
+    runAsync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // Avoid make other request on first render
@@ -116,22 +156,10 @@ function Page({ pageResult }: PageProps) {
       return;
     }
 
-    setIsLoading(true);
-    const searchTodos = async () => {
-      try {
-        const result = await todoClient.search({
-          search: searchString,
-          pageSize: PAGE_SIZE,
-        });
-        setTodos(result.data);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    fetchTodos();
 
-    //
-    searchTodos();
-  }, [searchString]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchString, filters]);
 
   return (
     <>
@@ -191,23 +219,11 @@ function Page({ pageResult }: PageProps) {
           inView={async (inView) => {
             if (inView) {
               if (hasMoreItems && !isLoading) {
-                setIsLoading(true);
-
-                try {
-                  const newTodos = await todoClient.search({
-                    search: searchString,
-                    page: page + 1,
-                    pageSize: PAGE_SIZE,
-                  });
-                  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-                  setTodos([...todos, ...newTodos.data]);
-                  setPage(newTodos.currentPage);
-                } catch (e) {
-                  console.error(e);
-                } finally {
-                  setIsLoading(false);
-                }
+                fetchTodos({
+                  append: true,
+                  page: page + 1,
+                  delay: 1000,
+                });
               }
             }
           }}
@@ -226,6 +242,18 @@ function Page({ pageResult }: PageProps) {
         onClose={onCloseFiltersMenu}
         onFilters={(filters) => {
           console.log(filters);
+          let completed: boolean | undefined;
+          switch (filters.state) {
+            case TodoState.Active:
+              completed = false;
+              break;
+            case TodoState.Completed:
+              completed = true;
+              break;
+          }
+
+          setFilters({ completed });
+          fetchTodos();
         }}
       />
     </>
@@ -254,6 +282,10 @@ function CenterText({ text }: CenterTextProps) {
 
 function Loading() {
   return <CircularProgress color="inherit" className="text-black" />;
+}
+
+function delayMs(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
 export default Page;

@@ -19,17 +19,33 @@ export class TodoApiService extends ApiService<ITodo, string> {
     options: QueryTodosOptions,
     config: RequestConfig = {}
   ): Promise<PageResult<ITodo>> {
-    const search = options.search || "";
-    const page = options.page || 1;
-    const pageSize = options.pageSize || 10;
+    // prettier-ignore
+    const { page = 1, pageSize = 10, search = "" } = options;
+
+    // prettier-ignore
+    let params: Record<string, string | number | boolean> = {};
+
+    if (page) {
+      params.page = page;
+    }
+
+    if (pageSize) {
+      params.pageSize = pageSize;
+    }
+
+    if (search) {
+      params.search = search;
+    }
+
+    // Set the extra params
+    params = {
+      ...params,
+      ...config.params,
+    };
 
     const result = await this.client.get<PageResult<ITodo>>(`/`, {
       ...config,
-      params: {
-        page,
-        pageSize,
-        search,
-      },
+      params,
     });
 
     return result;

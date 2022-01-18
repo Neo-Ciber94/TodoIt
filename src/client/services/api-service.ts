@@ -38,9 +38,7 @@ export class ApiService<T, TKey = string> {
     options: PagingOptions = {},
     config: RequestConfig = {}
   ): Promise<PageResult<T>> {
-    const page = options.page || 1;
-    const pageSize = options.pageSize || 10;
-
+    const { page = 1, pageSize = 10 } = options;
     const result = await this.client.get<PageResult<T>>(`/`, {
       ...config,
       params: {

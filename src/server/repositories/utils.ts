@@ -117,10 +117,32 @@ export function buildPaginationOptions<T>(
     }
   }
 
+  console.log({ config, rest });
   // Query
   if (config.query === true && rest) {
-    for (const [key, value] of Object.entries(rest)) {
-      (query as any)[key] = value;
+    // try {
+    //   const data = JSON.parse(JSON.stringify(rest));
+    //   console.log(data);
+    //   for (const [key, value] of Object.entries(data)) {
+    //     (query as any)[key] = value;
+    //   }
+    // } catch {
+    //   // Ignore
+    // }
+    // for (const [key, value] of Object.entries(rest)) {
+    //   (query as any)[key] = JSON.parse(value);
+    // }
+
+    console.log(rest);
+    try {
+      const data = JSON.parse(JSON.stringify(rest));
+      console.log(JSON.stringify(rest));
+      console.log({ data });
+      for (const [key, value] of Object.entries(rest)) {
+        (query as any)[key] = value;
+      }
+    } catch {
+      // Ignore
     }
   }
 
@@ -131,3 +153,9 @@ export function buildPaginationOptions<T>(
     query,
   };
 }
+
+function parseRecord(record: Record<string, string | string[]>): any {
+  return null;
+}
+
+function parseString(s: string): any {}

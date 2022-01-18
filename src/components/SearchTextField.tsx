@@ -39,11 +39,11 @@ export function SearchTextField({ sx, value, onSearch, className }: SearchTextFi
       sx={sx}
       onKeyPress={(e) => {
         if (e.key === "Enter") {
-          onSearch(value);
+          onSearch(value.trim());
         }
       }}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
-        onSearch(e.target.value);
+        onSearch(e.target.value.trim());
       }}
     />
   );
