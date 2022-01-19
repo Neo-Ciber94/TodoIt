@@ -22,6 +22,10 @@ export class ControllerBase {
   // Sets the current session data from the request
   @BeforeRequest()
   private __setSessionData({ request }: AppApiContext) {
+    if (this.config.useSession === false) {
+      return;
+    }
+
     const userId = request.userId;
 
     if (userId) {

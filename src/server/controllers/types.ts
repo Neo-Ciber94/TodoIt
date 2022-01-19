@@ -25,6 +25,12 @@ export type QueryParamsMapper<T> = (params: NextQueryParams) => FilterQuery<T>;
  */
 export interface ControllerConfig<T = any> {
   /**
+   * Whether if inject the session data like the `userId` in the queries.
+   * Default is `true`.
+   */
+  useSession?: boolean;
+
+  /**
    * The name of the property to set the user id to when creating, updating, deleting or filtering entities.
    * Defaults to `creatorUserId`.
    */
