@@ -53,7 +53,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
 
   // @tailwind
   const pillStyle =
-    "text-center px-3 py-2 min-w-[80px] rounded-full text-lg font-medium leading-5 mr-2";
+    "inline-flex flex-row justify-center items-center content-center px-3 py-2 w-full rounded-2xl text-base font-normal leading-6 mr-2";
 
   return (
     <Drawer
@@ -94,18 +94,19 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
           <div className="font-bold text-black text-xl">Tags</div>
         </ListItem>
         <ListItem>
-          <div className="flex flex-row gap-1 flex-wrap pb-5 pt-2">
+          {/* <div className="flex flex-row gap-1 flex-wrap pb-5 pt-2"> */}
+          <div className="grid grid-cols-3 w-full gap-1 pb-5 pt-2">
             {TAGS.map((tag, index) => (
               <button
                 key={index}
-                className={`${pillStyle} bg-purple-700 hover:bg-purple-800 text-white`}
+                className={`${pillStyle} bg-black hover:bg-gray-800 text-white`}
               >
                 {tag}
               </button>
             ))}
 
             <button
-              className={`${pillStyle} bg-pink-700 hover:bg-pink-800 text-white`}
+              className={`${pillStyle} bg-stone-700 hover:bg-stone-500 text-white`}
             >
               More...
             </button>
