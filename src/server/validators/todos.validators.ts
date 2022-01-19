@@ -1,9 +1,9 @@
 import { PASTEL_COLORS } from "@shared/config";
 import { ITodo } from "@shared/models/todo.model";
 import { WithOptional } from "@shared/types";
-import { SchemaOf, TestConfig } from "yup";
+import { SchemaOf } from "yup";
 import * as yup from "yup";
-import { AnyObject } from "yup/lib/types";
+import { notBlankString } from ".";
 
 // prettier-ignore
 export type TodoEntity = Pick<ITodo, "title" | "content" | "color" | "completed">;
@@ -33,14 +33,3 @@ export const todoUpdateValidator: SchemaOf<TodoUpdate> = yup.object({
   color: yup.string().optional().oneOf(PASTEL_COLORS),
   completed: yup.boolean().optional(),
 });
-
-function notBlankString(
-  message: string
-): TestConfig<string | undefined, AnyObject> {
-  return {
-    message,
-    test: (value) => {
-      return value != null && value.trim().length > 0;
-    },
-  };
-}
