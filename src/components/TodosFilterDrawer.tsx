@@ -55,8 +55,12 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   };
 
   // @tailwind
-  const pillStyle =
-    "inline-flex flex-row justify-center items-center content-center px-3 py-2 w-full rounded-2xl text-base font-normal leading-6 mr-2";
+  const pillStyle = `
+    inline-flex flex-row justify-center items-center content-center 
+    w-full rounded-2xl font-normal leading-6 mr-2
+    px-3 py-2
+    text-base
+    `;
 
   return (
     <Drawer
@@ -93,7 +97,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
           </ListItem>
         </div>
       </List>
-      <Divider className="mx-2 mb-auto" />
+      <Divider className="mx-2" />
       <List className="mt-auto">
         <ListItem>
           <div className="font-bold text-black text-xl">Tags</div>
