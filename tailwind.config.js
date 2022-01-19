@@ -5,8 +5,17 @@ module.exports = {
       keyframes: {},
       animation: {},
     },
+
+    // Changed to match MUI breakpoints: https://mui.com/customization/breakpoints/
+    screens: {
+      xs: "0px",
+      sm: "600px",
+      md: "900px",
+      lg: "1200px",
+      xl: "1536px",
+    },
   },
   variants: {
     extend: {},
-  }
+  },
 };
