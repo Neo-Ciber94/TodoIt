@@ -1,7 +1,14 @@
 {
-    "exportall.config.folderListener": [
-        "/src/lib/rest-api",
-        "/src/next-controllers/decorators",
-        "/src/next-controllers/core"
-    ]
+  "exportall.config.folderListener": [
+    "/src/lib/rest-api",
+    "/src/next-controllers/decorators",
+    "/src/next-controllers/core"
+  ],
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.experimental.classRegex": [
+    "classname[s]?\\s*=\\s*\"([^\"]*)\"",
+    "\/\/\\s*@tailwind\\s*\n\\s*const twStyles\\s*=\\s*\"([^\"]*)\""
+  ]
 }
