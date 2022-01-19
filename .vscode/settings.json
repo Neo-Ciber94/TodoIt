@@ -9,6 +9,6 @@
   },
   "tailwindCSS.experimental.classRegex": [
     "classname[s]?\\s*=\\s*\"([^\"]*)\"",
-    "\/\/\\s*@tailwind\\s*\n\\s*const twStyles\\s*=\\s*\"([^\"]*)\""
+    "//\\s*@tailwind\\s*\n\\s*const [a-zA-Z]*Style\\s*=\\s*\"([^\"]*)\""
   ]
 }
