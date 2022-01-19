@@ -1,11 +1,11 @@
 import { Drawer, List, ListItem, ListItemText, Divider } from "@mui/material";
-import Filter1Icon from "@mui/icons-material/Filter1";
-import Filter2Icon from "@mui/icons-material/Filter2";
-import Filter3Icon from "@mui/icons-material/Filter3";
 import ColorLensIcon from "@mui/icons-material/ColorLens";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import CheckBoxOutlineBlankOutlinedIcon from "@mui/icons-material/CheckBoxOutlineBlankOutlined";
 import IndeterminateCheckBoxOutlinedIcon from "@mui/icons-material/IndeterminateCheckBoxOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 export interface TodoFilters {
   completed?: boolean;
@@ -45,6 +45,9 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   filters,
   setFilters,
 }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+
   const setCompleted = (completed: boolean | undefined) => {
     const newFilters = { ...filters, completed };
     completed ?? delete newFilters.completed;
@@ -65,9 +68,11 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
       <List className="pt-0 flex flex-col h-full">
         <ListItem
           onClick={onClose}
-          className="bg-black cursor-pointer select-none"
+          className="bg-black cursor-pointer select-none flex flex-row"
         >
           <div className="text-white text-2xl p-2">Search Todos</div>
+
+          <CloseOutlinedIcon className="ml-auto text-white text-3xl" />
         </ListItem>
         <div className="mt-3">
           <ListItem button onClick={() => setCompleted(undefined)}>
