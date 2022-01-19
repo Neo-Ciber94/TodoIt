@@ -1,7 +1,11 @@
-import { Drawer, List, ListItem, ListItemText } from "@mui/material";
+import { Drawer, List, ListItem, ListItemText, Divider } from "@mui/material";
 import Filter1Icon from "@mui/icons-material/Filter1";
 import Filter2Icon from "@mui/icons-material/Filter2";
 import Filter3Icon from "@mui/icons-material/Filter3";
+import ColorLensIcon from "@mui/icons-material/ColorLens";
+import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
+import CheckBoxOutlineBlankOutlinedIcon from "@mui/icons-material/CheckBoxOutlineBlankOutlined";
+import IndeterminateCheckBoxOutlinedIcon from "@mui/icons-material/IndeterminateCheckBoxOutlined";
 
 export interface TodoFilters {
   completed?: boolean;
@@ -16,6 +20,25 @@ export interface TodosFiltersProps {
   setFilters: (filters: TodoFilters) => void;
 }
 
+// An array of sample tags for todos
+const TAGS: string[] = [
+  "home",
+  "work",
+  "school",
+  "personal",
+  "travel",
+  "shopping",
+  "family",
+  "friends",
+  "important",
+  "urgent",
+  "fun",
+  "hobby",
+  "health",
+  "career",
+  "money",
+];
+
 export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   open,
   onClose,
@@ -28,25 +51,65 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
     setFilters(newFilters);
   };
 
+  // @tailwind
+  const pillStyle =
+    "text-center px-3 py-2 min-w-[80px] rounded-full text-lg font-medium leading-5 mr-2";
+
   return (
     <Drawer
       anchor={"left"}
       open={open}
       onBackdropClick={onClose}
-      PaperProps={{ className: "bg-black w-1/2 md:w-1/3 pt-10 pl-3" }}
+      PaperProps={{ className: "bg-[#FED7AA] w-full md:w-1/3 sm:w-1/2" }}
     >
-      <List>
-        <ListItem button onClick={() => setCompleted(undefined)}>
-          <Filter1Icon className="text-white mr-3" />
-          <ListItemText className="text-white text-4xl" primary="All" />
+      <List className="pt-0 flex flex-col h-full">
+        <ListItem
+          onClick={onClose}
+          className="bg-black cursor-pointer select-none"
+        >
+          <div className="text-white text-2xl p-2">Search Todos</div>
         </ListItem>
-        <ListItem button onClick={() => setCompleted(false)}>
-          <Filter2Icon className="text-white mr-3" />
-          <ListItemText className="text-white text-4xl" primary="Active" />
+        <div className="mt-3">
+          <ListItem button onClick={() => setCompleted(undefined)}>
+            <IndeterminateCheckBoxOutlinedIcon className="mr-3 text-[30px]" />
+            <ListItemText className="p-1" primary="All" />
+          </ListItem>
+          <ListItem button onClick={() => setCompleted(false)}>
+            <CheckBoxOutlineBlankOutlinedIcon className="mr-3 text-[30px]" />
+            <ListItemText className="p-1" primary="Active" />
+          </ListItem>
+          <ListItem button onClick={() => setCompleted(true)}>
+            <CheckBoxOutlinedIcon className="mr-3 text-[30px]" />
+            <ListItemText className="p-1" primary="Completed" />
+          </ListItem>
+          <ListItem button onClick={() => {}}>
+            <ColorLensIcon className="mr-3 text-[30px]" />
+            <ListItemText className="p-1" primary="Color" />
+          </ListItem>
+        </div>
+      </List>
+      <Divider className="mx-2 mb-auto" />
+      <List className="mt-auto">
+        <ListItem>
+          <div className="font-bold text-black text-xl">Tags</div>
         </ListItem>
-        <ListItem button onClick={() => setCompleted(true)}>
-          <Filter3Icon className="text-white mr-3" />
-          <ListItemText className="text-white text-4xl" primary="Completed" />
+        <ListItem>
+          <div className="flex flex-row gap-1 flex-wrap pb-5 pt-2">
+            {TAGS.map((tag, index) => (
+              <button
+                key={index}
+                className={`${pillStyle} bg-purple-700 hover:bg-purple-800 text-white`}
+              >
+                {tag}
+              </button>
+            ))}
+
+            <button
+              className={`${pillStyle} bg-pink-700 hover:bg-pink-800 text-white`}
+            >
+              More...
+            </button>
+          </div>
         </ListItem>
       </List>
     </Drawer>
