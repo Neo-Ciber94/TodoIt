@@ -26,15 +26,21 @@ export interface SearchTextFieldProps {
   value: string;
   onSearch: (term: string) => void;
   className?: string;
-  sx?: SxProps<Theme>
+  sx?: SxProps<Theme>;
 }
 
-export function SearchTextField({ sx, value, onSearch, className }: SearchTextFieldProps) {
+export function SearchTextField({
+  sx,
+  value,
+  onSearch,
+  className,
+}: SearchTextFieldProps) {
   return (
     <StyledTextField
       label="Search"
       variant="standard"
       className={`w-full md:w-1/2 ${className || ""}`}
+      autoComplete="off"
       value={value}
       sx={sx}
       onKeyPress={(e) => {
