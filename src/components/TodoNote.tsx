@@ -88,7 +88,7 @@ export default function TodoNote({
         <Checkbox
           {...CHECKBOX_LABEL}
           checked={isCompleted}
-          sx={{ "& .MuiSvgIcon-root": { fontSize: 25 } }}
+          sx={{ "& .MuiSvgIcon-root": { fontSize: 25, color: "gray", opacity: 0.7 } }}
           color="default"
           onClick={async (e) => {
             e.stopPropagation();

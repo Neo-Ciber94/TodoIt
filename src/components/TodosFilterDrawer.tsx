@@ -4,8 +4,6 @@ import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import CheckBoxOutlineBlankOutlinedIcon from "@mui/icons-material/CheckBoxOutlineBlankOutlined";
 import IndeterminateCheckBoxOutlinedIcon from "@mui/icons-material/IndeterminateCheckBoxOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
 
 export interface TodoFilters {
   completed?: boolean;
@@ -45,7 +43,6 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   filters,
   setFilters,
 }) => {
-  const theme = useTheme();
   const setCompleted = (completed: boolean | undefined) => {
     const newFilters = { ...filters, completed };
     completed ?? delete newFilters.completed;
