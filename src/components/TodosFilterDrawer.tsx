@@ -46,8 +46,6 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   setFilters,
 }) => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
-
   const setCompleted = (completed: boolean | undefined) => {
     const newFilters = { ...filters, completed };
     completed ?? delete newFilters.completed;
@@ -67,9 +65,14 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
       anchor={"left"}
       open={open}
       onBackdropClick={onClose}
-      PaperProps={{ className: "bg-[#FED7AA] w-full md:w-1/3 sm:w-1/2" }}
+      PaperProps={{
+        sx: {
+          backgroundColor: "#FED7AA",
+          width: ["100%", "50%", "33%"],
+        },
+      }}
     >
-      <List className="pt-0 flex flex-col h-full">
+      <List sx={{ paddingTop: 0, flexDirection: "column", height: "100%" }}>
         <ListItem
           onClick={onClose}
           className="bg-black cursor-pointer select-none flex flex-row"
