@@ -1,2 +1,4 @@
-
-export const API_URL = `http://localhost:${process.env.NEXT_PUBLIC_PORT}/api`;
+/**
+ * The api URL.
+ */
+export const API_URL = process.env.PUBLIC_NEXT_API_URL;
