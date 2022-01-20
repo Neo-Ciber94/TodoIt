@@ -5,6 +5,7 @@ import { FilterQuery, Model } from "mongoose";
 import { NextApiRequest } from "next";
 import {
   PageResult,
+  PageSorting,
   PaginationOptions,
   SortDirection,
 } from "./base/repository";
@@ -85,23 +86,23 @@ export function buildPaginationOptions<T>(
 ): PaginationOptions<T> {
   // prettier-ignore
   const { page, pageSize, sort, sortAscending, sortDescending, search, ...rest } = req.query;
-  const sorting: Record<string, SortDirection> = {};
+  const sorting: PageSorting<T> = {};
 
   if (sort) {
     for (const key of ArrayUtils.getOrArray(sort)) {
-      sorting[key] = SortDirection.Descending;
+      sorting[key as keyof T] = SortDirection.Descending;
     }
   }
 
   if (sortAscending) {
     for (const key of ArrayUtils.getOrArray(sortAscending)) {
-      sorting[key] = SortDirection.Ascending;
+      sorting[key as keyof T] = SortDirection.Ascending;
     }
   }
 
   if (sortDescending) {
     for (const key of ArrayUtils.getOrArray(sortDescending)) {
-      sorting[key] = SortDirection.Descending;
+      sorting[key as keyof T] = SortDirection.Descending;
     }
   }
 
