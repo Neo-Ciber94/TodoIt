@@ -1,5 +1,6 @@
 import { Results } from "next-controllers";
 import { ValidationError } from "yup";
+import { AuditConfig } from "./types";
 
 /**
  * Handlers a server error.
@@ -15,3 +16,12 @@ export function errorHandler(error: any) {
 
   return Results.internalServerError(messsage);
 }
+
+/**
+ * The default `AuditConfig`.
+ */
+export const defaultAuditProps = {
+  create: "creatorUserId",
+  update: "updaterUserId",
+  delete: "deleterUserId",
+};

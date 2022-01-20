@@ -54,4 +54,33 @@ export interface ControllerConfig<T = any> {
    * By default is `false`.
    */
   query?: boolean | QueryParamsMapper<T>;
+
+  /**
+   * Whether if audit `create`/`update`/`delete` operations in the controller.
+   * Default is `true`.
+   *
+   * This sets the user id of the user performing that operation in a property
+   * defined by the `AuditConfig` by default those properties are: `creatorUserId`, `updaterUserId` and  `deleterUserId`.
+   */
+  audit?: boolean | AuditConfig;
+}
+
+/**
+ * Configuration for auditing operations.
+ */
+export interface AuditConfig {
+  /**
+   * Audit create. Default is `creatorUserId`.
+   */
+  create: boolean | string;
+
+  /**
+   * Audit create. Default is `updaterUserId`.
+   */
+  update: boolean | string;
+
+  /**
+   * Audit create. Default is `deleterUserId`.
+   */
+  delete: boolean | string;
 }
