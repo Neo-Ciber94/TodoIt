@@ -126,7 +126,10 @@ export function TodoForm({
             type="submit"
             variant="contained"
             disabled={isLoading}
-            className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800 mt-2`}
+            sx={{
+              marginTop: 1,
+            }}
+            className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800`}
           >
             {buttonText}
             {isLoading && (

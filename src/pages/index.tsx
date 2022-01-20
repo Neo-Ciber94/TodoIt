@@ -155,7 +155,8 @@ function Page({ pageResult }: PageProps) {
             <animated.div style={springs[0]}>
               <Button
                 variant="contained"
-                className={`!bg-black !hover:bg-gray-800 w-full sm:w-auto`}
+                color="primary"
+                className={`bg-black w-full sm:w-auto`}
               >
                 <AddIcon className="mr-2" />
                 <span>New Todo</span>
@@ -165,7 +166,8 @@ function Page({ pageResult }: PageProps) {
           <animated.div style={springs[0]}>
             <Button
               variant="contained"
-              className={`!bg-black !hover:bg-gray-800 w-full sm:w-auto`}
+              color="primary"
+              className={`bg-black w-full sm:w-auto`}
               onClick={() => setOpenFiltersMenu(true)}
             >
               <FilterListIcon />

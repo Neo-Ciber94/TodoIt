@@ -21,7 +21,7 @@ export function ButtonAppBar() {
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="fixed" className="bg-black">
+        <AppBar position="fixed">
           <Toolbar>
             <Box className="flex flex-row ml-auto">
               {user && (

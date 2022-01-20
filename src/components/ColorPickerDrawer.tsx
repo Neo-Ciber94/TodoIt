@@ -16,7 +16,7 @@ export function ColorPickerDrawer(props: ColorPickerDrawerProps) {
   return (
     <Drawer
       PaperProps={{
-        className: "bg-gray-800",
+        sx: { backgroundColor: "rgb(31, 41, 55)" },
       }}
       anchor="bottom"
       open={open}
