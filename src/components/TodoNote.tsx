@@ -25,8 +25,6 @@ export interface TodoNoteProps {
   onToggle: (todo: ITodo) => Promise<ITodo> | ITodo;
 }
 
-const CHECKBOX_LABEL = { inputProps: { "aria-label": "Checkbox demo" } };
-
 export default function TodoNote({
   todo,
   height,
@@ -86,7 +84,6 @@ export default function TodoNote({
     >
       <div className="flex flex-row justify-between">
         <Checkbox
-          {...CHECKBOX_LABEL}
           checked={isCompleted}
           sx={{
             "& .MuiSvgIcon-root": { fontSize: 25, color: "gray", opacity: 0.7 },

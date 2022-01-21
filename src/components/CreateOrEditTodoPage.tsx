@@ -8,7 +8,6 @@ import React, { useState } from "react";
 import { ITodo } from "@shared/models/todo.model";
 import { useSpring, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
-import LabelIcon from "@mui/icons-material/Label";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import TagsModal from "./TagsModal";
 
