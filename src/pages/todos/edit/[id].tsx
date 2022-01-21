@@ -35,7 +35,7 @@ export default function EditTodo({
     <CreateOrEditTodoPage
       todo={todo}
       title={"Edit Todo"}
-      submitText={"Edit Todo"}
+      submitText={"Save"}
       onSubmit={async (data) => {
         const { id } = router.query;
         await PromiseUtils.delay(1000);

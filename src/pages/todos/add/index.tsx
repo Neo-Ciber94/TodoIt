@@ -13,7 +13,7 @@ function CreateTodo() {
   return (
     <CreateOrEditTodoPage
       title={"Create Todo"}
-      submitText="Create Todo"
+      submitText="Create"
       onSubmit={async (data) => {
         await PromiseUtils.delay(1000);
         await todoClient.create(data);

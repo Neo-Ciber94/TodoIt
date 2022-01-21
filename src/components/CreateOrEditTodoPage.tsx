@@ -1,5 +1,5 @@
 import { TodoForm } from "src/components/TodoForm";
-import { Box, Button, Container, IconButton } from "@mui/material";
+import { Button, Container, IconButton } from "@mui/material";
 import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
@@ -29,7 +29,7 @@ export function CreateOrEditTodoPage({
   return (
     <>
       <Container className="pt-4">
-        <div className="sm:px-40 px-0 flex flex-row justify-between">
+        <div className="md:px-30 sm:px-20 px-0 flex flex-row justify-between">
           <animated.div style={backButtonSpring}>
             <Link href="/" passHref>
               <Button
