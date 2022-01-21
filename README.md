@@ -1,34 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TodoApp
 
-## Getting Started
+A todo app in created in `NextJS`.
 
-First, run the development server:
+The app use [Next-Controllers](https://www.npmjs.com/package/next-controllers) a library to manage the api controllers.
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+## Run
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For run the app you need to setup an `Auth0` account and a `MongoDB` database.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- https://auth0.com/signup
+- https://mongoosejs.com/
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+After that rename the `.env.local.sample` to `.env.local` and add your `Auth0` credentials and `MongoDB` credentials to the file.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Then continue with the following steps:
 
-## Learn More
+### 1. Install the dependencies
 
-To learn more about Next.js, take a look at the following resources:
+- `npm install`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Run the app in development mode
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- `npm run next:dev`
 
-## Deploy on Vercel
+## Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [x] Authentication
+- [x] List todos (with pagination)
+- [x] Create todos
+- [x] Update todos
+- [x] Delete todos
+- [x] Filtering todos by status
+- [x] Full text search
+- [ ] Tags
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Todo
+
+- [ ] CORS
+- [ ] Rate limiter
+- [ ] Logging
+- [ ] Trash can (soft delete)
+- [ ] Sorting
