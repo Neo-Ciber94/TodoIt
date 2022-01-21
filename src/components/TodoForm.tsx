@@ -90,7 +90,7 @@ export function TodoForm({
     <>
       <form
         onSubmit={handleSubmit(submit)}
-        className="flex flex-col sm:px-40 px-0"
+        className="flex flex-col md:px-30 sm:px-20 px-0"
       >
         <AnimatedFormControl
           style={springs[0]}
@@ -109,7 +109,7 @@ export function TodoForm({
         <AnimatedFormControl
           style={springs[1]}
           variant="standard"
-          className={`mt-8 mb-2`}
+          sx={{ marginTop: 3, marginBottom: 1 }}
         >
           <StyledTextField
             label="Content"
@@ -128,12 +128,16 @@ export function TodoForm({
             disabled={isLoading}
             sx={{
               marginTop: 1,
+              width: ["100%", "auto", "20%"],
             }}
-            className={`flex flex-row justify-center text-white bg-black hover:bg-gray-800`}
+            className={`flex flex-row justify-center bg-black`}
           >
             {buttonText}
             {isLoading && (
-              <CircularProgress className="text-white mx-4" size={20} />
+              <CircularProgress
+                sx={{ color: "white", margin: "16px 0" }}
+                size={20}
+              />
             )}
           </Button>
         </animated.div>
