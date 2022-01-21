@@ -1,15 +1,13 @@
 import { ApiController } from "@server/controllers/api-controller";
 import { errorHandler } from "@server/controllers/utils";
 import { TodoDocument } from "@server/database/schemas/todo.types";
-import authMiddleware from "@server/middlewares/auth";
-import mongoDbMiddleware from "@server/middlewares/mongodb";
+import { commonMiddlewares } from "@server/middlewares/common";
 import { TodoRepository } from "@server/repositories/todo.repository";
 import { AppApiContext, EntityInput } from "@server/types";
 import {
   todoCreateValidator,
   todoUpdateValidator,
 } from "@server/validators/todos.validators";
-import morgan from "morgan";
 import {
   Post,
   UseMiddleware,
@@ -18,7 +16,7 @@ import {
 } from "next-controllers";
 
 @RouteController({ onError: errorHandler })
-@UseMiddleware(morgan("dev"), authMiddleware(), mongoDbMiddleware())
+@UseMiddleware(...commonMiddlewares)
 class TodoApiController extends ApiController<TodoDocument> {
   constructor() {
     super(new TodoRepository(), { search: true, query: true });
