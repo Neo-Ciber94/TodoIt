@@ -88,7 +88,9 @@ export default function TodoNote({
         <Checkbox
           {...CHECKBOX_LABEL}
           checked={isCompleted}
-          sx={{ "& .MuiSvgIcon-root": { fontSize: 25, color: "gray", opacity: 0.7 } }}
+          sx={{
+            "& .MuiSvgIcon-root": { fontSize: 25, color: "gray", opacity: 0.7 },
+          }}
           color="default"
           onClick={async (e) => {
             e.stopPropagation();
@@ -101,6 +103,7 @@ export default function TodoNote({
           <MoreVertIcon sx={{ fontSize: 25 }} />
         </IconButton>
         <TodoMenu
+          color={todo.color}
           anchorEl={anchorEl}
           open={open}
           handleClose={handleClose}
@@ -153,12 +156,14 @@ function TodoNoteContent({ isCompleted, content }: TodoNoteContentProps) {
 
 interface TodoMenuProps {
   anchorEl: Element | null;
+  color: string;
   open: boolean;
   handleOnDelete: (e: React.MouseEvent) => void;
   handleClose: (e: React.MouseEvent) => void;
 }
 
 function TodoMenu({
+  color,
   anchorEl,
   open,
   handleClose,
@@ -169,6 +174,7 @@ function TodoMenu({
       id="basic-menu"
       anchorEl={anchorEl}
       open={open}
+      PaperProps={{ sx: { backgroundColor: color } }}
       onClose={handleClose}
       MenuListProps={{
         "aria-labelledby": "basic-button",
