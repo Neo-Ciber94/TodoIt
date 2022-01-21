@@ -14,6 +14,7 @@ import {
 import { UserProfile, useUser } from "@auth0/nextjs-auth0";
 import { useRef, useState } from "react";
 import React from "react";
+import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
@@ -33,35 +34,18 @@ export function ButtonAppBar() {
     </Button>
   );
 
-  const Logout = () => (
-    <>
-      {user && (
-        <div className="flex flex-col justify-center">
-          <Typography className="uppercase text-red-400 select-none">
-            {`${user.name} - `}
-          </Typography>
-        </div>
-      )}
-      <Button color="inherit" className="ml-auto" onClick={goToLogout}>
-        Logout
-      </Button>
-    </>
-  );
-
   return (
-    <>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="fixed">
-          <Toolbar>
-            <Box className="flex flex-row ml-auto">
-              {!isLogin && <Login />}
-              {isLogin && <Me user={user!} handleLogout={goToLogout} />}
-            </Box>
-          </Toolbar>
-        </AppBar>
-        <Offset />
-      </Box>
-    </>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Box className="flex flex-row ml-auto">
+            {!isLogin && <Login />}
+            {isLogin && <Me user={user!} handleLogout={goToLogout} />}
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Offset />
+    </Box>
   );
 }
 
@@ -72,10 +56,7 @@ export interface MeProps {
 
 function Me({ user, handleLogout }: MeProps) {
   const { email, picture, name } = user;
-  const [displayName, setDisplayName] = useState(name);
   const [anchorElUser, setAnchorElUser] = useState<HTMLElement | null>();
-
-  const userName = displayName || "Welcome!";
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -83,18 +64,6 @@ function Me({ user, handleLogout }: MeProps) {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
-  };
-
-  const isUserName = useRef(true);
-
-  const changeDisplayName = () => {
-    if (isUserName.current) {
-      setDisplayName(email);
-      isUserName.current = false;
-    } else {
-      setDisplayName(name);
-      isUserName.current = true;
-    }
   };
 
   return (
@@ -121,12 +90,23 @@ function Me({ user, handleLogout }: MeProps) {
         open={Boolean(anchorElUser)}
         onClose={handleCloseUserMenu}
       >
-        <MenuItem onClick={changeDisplayName}>
-          <AccountCircleRoundedIcon sx={{ color: "white", marginRight: 1 }} />
-          <Typography textAlign="center" sx={{ color: "white" }}>
-            {userName}
-          </Typography>
-        </MenuItem>
+        {email && (
+          <MenuItem onClick={handleCloseUserMenu}>
+            <EmailRoundedIcon sx={{ color: "white", marginRight: 1 }} />
+            <Typography textAlign="center" sx={{ color: "white" }}>
+              {email}
+            </Typography>
+          </MenuItem>
+        )}
+
+        {name && (
+          <MenuItem onClick={handleCloseUserMenu}>
+            <AccountCircleRoundedIcon sx={{ color: "white", marginRight: 1 }} />
+            <Typography textAlign="center" sx={{ color: "white" }}>
+              {name}
+            </Typography>
+          </MenuItem>
+        )}
 
         <MenuItem onClick={handleCloseUserMenu}>
           <LogoutRoundedIcon sx={{ color: "white", marginRight: 1 }} />
