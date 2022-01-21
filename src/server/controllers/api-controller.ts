@@ -23,16 +23,24 @@ export class ApiReadOnlyController<T extends IEntity> extends ControllerBase {
    * @returns A paginated result.
    */
   @Get("/")
-  async find(context: AppApiContext): Promise<PageResult<T>> {
-    const options = buildPaginationOptions<T>(context.request, {
-      query: this.config.query,
-      search: this.config.search,
-      searchPropertyName: this.config.searchPropertyName,
-    });
-    options.query = options.query || {};
-    this.setSessionData(options.query);
-    const result = await this.repository.findWithPagination(options);
-    return result;
+  async find(context: AppApiContext): Promise<PageResult<T> | T[]> {
+    const { page, pageSize } = context.request.query;
+    if (page == null && pageSize == null) {
+      const query: FilterQuery<T> = {};
+      this.setSessionData(query);
+      const result = await this.repository.find(query);
+      return result;
+    } else {
+      const options = buildPaginationOptions<T>(context.request, {
+        query: this.config.query,
+        search: this.config.search,
+        searchPropertyName: this.config.searchPropertyName,
+      });
+      options.query = options.query || {};
+      this.setSessionData(options.query);
+      const result = await this.repository.findWithPagination(options);
+      return result;
+    }
   }
 
   /**

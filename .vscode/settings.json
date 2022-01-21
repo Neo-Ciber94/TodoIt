@@ -2,7 +2,8 @@
   "exportall.config.folderListener": [
     "/src/lib/rest-api",
     "/src/next-controllers/decorators",
-    "/src/next-controllers/core"
+    "/src/next-controllers/core",
+    "/src/client/services"
   ],
   "editor.quickSuggestions": {
     "strings": true

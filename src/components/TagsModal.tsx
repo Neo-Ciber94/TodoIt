@@ -129,7 +129,7 @@ const tagSx: SxProps = {
 export default function TagsModal({
   open,
   setOpen,
-  initialTags = TAGS,
+  initialTags = [],
 }: TagsModalProps) {
   const handleClose = () => setOpen(false);
   const [items, setItems] = useState(initialTags);
