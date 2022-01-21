@@ -8,6 +8,9 @@ import React, { useState } from "react";
 import { ITodo } from "@shared/models/todo.model";
 import { useSpring, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
+import LabelIcon from "@mui/icons-material/Label";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import TagsModal from "./TagsModal";
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
@@ -25,6 +28,7 @@ export function CreateOrEditTodoPage({
   const [openColorPicker, setOpenColorPicker] = useState(false);
   const backButtonSpring = useSpring(animationSprings.slideLeftFadeIn(0));
   const titleSpring = useSpring(animationSprings.slideLeftFadeIn(100));
+  const [tagsOpen, setTagsOpen] = useState(false);
 
   return (
     <>
@@ -42,14 +46,20 @@ export function CreateOrEditTodoPage({
             </Link>
           </animated.div>
 
-          <IconButton
-            title="Change Color"
-            onClick={() => {
-              setOpenColorPicker(true);
-            }}
-          >
-            <PaletteIcon sx={{ color: "black" }} />
-          </IconButton>
+          <div>
+            <IconButton title="Add tags" onClick={() => setTagsOpen(true)}>
+              <LocalOfferIcon sx={{ color: "black" }} />
+            </IconButton>
+
+            <IconButton
+              title="Change Color"
+              onClick={() => {
+                setOpenColorPicker(true);
+              }}
+            >
+              <PaletteIcon sx={{ color: "black" }} />
+            </IconButton>
+          </div>
         </div>
 
         <animated.div style={titleSpring}>
@@ -64,6 +74,8 @@ export function CreateOrEditTodoPage({
           onSubmit={(data) => onSubmit(data)}
         />
       </Container>
+
+      <TagsModal open={tagsOpen} setOpen={setTagsOpen} />
     </>
   );
 }

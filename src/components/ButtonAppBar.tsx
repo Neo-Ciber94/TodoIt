@@ -12,7 +12,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { UserProfile, useUser } from "@auth0/nextjs-auth0";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
