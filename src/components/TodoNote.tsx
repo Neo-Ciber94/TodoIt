@@ -145,7 +145,7 @@ type TodoNoteContentProps = {
 function TodoNoteContent({ isCompleted, content }: TodoNoteContentProps) {
   return (
     <p
-      className={`font-mono line-clamp-10 break-words ${
+      className={`font-mono line-clamp-6 break-words ${
         isCompleted ? "line-through opacity-40" : ""
       }`}
     >
