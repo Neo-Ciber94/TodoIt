@@ -13,11 +13,13 @@ const PageColorContext = createContext<PageColorProps>({} as PageColorProps);
 export const PageColorProvider: React.FC = (props) => {
   const [pageColor, setPageColor] = React.useState<string>(DEFAULT_PAGE_COLOR);
 
+  useEffect(() => {
+    document.body.style.backgroundColor = pageColor;
+  }, [pageColor]);
+
   return (
     <PageColorContext.Provider value={{ pageColor, setPageColor }}>
-      <div style={{ backgroundColor: pageColor, minHeight: "100%" }}>
-        {props.children}
-      </div>
+      <div style={{ minHeight: "100%" }}>{props.children}</div>
     </PageColorContext.Provider>
   );
 };
@@ -32,7 +34,7 @@ export function usePageColor(initialColor?: string) {
 
     return () => {
       context.setPageColor(DEFAULT_PAGE_COLOR);
-    }
+    };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
