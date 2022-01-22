@@ -6,7 +6,7 @@ import {
   styled,
 } from "@mui/material";
 import { PASTEL_COLORS, randomPastelColor } from "@shared/config";
-import { ITodo } from "@shared/models/todo.model";
+import { ITodo, ITodoInput } from "@shared/models/todo.model";
 import { ToastContainer, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { usePageColor } from "src/contexts/PageColorContext";
@@ -17,14 +17,12 @@ import { useState } from "react";
 
 const AnimatedFormControl = animated(FormControl);
 
-type TodoFormData = Partial<Omit<ITodo, "tags">>;
-
 export interface TodoFormProps {
-  initialValue?: TodoFormData;
+  initialValue?: ITodoInput;
   buttonText: string;
   openColorPicker: boolean;
   onCloseColorPicker: () => void;
-  onSubmit: (data: TodoFormData) => Promise<void> | void;
+  onSubmit: (data: ITodoInput) => Promise<void> | void;
 }
 
 const StyledTextField = styled(TextField)({
@@ -59,7 +57,7 @@ export function TodoForm({
     setValue,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
-  } = useForm<TodoFormData>({
+  } = useForm<ITodoInput>({
     defaultValues: initialValue,
   });
 
@@ -73,7 +71,7 @@ export function TodoForm({
     initialValue?.color || randomPastelColor()
   );
 
-  const submit = async (data: TodoFormData) => {
+  const submit = async (data: ITodoInput) => {
     setIsLoading(true);
 
     try {

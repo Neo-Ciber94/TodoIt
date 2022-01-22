@@ -1,13 +1,13 @@
 import { PASTEL_COLORS } from "@shared/config";
 import { ITodo } from "@shared/models/todo.model";
-import { WithOptional } from "@shared/types";
+import { PartialProperty } from "@shared/types";
 import { SchemaOf } from "yup";
 import * as yup from "yup";
 import { notBlankString } from ".";
 
 // prettier-ignore
 export type TodoEntity = Pick<ITodo, "title" | "content" | "color" | "completed">;
-export type TodoCreate = Omit<WithOptional<TodoEntity, "color">, "completed">;
+export type TodoCreate = Omit<PartialProperty<TodoEntity, "color">, "completed">;
 export type TodoUpdate = Partial<TodoEntity>;
 
 const TITLE_REQUIRED = "Title is required";

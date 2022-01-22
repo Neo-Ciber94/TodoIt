@@ -5,18 +5,19 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
 import PaletteIcon from "@mui/icons-material/Palette";
 import React, { useEffect, useRef, useState } from "react";
-import { ITodo } from "@shared/models/todo.model";
+import { ITodo, ITodoInput } from "@shared/models/todo.model";
 import { useSpring, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import TagsModal from "./TagsModal";
 import { TagApiService } from "src/client/services";
+import { ITag, ITagInput } from "@shared/models/tag.model";
 
 const tagService = new TagApiService();
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
-  onSubmit: (todo: Partial<ITodo>) => void;
+  onSubmit: (todo: ITodoInput) => void;
   title: string;
   submitText: string;
 }
@@ -31,6 +32,10 @@ export function CreateOrEditTodoPage({
   const backButtonSpring = useSpring(animationSprings.slideLeftFadeIn(0));
   const titleSpring = useSpring(animationSprings.slideLeftFadeIn(100));
   const [tagsOpen, setTagsOpen] = useState(false);
+
+  const handleSelectTags = (tags: ITagInput[]) => {
+    console.log(tags);
+  };
 
   return (
     <>
@@ -77,7 +82,13 @@ export function CreateOrEditTodoPage({
         />
       </Container>
 
-      <TagsModal open={tagsOpen} setOpen={setTagsOpen} />
+      <TagsModal
+        initialTags={[]}
+        todo={todo}
+        open={tagsOpen}
+        setOpen={setTagsOpen}
+        onSelectTags={handleSelectTags}
+      />
     </>
   );
 }

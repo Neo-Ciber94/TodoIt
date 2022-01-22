@@ -1,13 +1,18 @@
-import { ObjectId } from "mongoose";
+import { PartialProperty } from "@shared/types";
+import { ITag } from "./tag.model";
 
 export interface ITodo {
   id: string;
   title: string;
-  content: string;
+  content?: string;
   color: string;
   creatorUserId: string;
-  tags: ObjectId[];
+  tags: ITag[];
   completed: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type ITodoInput = Pick<ITodo, "title" | "content" | "color"> & {
+  tags: PartialProperty<ITag, "id">[];
+};

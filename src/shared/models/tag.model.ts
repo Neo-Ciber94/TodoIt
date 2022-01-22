@@ -5,3 +5,7 @@ export interface ITag {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type ITagInput = Pick<ITag, "name"> & {
+  id?: string;
+};

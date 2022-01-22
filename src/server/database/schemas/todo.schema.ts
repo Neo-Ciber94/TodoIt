@@ -29,7 +29,8 @@ const todoSchema = new Schema<TodoDocument, TodoModel>(
       required: true,
       ref: "Tag",
       default: [],
-    },
+      autopopulate: true
+    } as any,
     creatorUserId: {
       type: String,
       trim: true,

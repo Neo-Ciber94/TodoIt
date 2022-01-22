@@ -2,7 +2,7 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import { ITag } from "@shared/models/tag.model";
+import { ITag, ITagInput } from "@shared/models/tag.model";
 import {
   AppBar,
   IconButton,
@@ -11,37 +11,21 @@ import {
   TextField,
   Toolbar,
   styled,
+  Button,
 } from "@mui/material";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import AddIcon from "@mui/icons-material/Add";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useReducer, useRef, useState } from "react";
 import { grey } from "@mui/material/colors";
 import { animated, useSpring } from "react-spring";
-
-const TAGS: ITag[] = [
-  "Programming",
-  "Design",
-  "Music",
-  "Art",
-  "Sports",
-  "Other",
-  "Business",
-  "Finance",
-  "Health",
-  "Education",
-  "Food",
-].map(createTag);
-
-function createTag(s: string, index: number): ITag {
-  return {
-    id: index.toString(),
-    name: s,
-    creatorUserId: "abc123",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-}
+import { ITodo } from "@shared/models/todo.model";
+import {
+  todoTagsReducer,
+  createTodoTagsInitialState,
+  selectTodoTags,
+  TodoTag,
+} from "src/redux/todo-tags.reducer";
 
 const TagSearchField = styled(TextField)({
   width: "100%",
@@ -74,8 +58,10 @@ const TagSearchField = styled(TextField)({
 });
 
 export interface TagsModalProps {
-  initialTags?: ITag[];
+  todo?: ITodo;
+  initialTags: ITag[];
   open: boolean;
+  onSelectTags: (tags: ITagInput[]) => void;
   setOpen: (open: boolean) => void;
 }
 
@@ -129,15 +115,21 @@ const tagSx: SxProps = {
 export default function TagsModal({
   open,
   setOpen,
-  initialTags = [],
+  onSelectTags,
+  todo,
+  initialTags,
 }: TagsModalProps) {
   const handleClose = () => setOpen(false);
-  const [items, setItems] = useState(initialTags);
   const [search, setSearch] = useState("");
-  const [tags, setTags] = useState(initialTags);
+  const [tags, dispacher] = useReducer(
+    todoTagsReducer,
+    createTodoTagsInitialState(todo, initialTags)
+  );
+  const [currentTags, setCurrentTags] = useState(tags);
   const heightRef = useRef(200);
-  const canCreate = items.length === 0 && search.length > 0;
+  const canCreate = currentTags.length === 0 && search.length > 0;
 
+  // Sets the height of the modal content
   useEffect(() => {
     if (tags.length > 5) {
       heightRef.current = 300;
@@ -145,12 +137,23 @@ export default function TagsModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleSave = () => {
+    const selectedTodos = selectTodoTags(tags);
+    onSelectTags(selectedTodos);
+    handleClose();
+  };
+
+  const handleTagCheck = (tag: TodoTag, check: boolean) => {
+    if (check) {
+      dispacher({ type: "todoTag/check", id: tag.id });
+    } else {
+      dispacher({ type: "todoTag/uncheck", id: tag.id  });
+    }
+  };
+
   const handleCreate = () => {
     if (search.length > 0) {
-      const newTags = [...tags, createTag(search, tags.length)];
-      setTags(newTags);
-      setItems(newTags);
-      setSearch("");
+      dispacher({ type: "todoTag/create", name: search });
     }
   };
 
@@ -162,9 +165,9 @@ export default function TagsModal({
       const tagsFound = tags.filter((tag) =>
         tag.name.trim().toLowerCase().includes(text.trim().toLowerCase())
       );
-      setItems(tagsFound);
+      setCurrentTags(tagsFound);
     } else {
-      setItems(tags);
+      setCurrentTags(tags);
     }
   };
 
@@ -220,11 +223,37 @@ export default function TagsModal({
             <Box sx={{ overflowY: "auto", height: heightRef.current }}>
               {canCreate && <CreateTagButton onClick={handleCreate} />}
               <Box>
-                {items.map((tag) => (
-                  <Tag key={tag.id} tag={tag} />
+                {currentTags.map((tag) => (
+                  <Tag key={tag.id} tag={tag} onCheck={handleTagCheck} />
                 ))}
               </Box>
             </Box>
+
+            <div className="flex flex-row gap-2">
+              <Button
+                variant="text"
+                sx={{
+                  marginLeft: "auto",
+                  color: "white",
+                  fontWeight: 500,
+                  width: 100,
+                }}
+                onClick={handleSave}
+              >
+                Save
+              </Button>
+              <Button
+                variant="text"
+                sx={{
+                  color: "red",
+                  fontWeight: 500,
+                  width: 100,
+                }}
+                onClick={handleClose}
+              >
+                Cancel
+              </Button>
+            </div>
           </Box>
         </Box>
       </Fade>
@@ -232,8 +261,18 @@ export default function TagsModal({
   );
 }
 
-function Tag({ tag }: { tag: Partial<ITag> }) {
+interface TagProps {
+  tag: TodoTag;
+  onCheck: (tag: TodoTag, check: boolean) => void;
+}
+
+function Tag({ tag, onCheck }: TagProps) {
   const [checked, setChecked] = useState(false);
+
+  const handleChecked = () => {
+    onCheck(tag, !checked);
+    setChecked(!checked);
+  };
 
   return (
     <Box
@@ -258,13 +297,13 @@ function Tag({ tag }: { tag: Partial<ITag> }) {
             },
           }}
           checked={checked}
-          onClick={() => setChecked(!checked)}
+          onClick={handleChecked}
         />
         <span>{tag.name}</span>
       </div>
 
       <Box
-        onClick={() => setChecked(!checked)}
+        onClick={handleChecked}
         sx={{
           cursor: "pointer",
           display: "flex",

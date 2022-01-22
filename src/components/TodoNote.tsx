@@ -27,16 +27,13 @@ export interface TodoNoteProps {
 
 export default function TodoNote({
   todo,
-  height,
-  width,
+  height = "auto",
+  width = 200,
   delayIndex,
   onDelete,
   onToggle,
   onClick,
 }: TodoNoteProps) {
-  height = height || "auto";
-  width = width || 200;
-
   const [isCompleted, setIsCompleted] = React.useState(todo.completed);
   const ref = React.useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = React.useState(false);
