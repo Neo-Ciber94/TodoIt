@@ -2,6 +2,12 @@ import { ITag, ITagInput } from "@shared/models/tag.model";
 import { ITodo } from "@shared/models/todo.model";
 import { nanoid } from "nanoid";
 
+export const TODO_TAG_INITAL_STATE: TodoTagState = Object.freeze({
+  tags: [],
+  displayedTags: [],
+  searchText: "",
+});
+
 export interface TodoTag {
   id: string;
   new: boolean;
@@ -13,6 +19,12 @@ export interface TodoTagState {
   tags: TodoTag[];
   displayedTags: TodoTag[];
   searchText: string;
+}
+
+export interface TodoTagActionInit {
+  type: "todoTag/init";
+  todo?: ITodo;
+  tags: ITag[];
 }
 
 export interface TodoTagActionCreate {
@@ -40,6 +52,7 @@ export interface TodoTagActionReset {
 }
 
 export type TodoTagAction =
+  | TodoTagActionInit
   | TodoTagActionCreate
   | TodoTagActionCheck
   | TodoTagActionUncheck
@@ -51,6 +64,8 @@ export function todoTagsReducer(
   action: TodoTagAction
 ): TodoTagState {
   switch (action.type) {
+    case "todoTag/init":
+      return handleTodoTagInit(state, action);
     case "todoTag/create":
       return handleTodoTagCreate(state, action);
     case "todoTag/check":
@@ -66,10 +81,18 @@ export function todoTagsReducer(
   }
 }
 
-export function createTodoTagsInitialState(
-  todo: ITodo | undefined,
-  tags: ITag[]
+export function selectTodoTags(tags: TodoTag[]): ITagInput[] {
+  return tags
+    .filter((tag) => tag.checked)
+    .map((tag) => ({ id: tag.new ? undefined : tag.id, name: tag.name }));
+}
+
+function handleTodoTagInit(
+  _: TodoTagState,
+  action: TodoTagActionInit
 ): TodoTagState {
+  const { todo, tags } = action;
+
   const result: TodoTag[] = tags.map((tag) => ({
     id: tag.id,
     new: false,
@@ -91,12 +114,6 @@ export function createTodoTagsInitialState(
     displayedTags: result,
     searchText: "",
   };
-}
-
-export function selectTodoTags(tags: TodoTag[]): ITagInput[] {
-  return tags
-    .filter((tag) => tag.checked)
-    .map((tag) => ({ id: tag.new ? undefined : tag.id, name: tag.name }));
 }
 
 function handleTodoTagCreate(state: TodoTagState, action: TodoTagActionCreate) {
@@ -152,9 +169,10 @@ function handleTodoTagSearch(state: TodoTagState, action: TodoTagActionSearch) {
 }
 
 function handleTodoTagReset(state: TodoTagState, _: TodoTagActionReset) {
+  const initialTags = state.tags.filter((tag) => !tag.new);
   return {
-    tags: state.tags,
-    displayedTags: state.tags,
+    tags: initialTags,
+    displayedTags: initialTags,
     searchText: "",
   };
 }

@@ -1,5 +1,5 @@
 import { PartialProperty } from "@shared/types";
-import { ITag } from "./tag.model";
+import { ITag, ITagInput } from "./tag.model";
 
 export interface ITodo {
   id: string;
@@ -14,5 +14,5 @@ export interface ITodo {
 }
 
 export type ITodoInput = Pick<ITodo, "title" | "content" | "color"> & {
-  tags: PartialProperty<ITag, "id">[];
+  tags: ITagInput[];
 };

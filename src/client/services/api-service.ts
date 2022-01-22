@@ -30,6 +30,11 @@ export class ApiService<T, TKey = string> {
     this.client = clientInstance.create(routeUrl);
   }
 
+  async getAll(config: RequestConfig = {}): Promise<T[]> {
+    const result = await this.client.get<T[]>(`/`, config);
+    return result;
+  }
+
   async getWithPagination(
     options: PagingOptions = {},
     config: RequestConfig = {}

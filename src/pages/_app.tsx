@@ -6,27 +6,28 @@ import type { AppProps } from "next/app";
 import { Layout } from "src/components/Layout";
 import { UserProvider } from "@auth0/nextjs-auth0";
 import { createTheme, ThemeProvider } from "@mui/material";
-import type { ThemeOptions} from "@mui/system";
+import type { ThemeOptions } from "@mui/system";
+import { SWRConfig } from "swr";
 
 export const themeOptions: ThemeOptions = {
   palette: {
-    type: 'light',
+    type: "light",
     primary: {
-      main: '#000000',
-      light: '#161616',
-      dark: '#0e0e0e',
+      main: "#000000",
+      light: "#161616",
+      dark: "#0e0e0e",
     },
     secondary: {
-      main: '#f50057',
+      main: "#f50057",
     },
     background: {
-      paper: '#fed7aa',
+      paper: "#fed7aa",
     },
     text: {
-      primary: '#000000',
-      secondary: '#000000',
-      disabled: 'rgba(255,255,255,0)',
-      hint: '#f9f9f9',
+      primary: "#000000",
+      secondary: "#000000",
+      disabled: "rgba(255,255,255,0)",
+      hint: "#f9f9f9",
     },
   },
 };
@@ -38,11 +39,17 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <UserProvider>
-      <ThemeProvider theme={theme}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ThemeProvider>
+      <SWRConfig
+        value={{
+          provider: () => new Map(),
+        }}
+      >
+        <ThemeProvider theme={theme}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
+      </SWRConfig>
     </UserProvider>
   );
 }

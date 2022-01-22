@@ -12,6 +12,7 @@ import {
   Toolbar,
   styled,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
@@ -21,11 +22,16 @@ import { grey } from "@mui/material/colors";
 import { ITodo } from "@shared/models/todo.model";
 import {
   todoTagsReducer,
-  createTodoTagsInitialState,
   selectTodoTags,
   TodoTag,
+  TODO_TAG_INITAL_STATE,
 } from "src/redux/todo-tags.reducer";
 import { FadeTransition } from "./transitions";
+import useSWR from "swr";
+import { TagApiService } from "src/client/services";
+import React from "react";
+
+const tagService = new TagApiService();
 
 const TagSearchField = styled(TextField)({
   width: "100%",
@@ -59,7 +65,7 @@ const TagSearchField = styled(TextField)({
 
 export interface TagsModalProps {
   todo?: ITodo;
-  initialTags: ITag[];
+  // initialTags: ITag[];
   open: boolean;
   onSelectTags: (tags: ITagInput[]) => void;
   setOpen: (open: boolean) => void;
@@ -77,32 +83,47 @@ const tagSx: SxProps = {
   width: "90%",
 };
 
+enum ModalMinHeight {
+  sm = 100,
+  md = 200,
+  lg = 300,
+}
+
 export default function TagsModal({
   open,
+  todo,
   setOpen,
   onSelectTags,
-  todo,
-  initialTags,
 }: TagsModalProps) {
+  const { data, error } = useSWR("/api/tags", () => tagService.getAll());
   const [searchText, setSearchText] = useState("");
-  const [state, dispacher] = useReducer(
-    todoTagsReducer,
-    createTodoTagsInitialState(todo, initialTags)
-  );
-  const heightRef = useRef(200);
+  const [state, dispacher] = useReducer(todoTagsReducer, TODO_TAG_INITAL_STATE);
+  const minHeightRef = useRef(ModalMinHeight.sm);
   const { displayedTags } = state;
   const canCreate = displayedTags.length === 0 && searchText.length > 0;
 
   // Sets the height of the modal content
   useEffect(() => {
-    if (state.tags.length > 5) {
-      heightRef.current = 300;
+    if (state.tags.length === 0) {
+      minHeightRef.current = ModalMinHeight.sm;
+    } else if (state.tags.length > 5) {
+      minHeightRef.current = ModalMinHeight.lg;
+    } else {
+      minHeightRef.current = ModalMinHeight.md;
+    }
+  }, [state.tags.length]);
+
+  // Init the tags with the todo tags
+  useEffect(() => {
+    if (data) {
+      dispacher({ type: "todoTag/init", todo, tags: data });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data]);
 
   const handleClose = () => {
     setOpen(false);
+    setSearchText("");
     dispacher({ type: "todoTag/reset" });
   };
 
@@ -130,6 +151,33 @@ export default function TagsModal({
     const search = e.target.value || "";
     setSearchText(search);
     dispacher({ type: "todoTag/search", searchText: search });
+  };
+
+  const Content = () => {
+    if (!data) {
+      return <CircularProgress sx={{ color: "white" }} />;
+    }
+
+    if (error) {
+      const errorMessage = error.message || "Something went wrong";
+      return <h1>Error: {errorMessage}</h1>;
+    }
+
+    return (
+      <>
+        {canCreate && <CreateTagButton onClick={handleCreate} />}
+        <Box>
+          {displayedTags.map((tag) => (
+            <Tag
+              key={tag.id}
+              tag={tag}
+              isChecked={tag.checked}
+              onCheck={handleTagCheck}
+            />
+          ))}
+        </Box>
+      </>
+    );
   };
 
   return (
@@ -181,18 +229,14 @@ export default function TagsModal({
               />
             </Box>
 
-            <Box sx={{ overflowY: "auto", height: heightRef.current }}>
-              {canCreate && <CreateTagButton onClick={handleCreate} />}
-              <Box>
-                {displayedTags.map((tag) => (
-                  <Tag
-                    key={tag.id}
-                    tag={tag}
-                    isChecked={tag.checked}
-                    onCheck={handleTagCheck}
-                  />
-                ))}
-              </Box>
+            <Box
+              sx={{
+                overflowY: "auto",
+                minHeight: minHeightRef.current,
+                maxHeight: ModalMinHeight.lg,
+              }}
+            >
+              <Content />
             </Box>
 
             <div className="flex flex-row gap-2">

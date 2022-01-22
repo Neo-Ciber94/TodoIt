@@ -9,11 +9,8 @@ import { ITodo, ITodoInput } from "@shared/models/todo.model";
 import { useSpring, animated } from "react-spring";
 import { animationSprings } from "src/animations/springs";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import TagsModal from "./TagsModal";
-import { TagApiService } from "src/client/services";
+import ModalMinHeight from "./TagsModal";
 import { ITag, ITagInput } from "@shared/models/tag.model";
-
-const tagService = new TagApiService();
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
@@ -32,9 +29,16 @@ export function CreateOrEditTodoPage({
   const backButtonSpring = useSpring(animationSprings.slideLeftFadeIn(0));
   const titleSpring = useSpring(animationSprings.slideLeftFadeIn(100));
   const [tagsOpen, setTagsOpen] = useState(false);
+  const [tags, setTags] = useState<ITagInput[]>(todo?.tags || []);
 
   const handleSelectTags = (tags: ITagInput[]) => {
+    setTags(tags);
     console.log(tags);
+  };
+
+  const handleSubmit = (todo: ITodoInput) => {
+    todo.tags = tags;
+    onSubmit(todo);
   };
 
   return (
@@ -78,12 +82,11 @@ export function CreateOrEditTodoPage({
           buttonText={submitButtonText}
           openColorPicker={openColorPicker}
           onCloseColorPicker={() => setOpenColorPicker(false)}
-          onSubmit={(data) => onSubmit(data)}
+          onSubmit={handleSubmit}
         />
       </Container>
 
-      <TagsModal
-        initialTags={[]}
+      <ModalMinHeight
         todo={todo}
         open={tagsOpen}
         setOpen={setTagsOpen}
