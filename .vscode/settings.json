@@ -3,7 +3,8 @@
     "/src/lib/rest-api",
     "/src/next-controllers/decorators",
     "/src/next-controllers/core",
-    "/src/client/services"
+    "/src/client/services",
+    "/src/components/transitions"
   ],
   "editor.quickSuggestions": {
     "strings": true

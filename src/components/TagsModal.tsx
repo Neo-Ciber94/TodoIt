@@ -16,9 +16,8 @@ import {
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import AddIcon from "@mui/icons-material/Add";
-import { forwardRef, useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { grey } from "@mui/material/colors";
-import { animated, useSpring } from "react-spring";
 import { ITodo } from "@shared/models/todo.model";
 import {
   todoTagsReducer,
@@ -26,6 +25,7 @@ import {
   selectTodoTags,
   TodoTag,
 } from "src/redux/todo-tags.reducer";
+import { FadeTransition } from "./transitions";
 
 const TagSearchField = styled(TextField)({
   width: "100%",
@@ -65,41 +65,6 @@ export interface TagsModalProps {
   setOpen: (open: boolean) => void;
 }
 
-interface TransitionProps {
-  children?: React.ReactElement;
-  in: boolean;
-  onEnter?: () => {};
-  onExited?: () => {};
-}
-
-const Fade = forwardRef<HTMLDivElement, TransitionProps>(function Fade(
-  props,
-  ref
-) {
-  const { in: open, children, onEnter, onExited, ...other } = props;
-  const style = useSpring({
-    config: { duration: 200 },
-    from: { opacity: 0 },
-    to: { opacity: open ? 1 : 0 },
-    onStart: () => {
-      if (open && onEnter) {
-        onEnter();
-      }
-    },
-    onRest: () => {
-      if (!open && onExited) {
-        onExited();
-      }
-    },
-  });
-
-  return (
-    <animated.div ref={ref} style={style} {...other}>
-      {children}
-    </animated.div>
-  );
-});
-
 const tagSx: SxProps = {
   position: "absolute",
   top: "50%",
@@ -119,56 +84,52 @@ export default function TagsModal({
   todo,
   initialTags,
 }: TagsModalProps) {
-  const handleClose = () => setOpen(false);
-  const [search, setSearch] = useState("");
-  const [tags, dispacher] = useReducer(
+  const [searchText, setSearchText] = useState("");
+  const [state, dispacher] = useReducer(
     todoTagsReducer,
     createTodoTagsInitialState(todo, initialTags)
   );
-  const [currentTags, setCurrentTags] = useState(tags);
   const heightRef = useRef(200);
-  const canCreate = currentTags.length === 0 && search.length > 0;
+  const { displayedTags } = state;
+  const canCreate = displayedTags.length === 0 && searchText.length > 0;
 
   // Sets the height of the modal content
   useEffect(() => {
-    if (tags.length > 5) {
+    if (state.tags.length > 5) {
       heightRef.current = 300;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleClose = () => {
+    setOpen(false);
+    dispacher({ type: "todoTag/reset" });
+  };
+
   const handleSave = () => {
-    const selectedTodos = selectTodoTags(tags);
+    const selectedTodos = selectTodoTags(state.tags);
     onSelectTags(selectedTodos);
     handleClose();
+  };
+
+  const handleCreate = () => {
+    if (searchText.length > 0) {
+      dispacher({ type: "todoTag/create", name: searchText });
+    }
   };
 
   const handleTagCheck = (tag: TodoTag, check: boolean) => {
     if (check) {
       dispacher({ type: "todoTag/check", id: tag.id });
     } else {
-      dispacher({ type: "todoTag/uncheck", id: tag.id  });
-    }
-  };
-
-  const handleCreate = () => {
-    if (search.length > 0) {
-      dispacher({ type: "todoTag/create", name: search });
+      dispacher({ type: "todoTag/uncheck", id: tag.id });
     }
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value || "";
-    setSearch(text);
-
-    if (text.length > 0) {
-      const tagsFound = tags.filter((tag) =>
-        tag.name.trim().toLowerCase().includes(text.trim().toLowerCase())
-      );
-      setCurrentTags(tagsFound);
-    } else {
-      setCurrentTags(tags);
-    }
+    const search = e.target.value || "";
+    setSearchText(search);
+    dispacher({ type: "todoTag/search", searchText: search });
   };
 
   return (
@@ -181,7 +142,7 @@ export default function TagsModal({
       BackdropComponent={Backdrop}
       BackdropProps={{ timeout: 500 }}
     >
-      <Fade in={open}>
+      <FadeTransition in={open}>
         <Box sx={tagSx}>
           <AppBar position="static">
             <Toolbar>
@@ -215,7 +176,7 @@ export default function TagsModal({
                 label="Tag Name"
                 variant="standard"
                 autoComplete="off"
-                value={search}
+                value={searchText}
                 onChange={handleSearch}
               />
             </Box>
@@ -223,8 +184,13 @@ export default function TagsModal({
             <Box sx={{ overflowY: "auto", height: heightRef.current }}>
               {canCreate && <CreateTagButton onClick={handleCreate} />}
               <Box>
-                {currentTags.map((tag) => (
-                  <Tag key={tag.id} tag={tag} onCheck={handleTagCheck} />
+                {displayedTags.map((tag) => (
+                  <Tag
+                    key={tag.id}
+                    tag={tag}
+                    isChecked={tag.checked}
+                    onCheck={handleTagCheck}
+                  />
                 ))}
               </Box>
             </Box>
@@ -256,18 +222,19 @@ export default function TagsModal({
             </div>
           </Box>
         </Box>
-      </Fade>
+      </FadeTransition>
     </Modal>
   );
 }
 
 interface TagProps {
   tag: TodoTag;
+  isChecked: boolean;
   onCheck: (tag: TodoTag, check: boolean) => void;
 }
 
-function Tag({ tag, onCheck }: TagProps) {
-  const [checked, setChecked] = useState(false);
+function Tag({ tag, isChecked, onCheck }: TagProps) {
+  const [checked, setChecked] = useState(isChecked);
 
   const handleChecked = () => {
     onCheck(tag, !checked);

@@ -9,42 +9,58 @@ export interface TodoTag {
   name: string;
 }
 
-export interface TodoTagCreate {
+export interface TodoTagState {
+  tags: TodoTag[];
+  displayedTags: TodoTag[];
+  searchText: string;
+}
+
+export interface TodoTagActionCreate {
   type: "todoTag/create";
   name: string;
 }
 
-export interface TodoTagCheck {
+export interface TodoTagActionCheck {
   type: "todoTag/check";
   id: string;
 }
 
-export interface TodoTagUncheck {
+export interface TodoTagActionUncheck {
   type: "todoTag/uncheck";
   id: string;
 }
 
-export type TodoTagAction = TodoTagCreate | TodoTagCheck | TodoTagUncheck;
+export interface TodoTagActionSearch {
+  type: "todoTag/search";
+  searchText: string;
+}
+
+export interface TodoTagActionReset {
+  type: "todoTag/reset";
+}
+
+export type TodoTagAction =
+  | TodoTagActionCreate
+  | TodoTagActionCheck
+  | TodoTagActionUncheck
+  | TodoTagActionSearch
+  | TodoTagActionReset;
 
 export function todoTagsReducer(
-  state: TodoTag[],
+  state: TodoTagState,
   action: TodoTagAction
-): TodoTag[] {
+): TodoTagState {
   switch (action.type) {
-    case "todoTag/create": {
-      const todoTag: TodoTag = {
-        id: nanoid(),
-        new: true,
-        name: action.name,
-        checked: true,
-      };
-      return [...state, todoTag];
-    }
+    case "todoTag/create":
+      return handleTodoTagCreate(state, action);
     case "todoTag/check":
-      return markTodoAsChecked(state, action.id, true);
-    case "todoTag/uncheck": {
-      return markTodoAsChecked(state, action.id, false);
-    }
+      return handleTodoTagCheck(state, action);
+    case "todoTag/uncheck":
+      return handleTodoTagCheck(state, action);
+    case "todoTag/search":
+      return handleTodoTagSearch(state, action);
+    case "todoTag/reset":
+      return handleTodoTagReset(state, action);
     default:
       return state;
   }
@@ -53,7 +69,7 @@ export function todoTagsReducer(
 export function createTodoTagsInitialState(
   todo: ITodo | undefined,
   tags: ITag[]
-): TodoTag[] {
+): TodoTagState {
   const result: TodoTag[] = tags.map((tag) => ({
     id: tag.id,
     new: false,
@@ -70,30 +86,85 @@ export function createTodoTagsInitialState(
     });
   }
 
-  return result;
+  return {
+    tags: result,
+    displayedTags: result,
+    searchText: "",
+  };
 }
 
 export function selectTodoTags(tags: TodoTag[]): ITagInput[] {
   return tags
     .filter((tag) => tag.checked)
-    .map((tag) => ({ id: tag.id, name: tag.name }));
+    .map((tag) => ({ id: tag.new ? undefined : tag.id, name: tag.name }));
 }
 
-function markTodoAsChecked(
-  state: TodoTag[],
-  id: string,
-  checked: boolean
-): TodoTag[] {
-  const index = state.findIndex((todoTag) => todoTag.id === id);
+function handleTodoTagCreate(state: TodoTagState, action: TodoTagActionCreate) {
+  const todoTag: TodoTag = {
+    id: nanoid(),
+    name: action.name,
+    new: true,
+    checked: true,
+  };
+
+  const newTags = [...state.tags, todoTag];
+
+  return {
+    tags: newTags,
+    displayedTags: filterTodoTags(newTags, state.searchText),
+    searchText: state.searchText,
+  };
+}
+
+function handleTodoTagCheck(
+  state: TodoTagState,
+  action: TodoTagActionCheck | TodoTagActionUncheck
+) {
+  const index = state.tags.findIndex((todoTag) => todoTag.id === action.id);
   if (index === -1) {
     throw new Error("todoTag not found");
   }
 
-  const newState = [...state];
+  const checked = action.type === "todoTag/check";
+  const newState = [...state.tags];
   const todoTag = newState[index];
   newState[index] = {
     ...todoTag,
     checked,
   };
-  return newState;
+
+  return {
+    tags: newState,
+    displayedTags: filterTodoTags(newState, state.searchText),
+    searchText: state.searchText,
+  };
+}
+
+function handleTodoTagSearch(state: TodoTagState, action: TodoTagActionSearch) {
+  const searchText = action.searchText;
+  const displayedTags = filterTodoTags(state.tags, searchText);
+
+  return {
+    tags: state.tags,
+    displayedTags,
+    searchText,
+  };
+}
+
+function handleTodoTagReset(state: TodoTagState, _: TodoTagActionReset) {
+  return {
+    tags: state.tags,
+    displayedTags: state.tags,
+    searchText: "",
+  };
+}
+
+function filterTodoTags(tags: TodoTag[], searchText: string): TodoTag[] {
+  if (searchText.trim() === "") {
+    return tags;
+  }
+
+  return tags.filter((tag) =>
+    tag.name.trim().toLowerCase().includes(searchText.trim().toLowerCase())
+  );
 }
