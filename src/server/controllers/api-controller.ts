@@ -90,10 +90,9 @@ export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
   @Post("/")
   async create(context: AppApiContext): Promise<T | T[]> {
     const data = context.request.body || {};
+    this.setAuditData("creator", data);
 
     if (Array.isArray(data)) {
-      data.forEach((entity) => this.setAuditData("creator", entity));
-
       if (this.beforeUpdate) {
         for (const e of data) {
           await this.beforeCreate?.(e);
@@ -102,7 +101,6 @@ export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
 
       return this.repository.createMany(data);
     } else {
-      this.setAuditData("creator", data);
       this.beforeCreate?.(data);
       return this.repository.create(data);
     }

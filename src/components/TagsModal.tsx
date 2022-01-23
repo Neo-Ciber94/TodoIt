@@ -118,8 +118,7 @@ export default function TagsModal({
     if (data) {
       dispacher({ type: "todoTag/init", todo, tags: data });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [todo, data]);
 
   const handleClose = () => {
     setOpen(false);
@@ -129,13 +128,16 @@ export default function TagsModal({
 
   const handleSave = () => {
     const selectedTodos = selectTodoTags(state.tags);
+    dispacher({ type: "todoTag/done" });
+    setOpen(false);
     onSelectTags(selectedTodos);
-    handleClose();
+    setSearchText("");
   };
 
   const handleCreate = () => {
     if (searchText.length > 0) {
       dispacher({ type: "todoTag/create", name: searchText });
+      setSearchText("");
     }
   };
 

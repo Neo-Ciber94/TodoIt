@@ -14,5 +14,6 @@ export interface ITodo {
 }
 
 export type ITodoInput = Pick<ITodo, "title" | "content" | "color"> & {
+  completed?: boolean;
   tags: ITagInput[];
 };

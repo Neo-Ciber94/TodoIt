@@ -33,12 +33,12 @@ export function CreateOrEditTodoPage({
 
   const handleSelectTags = (tags: ITagInput[]) => {
     setTags(tags);
-    console.log(tags);
   };
 
   const handleSubmit = (todo: ITodoInput) => {
     todo.tags = tags;
     onSubmit(todo);
+    console.log(todo);
   };
 
   return (

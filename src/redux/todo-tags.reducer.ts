@@ -47,6 +47,10 @@ export interface TodoTagActionSearch {
   searchText: string;
 }
 
+export interface TodoTagActionDone {
+  type: "todoTag/done";
+}
+
 export interface TodoTagActionReset {
   type: "todoTag/reset";
 }
@@ -57,6 +61,7 @@ export type TodoTagAction =
   | TodoTagActionCheck
   | TodoTagActionUncheck
   | TodoTagActionSearch
+  | TodoTagActionDone
   | TodoTagActionReset;
 
 export function todoTagsReducer(
@@ -74,6 +79,8 @@ export function todoTagsReducer(
       return handleTodoTagCheck(state, action);
     case "todoTag/search":
       return handleTodoTagSearch(state, action);
+    case "todoTag/done":
+      return handleTodoTagSelect(state, action);
     case "todoTag/reset":
       return handleTodoTagReset(state, action);
     default:
@@ -128,8 +135,8 @@ function handleTodoTagCreate(state: TodoTagState, action: TodoTagActionCreate) {
 
   return {
     tags: newTags,
-    displayedTags: filterTodoTags(newTags, state.searchText),
-    searchText: state.searchText,
+    displayedTags: newTags,
+    searchText: "",
   };
 }
 
@@ -168,8 +175,24 @@ function handleTodoTagSearch(state: TodoTagState, action: TodoTagActionSearch) {
   };
 }
 
+function handleTodoTagSelect(state: TodoTagState, _: TodoTagActionDone) {
+  const initialTags = state.tags.slice();
+  initialTags.forEach((tag) => {
+    if (tag.new) {
+      tag.new = false;
+    }
+  });
+
+  return {
+    tags: initialTags,
+    displayedTags: initialTags,
+    searchText: "",
+  };
+}
+
 function handleTodoTagReset(state: TodoTagState, _: TodoTagActionReset) {
   const initialTags = state.tags.filter((tag) => !tag.new);
+
   return {
     tags: initialTags,
     displayedTags: initialTags,

@@ -3,8 +3,6 @@ import { BeforeRequest } from "next-controllers";
 import { ControllerConfig, AppSession, AuditConfig } from "./types";
 import { defaultAuditProps } from "./utils";
 
-const USER_PROP = "creatorUserId";
-
 export type AuditEvent = "creator" | "updater" | "deleter";
 
 /**
@@ -109,5 +107,9 @@ function setUser(
       ? defaultAuditProps[prop]
       : auditProp;
 
-  target[propName] = userId;
+  if (Array.isArray(target)) {
+    target.forEach((t) => (t[propName] = userId));
+  } else {
+    target[propName] = userId;
+  }
 }
