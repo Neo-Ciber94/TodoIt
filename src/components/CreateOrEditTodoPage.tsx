@@ -28,6 +28,7 @@ export function CreateOrEditTodoPage({
   const [openColorPicker, setOpenColorPicker] = useState(false);
   const backButtonSpring = useSpring(animations.slideLeftFadeIn(0));
   const titleSpring = useSpring(animations.slideLeftFadeIn(100));
+  const tagsSpring = useSpring(animations.slideLeftFadeIn(200));
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tags, setTags] = useState<ITagInput[]>(todo?.tags || []);
 
@@ -85,27 +86,29 @@ export function CreateOrEditTodoPage({
           onSubmit={handleSubmit}
         />
 
-        <div className="md:px-30 sm:px-20 px-0 flex flex-row mt-8 gap-2">
-          {tags.map((tag) => (
-            <Chip
-              sx={{
-                color: "black",
-                backgroundColor: "transparent",
-                border: "3px solid black",
-                fontWeight: 600,
-                boxShadow: 2,
-                px: 2,
-                "&:hover": {
-                  backgroundColor: "black",
-                  color: "white"
-                }
-              }}
-              key={tag.id}
-              label={tag.name}
-              onClick={() => setTagsOpen(true)}
-            />
-          ))}
-        </div>
+        <animated.div style={titleSpring}>
+          <div className="md:px-30 sm:px-20 px-0 flex flex-row mt-8 gap-2">
+            {tags.map((tag) => (
+              <Chip
+                sx={{
+                  color: "black",
+                  backgroundColor: "transparent",
+                  border: "3px solid black",
+                  fontWeight: 600,
+                  boxShadow: 2,
+                  px: 2,
+                  "&:hover": {
+                    backgroundColor: "black",
+                    color: "white",
+                  },
+                }}
+                key={tag.id}
+                label={tag.name}
+                onClick={() => setTagsOpen(true)}
+              />
+            ))}
+          </div>
+        </animated.div>
       </Container>
 
       <ModalMinHeight
