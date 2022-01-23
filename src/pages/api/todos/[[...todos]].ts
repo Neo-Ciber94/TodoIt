@@ -10,7 +10,7 @@ import {
   todoUpdateValidator,
 } from "@server/validators/todos.validators";
 import { ITag } from "@shared/models/tag.model";
-import { ITodo, ITodoInput } from "@shared/models/todo.model";
+import { ITodo } from "@shared/models/todo.model";
 import {
   Post,
   UseMiddleware,

@@ -1,6 +1,5 @@
 import { Results } from "next-controllers";
 import { ValidationError } from "yup";
-import { AuditConfig } from "./types";
 
 /**
  * Handlers a server error.

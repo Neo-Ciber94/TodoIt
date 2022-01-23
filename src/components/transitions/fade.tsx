@@ -10,7 +10,7 @@ export const FadeTransition = forwardRef<HTMLDivElement, TransitionProps>(
       duration = 200,
       onEnter,
       onExited,
-      ...other
+      ...rest
     } = props;
     
     const style = useSpring({
@@ -30,7 +30,7 @@ export const FadeTransition = forwardRef<HTMLDivElement, TransitionProps>(
     });
 
     return (
-      <animated.div ref={ref} style={style} {...other}>
+      <animated.div ref={ref} style={style} {...rest}>
         {children}
       </animated.div>
     );

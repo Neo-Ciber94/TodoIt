@@ -6,7 +6,7 @@ import {
   styled,
 } from "@mui/material";
 import { PASTEL_COLORS, randomPastelColor } from "@shared/config";
-import { ITodo, ITodoInput } from "@shared/models/todo.model";
+import { ITodoInput } from "@shared/models/todo.model";
 import { ToastContainer, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { usePageColor } from "src/contexts/PageColorContext";
@@ -56,7 +56,7 @@ export function TodoForm({
     register,
     setValue,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors },
   } = useForm<ITodoInput>({
     defaultValues: initialValue,
   });

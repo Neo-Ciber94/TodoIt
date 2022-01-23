@@ -1,5 +1,5 @@
 import { TodoForm } from "src/components/TodoForm";
-import { Button, Chip, Container, IconButton, Stack } from "@mui/material";
+import { Button, Chip, Container, IconButton } from "@mui/material";
 import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import { ITagInput } from "@shared/models/tag.model";
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;
-  onSubmit: (todo: ITodoInput) => void;
+  onSubmit: (todo: ITodoInput) => void | Promise<void>;
   title: string;
   submitText: string;
 }
@@ -28,7 +28,7 @@ export function CreateOrEditTodoPage({
   const [openColorPicker, setOpenColorPicker] = useState(false);
   const backButtonSpring = useSpring(animations.slideLeftFadeIn(0));
   const titleSpring = useSpring(animations.slideLeftFadeIn(100));
-  const tagsSpring = useSpring(animations.slideLeftFadeIn(200));
+  const tagsSpring = useSpring(animations.slideLeftFadeIn(500));
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tags, setTags] = useState<ITagInput[]>(todo?.tags || []);
 
@@ -36,10 +36,9 @@ export function CreateOrEditTodoPage({
     setTags(tags);
   };
 
-  const handleSubmit = (todo: ITodoInput) => {
+  const handleSubmit = async (todo: ITodoInput) => {
     todo.tags = tags;
-    onSubmit(todo);
-    console.log(todo);
+    await onSubmit(todo);
   };
 
   return (
@@ -86,7 +85,7 @@ export function CreateOrEditTodoPage({
           onSubmit={handleSubmit}
         />
 
-        <animated.div style={titleSpring}>
+        <animated.div style={tagsSpring}>
           <div className="md:px-30 sm:px-20 px-0 flex flex-row mt-8 gap-2">
             {tags.map((tag) => (
               <Chip

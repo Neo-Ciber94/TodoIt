@@ -1,12 +1,7 @@
 import { ITag, ITagInput } from "@shared/models/tag.model";
 import { ITodo } from "@shared/models/todo.model";
 import { nanoid } from "nanoid";
-
-export const TODO_TAG_INITAL_STATE: TodoTagState = Object.freeze({
-  tags: [],
-  displayedTags: [],
-  searchText: "",
-});
+import { useReducer } from "react";
 
 export interface TodoTag {
   id: string;
@@ -64,6 +59,14 @@ export type TodoTagAction =
   | TodoTagActionDone
   | TodoTagActionReset;
 
+export function useTodoTagReducer() {
+  return useReducer(todoTagsReducer, {
+    tags: [],
+    displayedTags: [],
+    searchText: "",
+  });
+}
+
 export function todoTagsReducer(
   state: TodoTagState,
   action: TodoTagAction
@@ -88,7 +91,7 @@ export function todoTagsReducer(
   }
 }
 
-export function selectTodoTags(tags: TodoTag[]): ITagInput[] {
+export function selectCheckedTags(tags: TodoTag[]): ITagInput[] {
   return tags
     .filter((tag) => tag.checked)
     .map((tag) => ({ id: tag.new ? undefined : tag.id, name: tag.name }));
@@ -115,6 +118,9 @@ function handleTodoTagInit(
       }
     });
   }
+
+  // Sort by checked
+  result.sort((a, b) => (a.checked === b.checked ? 0 : a.checked ? -1 : 1));
 
   return {
     tags: result,

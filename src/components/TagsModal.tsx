@@ -17,18 +17,18 @@ import {
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import AddIcon from "@mui/icons-material/Add";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { grey } from "@mui/material/colors";
 import { ITodo } from "@shared/models/todo.model";
 import {
-  todoTagsReducer,
-  selectTodoTags,
+  selectCheckedTags,
   TodoTag,
-  TODO_TAG_INITAL_STATE,
+  useTodoTagReducer,
 } from "src/redux/todo-tags.reducer";
 import { FadeTransition } from "./transitions";
 import React from "react";
 import { useTags } from "src/hooks/fetchers";
+import { DarkModal } from "./DarkModal";
 
 const TagSearchField = styled(TextField)({
   width: "100%",
@@ -94,7 +94,7 @@ export default function TagsModal({
 }: TagsModalProps) {
   const { data, error } = useTags();
   const [searchText, setSearchText] = useState("");
-  const [state, dispacher] = useReducer(todoTagsReducer, TODO_TAG_INITAL_STATE);
+  const [state, dispacher] = useTodoTagReducer();
   const minHeightRef = useRef(ModalMinHeight.sm);
   const { displayedTags } = state;
   const canCreate = displayedTags.length === 0 && searchText.length > 0;
@@ -115,7 +115,8 @@ export default function TagsModal({
     if (data) {
       dispacher({ type: "todoTag/init", todo, tags: data });
     }
-  }, [todo, data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [todo]);
 
   const handleClose = () => {
     setOpen(false);
@@ -124,7 +125,7 @@ export default function TagsModal({
   };
 
   const handleSave = () => {
-    const selectedTodos = selectTodoTags(state.tags);
+    const selectedTodos = selectCheckedTags(state.tags);
     dispacher({ type: "todoTag/done" });
     setOpen(false);
     onSelectTags(selectedTodos);
@@ -180,93 +181,65 @@ export default function TagsModal({
   };
 
   return (
-    <Modal
-      aria-labelledby="spring-modal-title"
-      aria-describedby="spring-modal-description"
+    <DarkModal
+      title="Test"
       open={open}
-      onClose={handleClose}
-      closeAfterTransition
-      BackdropComponent={Backdrop}
-      BackdropProps={{ timeout: 500 }}
+      handleClose={handleClose}
+      Icon={LocalOfferIcon}
+      Transition={FadeTransition}
     >
-      <FadeTransition in={open}>
-        <Box sx={tagSx}>
-          <AppBar position="static">
-            <Toolbar>
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-              >
-                <LocalOfferIcon />
-              </IconButton>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Tags
-              </Typography>
-            </Toolbar>
-          </AppBar>
-          <Box
-            sx={{
-              padding: 2,
-              backgroundColor: "rgb(31, 31, 31)",
-            }}
-          >
-            <Box
-              sx={{
-                color: "white",
-                paddingBottom: 2,
-                px: 1,
-              }}
-            >
-              <TagSearchField
-                label="Tag Name"
-                variant="standard"
-                autoComplete="off"
-                value={searchText}
-                onChange={handleSearch}
-              />
-            </Box>
+      <Box
+        sx={{
+          color: "white",
+          paddingBottom: 2,
+          px: 1,
+        }}
+      >
+        <TagSearchField
+          label="Tag Name"
+          variant="standard"
+          autoComplete="off"
+          value={searchText}
+          onChange={handleSearch}
+        />
+      </Box>
 
-            <Box
-              sx={{
-                overflowY: "auto",
-                minHeight: minHeightRef.current,
-                maxHeight: ModalMinHeight.lg,
-              }}
-            >
-              <Content />
-            </Box>
+      <Box
+        sx={{
+          overflowY: "auto",
+          minHeight: minHeightRef.current,
+          maxHeight: ModalMinHeight.lg,
+        }}
+      >
+        <Content />
+      </Box>
 
-            <div className="flex flex-row gap-2">
-              <Button
-                variant="text"
-                sx={{
-                  marginLeft: "auto",
-                  color: "white",
-                  fontWeight: 500,
-                  width: 100,
-                }}
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-              <Button
-                variant="text"
-                sx={{
-                  color: "red",
-                  fontWeight: 500,
-                  width: 100,
-                }}
-                onClick={handleClose}
-              >
-                Cancel
-              </Button>
-            </div>
-          </Box>
-        </Box>
-      </FadeTransition>
-    </Modal>
+      <div className="flex flex-row gap-2">
+        <Button
+          variant="text"
+          sx={{
+            marginLeft: "auto",
+            color: "white",
+            fontWeight: 500,
+            width: 100,
+          }}
+          onClick={handleSave}
+        >
+          Save
+        </Button>
+        <Button
+          variant="text"
+          sx={{
+            color: "red",
+            fontWeight: 500,
+            width: 100,
+          }}
+          onClick={handleClose}
+        >
+          Cancel
+        </Button>
+      </div>
+    </DarkModal>
   );
 }
 

@@ -16,7 +16,7 @@ export function ColorPickerDrawer(props: ColorPickerDrawerProps) {
   return (
     <Drawer
       PaperProps={{
-        sx: { backgroundColor: "rgb(31, 41, 55)" },
+        sx: { backgroundColor: "rgb(31, 31, 31)" },
       }}
       anchor="bottom"
       open={open}
