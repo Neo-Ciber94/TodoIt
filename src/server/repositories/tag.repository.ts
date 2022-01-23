@@ -1,7 +1,6 @@
 import Tag from "@server/database/schemas/tag.schema";
 import { TagModel } from "@server/database/schemas/tag.types";
-import { EntityInput } from "@server/types";
-import { ITag, ITagInput } from "@shared/models/tag.model";
+import { ITag } from "@shared/models/tag.model";
 import { Repository } from "./base/repository.base";
 
 export class TagRepository extends Repository<ITag, TagModel> {
@@ -14,11 +13,11 @@ export class TagRepository extends Repository<ITag, TagModel> {
     userId: string
   ): Promise<ITag[]> {
     const ids = tags.map((tag) => tag.id);
-    const names = tags.map((tag) => tag.name);
+    // const names = tags.map((tag) => tag.name);
 
     const existingTags = await this.find({
       // Using `as any` to allow use undefined `id`
-      $or: [{ id: { $in: ids } as any }, { name: { $in: names } as any }],
+      id: { $in: ids } as any ,  // FIXME: check for duplicated names 
       creatorUserId: userId,
     });
 

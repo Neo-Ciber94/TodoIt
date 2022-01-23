@@ -16,6 +16,7 @@ import {
   UseMiddleware,
   withController,
   RouteController,
+  Put,
 } from "next-controllers";
 
 @RouteController({ onError: errorHandler })
@@ -42,7 +43,7 @@ class TodoApiController extends ApiController<TodoDocument> {
     this.setAuditData("creator", entity);
     this.setAuditData("creator", entity.tags);
 
-    const userId = this.session.userId || "";
+    const userId = this.session.userId || ""; // Empty string is an invalid id
     const tagsToCreate: EntityInput<ITag>[] = entity.tags as any;
     const tags: ITag[] = await this.tagRepository.findOrCreate(
       tagsToCreate,
@@ -52,6 +53,41 @@ class TodoApiController extends ApiController<TodoDocument> {
 
     const newEntity = await this.repository.create(entity);
     console.log(newEntity);
+    return newEntity;
+  }
+
+  @Put("/:id")
+  async updateOne(context: AppApiContext<any>): Promise<TodoDocument | null> {
+    // FIXME: Run in a transaction
+    const id = String(context.request.params.id);
+    const entity = context.request.body as EntityInput<ITodo>;
+
+    await todoUpdateValidator.validate(entity);
+    this.setAuditData("updater", entity);
+    this.setAuditData("creator", entity.tags);
+
+    const userId = this.session.userId || ""; // Empty string is an invalid id
+    const tagsToCreate: EntityInput<ITag>[] = entity.tags as any;
+
+    // Create the query to update the todo
+    const query = { _id: id } as any;
+    this.setAuditData("creator", query);
+
+    // Check if exists
+    const exist = await this.repository.findOne(query).then((e) => e != null);
+    if (exist === false) {
+      return null;
+    }
+
+    const tags: ITag[] = await this.tagRepository.findOrCreate(
+      tagsToCreate,
+      userId
+    );
+    // console.log("TAGS: ", tags)
+    entity.tags = tags;
+
+    const newEntity = await this.repository.updateOne(query, entity);
+    // console.log(newEntity);
     return newEntity;
   }
 

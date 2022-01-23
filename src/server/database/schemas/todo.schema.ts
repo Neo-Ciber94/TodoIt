@@ -1,4 +1,5 @@
 import mongoose, { Schema, SchemaTypes } from "mongoose";
+import autoPopulate from "mongoose-autopopulate";
 import { TodoDocument, TodoModel } from "./todo.types";
 import { PASTEL_COLORS } from "@shared/config";
 
@@ -29,7 +30,7 @@ const todoSchema = new Schema<TodoDocument, TodoModel>(
       required: true,
       ref: "Tag",
       default: [],
-      autopopulate: true
+      autopopulate: true,
     } as any,
     creatorUserId: {
       type: String,
@@ -55,6 +56,9 @@ const todoSchema = new Schema<TodoDocument, TodoModel>(
     },
   }
 );
+
+// Plugins
+todoSchema.plugin(autoPopulate);
 
 // Indexes
 todoSchema.index({ title: "text", content: "text" });

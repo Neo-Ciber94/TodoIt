@@ -16,7 +16,7 @@ import React, { useCallback } from "react";
 
 export interface TodoFilters {
   completed?: boolean;
-  color?: string[];
+  color?: string[]; // TODO
   tags?: string;
 }
 
