@@ -5,7 +5,7 @@ import { defaultAuditProps } from "./utils";
 
 const USER_PROP = "creatorUserId";
 
-export type AuditEvent = "create" | "update" | "delete";
+export type AuditEvent = "creator" | "updater" | "deleter";
 
 /**
  * The base controller for all API controllers.
@@ -13,7 +13,10 @@ export type AuditEvent = "create" | "update" | "delete";
 export class ControllerBase {
   protected _session: AppSession = {};
 
-  constructor(protected readonly config: ControllerConfig) {}
+  constructor(protected readonly config: ControllerConfig) {
+    // This is just used to remove the 'unused' warning.
+    console.assert(this.__setSessionData);
+  }
 
   /**
    * Current session data.
@@ -37,21 +40,10 @@ export class ControllerBase {
   }
 
   /**
-   * Sets the session data to the given value.
-   * @param target The object to set the session data.
+   * Sets the creator, deleter or updater to the target entity.
+   * @param event The event used to set the data.
+   * @param target The value to set the data.
    */
-  protected setSessionData(target: any) {
-    if (target == null) {
-      return;
-    }
-
-    const userId = this.session.userId;
-
-    if (userId) {
-      target[this.config.userPropertyName || USER_PROP] = userId;
-    }
-  }
-
   protected setAuditData(event: AuditEvent, target: any) {
     if (target == null || this.config.audit === false) {
       return;
@@ -64,47 +56,58 @@ export class ControllerBase {
     }
 
     switch (event) {
-      case "create":
+      case "creator":
         this.setCreatorUser(userId, target);
         break;
-      case "update":
+      case "updater":
         this.setUpdaterUser(userId, target);
         break;
-      case "delete":
+      case "deleter":
         this.setDeleterUser(userId, target);
         break;
       default:
-        break;
+        throw new Error(`Invalid audit event: ${event}`);
     }
   }
 
-  protected setCreatorUser(userId: string, target: any) {
-    const audit = this.config.audit!;
-    const propName: string =
-      typeof audit === "boolean" || typeof audit.create === "boolean"
-        ? defaultAuditProps.create
-        : audit.create;
+  private get auditConfig(): AuditConfig {
+    if (!this.config.audit || this.config.audit === true) {
+      return defaultAuditProps;
+    }
 
-    target[propName] = userId;
+    return this.config.audit;
   }
 
-  protected setUpdaterUser(userId: string, target: any) {
-    const audit = this.config.audit!;
-    const propName: string =
-      typeof audit === "boolean" || typeof audit.update === "boolean"
-        ? defaultAuditProps.update
-        : audit.update;
-
-    target[propName] = userId;
+  private setCreatorUser(userId: string, target: any) {
+    setUser(userId, this.auditConfig, target, "creator");
   }
 
-  protected setDeleterUser(userId: string, target: any) {
-    const audit = this.config.audit!;
-    const propName: string =
-      typeof audit === "boolean" || typeof audit.delete === "boolean"
-        ? defaultAuditProps.delete
-        : audit.delete;
-
-    target[propName] = userId;
+  private setUpdaterUser(userId: string, target: any) {
+    setUser(userId, this.auditConfig, target, "updater");
   }
+
+  private setDeleterUser(userId: string, target: any) {
+    setUser(userId, this.auditConfig, target, "deleter");
+  }
+}
+
+function setUser(
+  userId: string,
+  audit: AuditConfig | boolean,
+  target: any,
+  prop: keyof AuditConfig
+) {
+  const canSet = typeof audit !== "boolean" && audit[prop] !== false;
+
+  if (!canSet) {
+    return;
+  }
+
+  const auditProp = audit[prop];
+  const propName: string =
+    typeof audit === "boolean" || typeof auditProp === "boolean"
+      ? defaultAuditProps[prop]
+      : auditProp;
+
+  target[propName] = userId;
 }

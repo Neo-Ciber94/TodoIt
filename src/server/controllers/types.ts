@@ -31,12 +31,6 @@ export interface ControllerConfig<T = any> {
   useSession?: boolean;
 
   /**
-   * The name of the property to set the user id to when creating, updating, deleting or filtering entities.
-   * Defaults to `creatorUserId`.
-   */
-  userPropertyName?: string;
-
-  /**
    * Enables text search within the controller.
    * By default is `false` but if enable will use the property `search`
    * of the request query.
@@ -56,6 +50,12 @@ export interface ControllerConfig<T = any> {
   query?: boolean | QueryParamsMapper<T>;
 
   /**
+   * Specifies the property to set to soft delete the entity.
+   * The property should be a boolean.
+   */
+  softDelete?: keyof T;
+
+  /**
    * Whether if audit `create`/`update`/`delete` operations in the controller.
    * Default is `true`.
    *
@@ -72,15 +72,15 @@ export interface AuditConfig {
   /**
    * Audit create. Default is `creatorUserId`.
    */
-  create: boolean | string;
+  creator: boolean | string;
 
   /**
-   * Audit create. Default is `updaterUserId`.
+   * Audit update. Default is `updaterUserId`.
    */
-  update: boolean | string;
+  updater: boolean | string;
 
   /**
-   * Audit create. Default is `deleterUserId`.
+   * Audit delete. Default is `deleterUserId`.
    */
-  delete: boolean | string;
+  deleter: boolean | string;
 }

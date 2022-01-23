@@ -21,7 +21,7 @@ export function errorHandler(error: any) {
  * The default `AuditConfig`.
  */
 export const defaultAuditProps = {
-  create: "creatorUserId",
-  update: "updaterUserId",
-  delete: "deleterUserId",
+  creator: "creatorUserId",
+  updater: "updaterUserId",
+  deleter: "deleterUserId",
 };

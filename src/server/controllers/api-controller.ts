@@ -25,19 +25,23 @@ export class ApiReadOnlyController<T extends IEntity> extends ControllerBase {
   @Get("/")
   async find(context: AppApiContext): Promise<PageResult<T> | T[]> {
     const { page, pageSize } = context.request.query;
+
+    // If dont have a page or pageSize, return all the entities
     if (page == null && pageSize == null) {
       const query: FilterQuery<T> = {};
-      this.setSessionData(query);
+      this.setAuditData("creator", query);
       const result = await this.repository.find(query);
       return result;
-    } else {
+    }
+    // Otherwise return a paginated result
+    else {
       const options = buildPaginationOptions<T>(context.request, {
         query: this.config.query,
         search: this.config.search,
         searchPropertyName: this.config.searchPropertyName,
       });
       options.query = options.query || {};
-      this.setSessionData(options.query);
+      this.setAuditData("creator", options.query);
       const result = await this.repository.findWithPagination(options);
       return result;
     }
@@ -52,7 +56,7 @@ export class ApiReadOnlyController<T extends IEntity> extends ControllerBase {
   async findById(context: AppApiContext): Promise<T | null> {
     const id = String(context.request.params.id);
     const query: FilterQuery<T> = { _id: id } as any;
-    this.setSessionData(query);
+    this.setAuditData("creator", query);
     const result = await this.repository.findOne(query);
     return result;
   }
@@ -88,7 +92,7 @@ export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
     const data = context.request.body || {};
 
     if (Array.isArray(data)) {
-      data.forEach((entity) => this.setSessionData(entity));
+      data.forEach((entity) => this.setAuditData("creator", entity));
 
       if (this.beforeUpdate) {
         for (const e of data) {
@@ -98,7 +102,7 @@ export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
 
       return this.repository.createMany(data);
     } else {
-      this.setSessionData(data);
+      this.setAuditData("creator", data);
       this.beforeCreate?.(data);
       return this.repository.create(data);
     }
@@ -116,7 +120,8 @@ export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
     const data = request.body || {};
     const query: FilterQuery<T> = { _id: id } as any;
 
-    this.setSessionData(query);
+    this.setAuditData("creator", query);
+    this.setAuditData("updater", data);
     this.beforeUpdate?.(data);
     return this.repository.updateOne(query, data);
   }
@@ -130,7 +135,15 @@ export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
   deleteOne(context: AppApiContext): Promise<T | null> {
     const id = String(context.request.params.id);
     const query: FilterQuery<T> = { _id: id } as any;
-    this.setSessionData(query);
-    return this.repository.deleteOne(query);
+    this.setAuditData("creator", query);
+    const softDelete = this.config.softDelete;
+
+    if (typeof softDelete === "string") {
+      const entity = { [softDelete]: true } as any;
+      this.setAuditData("deleter", entity);
+      return this.repository.updateOne(query, entity);
+    } else {
+      return this.repository.deleteOne(query);
+    }
   }
 }
