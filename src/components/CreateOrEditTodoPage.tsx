@@ -4,13 +4,13 @@ import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
 import PaletteIcon from "@mui/icons-material/Palette";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ITodo, ITodoInput } from "@shared/models/todo.model";
 import { useSpring, animated } from "react-spring";
 import { animations } from "src/animations/springs";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ModalMinHeight from "./TagsModal";
-import { ITag, ITagInput } from "@shared/models/tag.model";
+import { ITagInput } from "@shared/models/tag.model";
 
 export interface CreateOrEditTodoPageProps {
   todo?: ITodo;

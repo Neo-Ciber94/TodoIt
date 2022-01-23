@@ -3,7 +3,6 @@
     "/src/lib/rest-api",
     "/src/next-controllers/decorators",
     "/src/next-controllers/core",
-    "/src/client/services",
     "/src/components/transitions"
   ],
   "editor.quickSuggestions": {
@@ -13,5 +12,8 @@
     "classname[s]?\\s*=\\s*\"([^\"]*)\"",
     "//\\s*@tailwind\\s*\n\\s*const [a-zA-Z]*Style\\s*=\\s*\"([^\"]*)\"",
     "//\\s*@tailwind\\s*\n\\s*const [a-zA-Z]*Style\\s*=\\s*`([^`]*)`"
+  ],
+  "exportall.config.relExclusion": [
+    "/src/client/services"
   ]
 }

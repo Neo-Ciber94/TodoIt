@@ -2,7 +2,7 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import { ITag, ITagInput } from "@shared/models/tag.model";
+import { ITagInput } from "@shared/models/tag.model";
 import {
   AppBar,
   IconButton,
@@ -27,11 +27,8 @@ import {
   TODO_TAG_INITAL_STATE,
 } from "src/redux/todo-tags.reducer";
 import { FadeTransition } from "./transitions";
-import useSWR from "swr";
-import { TagApiService } from "src/client/services";
 import React from "react";
-
-const tagService = new TagApiService();
+import { useTags } from "src/hooks/fetchers";
 
 const TagSearchField = styled(TextField)({
   width: "100%",
@@ -95,7 +92,7 @@ export default function TagsModal({
   setOpen,
   onSelectTags,
 }: TagsModalProps) {
-  const { data, error } = useSWR("/api/tags", () => tagService.getAll());
+  const { data, error } = useTags();
   const [searchText, setSearchText] = useState("");
   const [state, dispacher] = useReducer(todoTagsReducer, TODO_TAG_INITAL_STATE);
   const minHeightRef = useRef(ModalMinHeight.sm);
