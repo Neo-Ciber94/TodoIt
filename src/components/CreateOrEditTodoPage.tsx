@@ -1,5 +1,5 @@
 import { TodoForm } from "src/components/TodoForm";
-import { Button, Container, IconButton } from "@mui/material";
+import { Button, Chip, Container, IconButton, Stack } from "@mui/material";
 import { PageTitle } from "src/components/PageTitle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Link from "next/link";
@@ -84,6 +84,28 @@ export function CreateOrEditTodoPage({
           onCloseColorPicker={() => setOpenColorPicker(false)}
           onSubmit={handleSubmit}
         />
+
+        <div className="md:px-30 sm:px-20 px-0 flex flex-row mt-8 gap-2">
+          {tags.map((tag) => (
+            <Chip
+              sx={{
+                color: "black",
+                backgroundColor: "transparent",
+                border: "3px solid black",
+                fontWeight: 600,
+                boxShadow: 2,
+                px: 2,
+                "&:hover": {
+                  backgroundColor: "black",
+                  color: "white"
+                }
+              }}
+              key={tag.id}
+              label={tag.name}
+              onClick={() => setTagsOpen(true)}
+            />
+          ))}
+        </div>
       </Container>
 
       <ModalMinHeight
