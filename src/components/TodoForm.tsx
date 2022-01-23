@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { usePageColor } from "src/contexts/PageColorContext";
 import { ColorPickerDrawer } from "./ColorPickerDrawer";
 import { useSprings, animated } from "react-spring";
-import { animationSprings } from "src/animations/springs";
+import { animations } from "src/animations/springs";
 import { useState } from "react";
 
 const AnimatedFormControl = animated(FormControl);
@@ -65,7 +65,7 @@ export function TodoForm({
   const showError = (error: string) => toast.error(error);
 
   const [springs, _] = useSprings(3, (index) =>
-    animationSprings.slideLeftFadeIn((index + 2) * 100)
+    animations.slideLeftFadeIn((index + 2) * 100)
   );
   const { pageColor, setPageColor } = usePageColor(
     initialValue?.color || randomPastelColor()

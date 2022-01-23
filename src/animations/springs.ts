@@ -1,13 +1,12 @@
-import { UseSpringProps, animated } from "react-spring";
-import { Box } from "@mui/material"
+import { UseSpringProps } from "react-spring";
 
 export type SpringPropFactory = (delay?: number) => UseSpringProps;
 
-export interface AnimationSpringsCollection {
+export interface SpringAnimations {
   [key: string]: SpringPropFactory;
 }
 
-export const animationSprings: AnimationSpringsCollection = {
+export const animations: SpringAnimations = {
   slideLeftFadeIn: (delay?: number) => ({
     from: { opacity: 0, transform: `translateX(-100%)` },
     to: { opacity: 1, transform: "translateX(0%)" },

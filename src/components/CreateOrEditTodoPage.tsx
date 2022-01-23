@@ -7,7 +7,7 @@ import PaletteIcon from "@mui/icons-material/Palette";
 import React, { useEffect, useRef, useState } from "react";
 import { ITodo, ITodoInput } from "@shared/models/todo.model";
 import { useSpring, animated } from "react-spring";
-import { animationSprings } from "src/animations/springs";
+import { animations } from "src/animations/springs";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ModalMinHeight from "./TagsModal";
 import { ITag, ITagInput } from "@shared/models/tag.model";
@@ -26,8 +26,8 @@ export function CreateOrEditTodoPage({
   submitText: submitButtonText,
 }: CreateOrEditTodoPageProps) {
   const [openColorPicker, setOpenColorPicker] = useState(false);
-  const backButtonSpring = useSpring(animationSprings.slideLeftFadeIn(0));
-  const titleSpring = useSpring(animationSprings.slideLeftFadeIn(100));
+  const backButtonSpring = useSpring(animations.slideLeftFadeIn(0));
+  const titleSpring = useSpring(animations.slideLeftFadeIn(100));
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tags, setTags] = useState<ITagInput[]>(todo?.tags || []);
 

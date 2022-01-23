@@ -22,7 +22,7 @@ import { ITodo } from "@shared/models/todo.model";
 import { useRouter } from "next/router";
 import { Center } from "src/components/Center";
 import { useSprings, animated } from "react-spring";
-import { animationSprings } from "src/animations/springs";
+import { animations } from "src/animations/springs";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import {
   TodoFilters,
@@ -61,7 +61,7 @@ export const getServerSideProps = withPageAuthRequired<Data>({
 function Page({ pageResult }: PageProps) {
   const { data, totalPages } = pageResult;
   const [springs, _] = useSprings(3, (index) =>
-    animationSprings.slideLeftFadeIn(index * 100)
+    animations.slideLeftFadeIn(index * 100)
   );
   const [todos, setTodos] = useState(data);
   const [searchTerm, setSearchTerm] = useState("");
