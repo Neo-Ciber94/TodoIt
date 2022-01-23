@@ -7,7 +7,8 @@
     "next:build": "next build",
     "next:dev-local": "ts-node --project ./tsconfig.server.json ./local/server.ts",
     "next:start-local": "cross-env NODE_ENV=production ts-node --project ./tsconfig.server.json ./local/server.ts",
-    "next:lint": "next lint"
+    "next:lint": "next lint",
+    "typecheck": "tsc --noEmit --incremental"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^1.6.1",

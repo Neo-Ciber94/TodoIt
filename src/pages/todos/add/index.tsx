@@ -3,9 +3,7 @@ import { PromiseUtils } from "@shared/utils/PromiseUtilts";
 import React from "react";
 import { CreateOrEditTodoPage } from "src/components/CreateOrEditTodoPage";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { TodoApiService } from "src/client/services/todos.service";
-
-const todoClient = new TodoApiService();
+import { services } from "src/client/services";
 
 function CreateTodo() {
   const router = useRouter();
@@ -16,7 +14,7 @@ function CreateTodo() {
       submitText="Create"
       onSubmit={async (data) => {
         await PromiseUtils.delay(1000);
-        await todoClient.create(data);
+        await services.todos.create(data);
         router.push("/");
       }}
     />

@@ -6,9 +6,7 @@ import { InferGetServerSidePropsType } from "next";
 import { ITodo } from "@shared/models/todo.model";
 import { TodoView } from "src/components/TodoView";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { TodoApiService } from "src/client/services/todos.service";
-
-const todoClient = new TodoApiService();
+import { services } from "src/client/services";
 
 type Data = {
   todo: ITodo;
@@ -17,7 +15,7 @@ type Data = {
 export const getServerSideProps = withPageAuthRequired<Data>({
   getServerSideProps: async (context) => {
     const todoId = context.params?.id;
-    const todo = await todoClient.getById(String(todoId));
+    const todo = await services.todos.getById(String(todoId));
     return {
       props: {
         todo,

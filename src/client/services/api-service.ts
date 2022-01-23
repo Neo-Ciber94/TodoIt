@@ -1,4 +1,5 @@
 import { PageResult } from "@server/repositories/base/repository";
+import { DeepPartial } from "@shared/types";
 import { API_URL } from "src/client/constants";
 import {
   AxiosApiClient,
@@ -56,26 +57,30 @@ export class ApiService<T, TKey = string> {
     return result;
   }
 
-  async create(data: Partial<T>, config: RequestConfig = {}): Promise<T> {
-    const result = await this.client.post<T, Partial<T>>(`/`, data, config);
+  async create(data: DeepPartial<T>, config: RequestConfig = {}): Promise<T> {
+    const result = await this.client.post<T, DeepPartial<T>>(`/`, data, config);
     return result;
   }
 
   async update(
     id: TKey,
-    data: Partial<T>,
+    data: DeepPartial<T>,
     config: RequestConfig = {}
   ): Promise<T> {
-    const result = await this.client.put<T, Partial<T>>(`/${id}`, data, config);
+    const result = await this.client.put<T, DeepPartial<T>>(
+      `/${id}`,
+      data,
+      config
+    );
     return result;
   }
 
   async partialUpdate(
     id: TKey,
-    data: Partial<T>,
+    data: DeepPartial<T>,
     config: RequestConfig = {}
   ): Promise<T> {
-    const result = await this.client.patch<T, Partial<T>>(
+    const result = await this.client.patch<T, DeepPartial<T>>(
       `/${id}`,
       data,
       config

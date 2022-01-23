@@ -32,7 +32,7 @@ Then continue with the following steps:
 - [x] Delete todos
 - [x] Filtering todos by status
 - [x] Full text search
-- [ ] Tags
+- [x] Tags
 
 ## Todo
 
@@ -41,3 +41,4 @@ Then continue with the following steps:
 - [ ] Logging
 - [ ] Trash can (soft delete)
 - [ ] Sorting
+- [ ] Multi-language

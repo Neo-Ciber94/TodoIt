@@ -30,11 +30,11 @@ import {
 } from "src/components/TodosFilterDrawer";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PageResult } from "@server/repositories/base/repository";
-import { TodoApiService } from "src/client/services/todos.service";
 import { RequestConfig } from "src/client/http-client";
+import { services } from "src/client/services";
 
 const PAGE_SIZE = 10;
-const todoClient = new TodoApiService();
+const todoClient = services.todos;
 
 type SearchTodoOptions = {
   page?: number;

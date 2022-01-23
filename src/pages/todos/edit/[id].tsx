@@ -4,9 +4,7 @@ import { ITodo } from "@shared/models/todo.model";
 import { PromiseUtils } from "@shared/utils/PromiseUtilts";
 import { CreateOrEditTodoPage } from "src/components/CreateOrEditTodoPage";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { TodoApiService } from "src/client/services/todos.service";
-
-const todoClient = new TodoApiService();
+import { services } from "src/client/services";
 
 type Data = {
   todo: ITodo;
@@ -15,7 +13,7 @@ type Data = {
 export const getServerSideProps = withPageAuthRequired<Data>({
   getServerSideProps: async ({ req, ...context }) => {
     const todoId = context.params?.id;
-    const todo = await todoClient.getById(String(todoId), {
+    const todo = await services.todos.getById(String(todoId), {
       headers: { cookie: req.headers.cookie || "" },
     });
     return {
@@ -39,7 +37,7 @@ export default function EditTodo({
       onSubmit={async (data) => {
         const { id } = router.query;
         await PromiseUtils.delay(1000);
-        await todoClient.update(String(id), data);
+        await services.todos.update(String(id), data);
         router.push("/");
       }}
     />

@@ -52,7 +52,6 @@ class TodoApiController extends ApiController<TodoDocument> {
     entity.tags = tags;
 
     const newEntity = await this.repository.create(entity);
-    console.log(newEntity);
     return newEntity;
   }
 
@@ -83,11 +82,10 @@ class TodoApiController extends ApiController<TodoDocument> {
       tagsToCreate,
       userId
     );
-    // console.log("TAGS: ", tags)
+
     entity.tags = tags;
 
     const newEntity = await this.repository.updateOne(query, entity);
-    // console.log(newEntity);
     return newEntity;
   }
 
