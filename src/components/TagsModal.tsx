@@ -1,15 +1,9 @@
-import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Typography from "@mui/material/Typography";
 import { ITagInput } from "@shared/models/tag.model";
 import {
-  AppBar,
-  IconButton,
   SxProps,
   Checkbox,
   TextField,
-  Toolbar,
   styled,
   Button,
   CircularProgress,
@@ -25,7 +19,7 @@ import {
   TodoTag,
   useTodoTagReducer,
 } from "src/redux/todo-tags.reducer";
-import { FadeTransition } from "./transitions";
+import { FadeTransition, SlideTransition } from "./transitions";
 import React from "react";
 import { useTags } from "src/hooks/fetchers";
 import { DarkModal } from "./DarkModal";
@@ -116,7 +110,7 @@ export default function TagsModal({
       dispacher({ type: "todoTag/init", todo, tags: data });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [todo]);
+  }, [todo, data]);
 
   const handleClose = () => {
     setOpen(false);
@@ -186,7 +180,7 @@ export default function TagsModal({
       open={open}
       handleClose={handleClose}
       Icon={LocalOfferIcon}
-      Transition={FadeTransition}
+      Transition={SlideTransition}
     >
       <Box
         sx={{

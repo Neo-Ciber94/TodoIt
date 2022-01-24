@@ -1,52 +1,26 @@
-import { forwardRef } from "react";
-import { animated, useSpring } from "react-spring";
-import { TransitionProps } from "./props";
+import React, { forwardRef } from "react";
+import Slide, { SlideProps } from "@mui/material/Slide";
+import { easing } from "@mui/material";
 
-export interface SlideTransitionProps extends TransitionProps {
-  direction?: "left" | "right"; // default to left
-}
+const easeOutBounce = `cubic-bezier(0, 1.3, 0.8, 1)`;
 
-export const SlideTransition = forwardRef<HTMLDivElement, SlideTransitionProps>(
-  function Fade(props, ref) {
-    const {
-      in: open,
-      children,
-      duration = 200,
-      onEnter,
-      onExited,
-      ...rest
-    } = props;
+export const SlideTransition = forwardRef<
+  HTMLDivElement,
+  React.PropsWithChildren<SlideProps>
+>(function SlideTransition(props, ref) {
+  const { direction = "right", children, ...rest } = props;
 
-    const onStart = () => {
-      if (open && onEnter) {
-        onEnter();
-      }
-    };
-
-    const onRest = () => {
-      if (!open && onExited) {
-        onExited();
-      }
-    };
-
-    const transformDir =
-      props.direction === "right" ? "100%" : "-100%";
-
-    const style = useSpring({
-      config: { duration },
-      from: { opacity: 0, transform: transformDir },
-      to: {
-        opacity: open ? 1 : 0,
-        padding: open ? "0%" : transformDir,
-      },
-      onStart,
-      onRest,
-    });
-
-    return (
-      <animated.div ref={ref} style={style} {...rest}>
-        {children}
-      </animated.div>
-    );
-  }
-);
+  return (
+    <Slide
+      ref={ref}
+      {...rest}
+      direction={direction}
+      easing={{
+        enter: easeOutBounce,
+        exit: easing.easeInOut,
+      }}
+    >
+      {children}
+    </Slide>
+  );
+});

@@ -1,38 +1,14 @@
-import { forwardRef } from "react";
-import { animated, useSpring } from "react-spring";
-import { TransitionProps } from "./props";
+import React, { forwardRef } from "react";
+import Fade, { FadeProps } from "@mui/material/Fade";
 
-export const FadeTransition = forwardRef<HTMLDivElement, TransitionProps>(
-  function Fade(props, ref) {
-    const {
-      in: open,
-      children,
-      duration = 200,
-      onEnter,
-      onExited,
-      ...rest
-    } = props;
-    
-    const style = useSpring({
-      config: { duration },
-      from: { opacity: 0 },
-      to: { opacity: open ? 1 : 0 },
-      onStart: () => {
-        if (open && onEnter) {
-          onEnter();
-        }
-      },
-      onRest: () => {
-        if (!open && onExited) {
-          onExited();
-        }
-      },
-    });
+export const FadeTransition = forwardRef<HTMLDivElement, FadeProps>(
+  function FadeTransition(props, ref) {
+    const { in: open, children, ...rest } = props;
 
     return (
-      <animated.div ref={ref} style={style} {...rest}>
+      <Fade in={open} ref={ref} {...rest}>
         {children}
-      </animated.div>
+      </Fade>
     );
   }
 );
