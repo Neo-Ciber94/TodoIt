@@ -10,10 +10,12 @@ import {
   ListItemIcon,
 } from "@mui/material";
 import { useEffect } from "react";
-import { useTheme } from "@mui/material/styles";
+import { SxProps, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { TransitionStatus } from "react-transition-group";
+import { Transition } from "react-transition-group";
 
 export interface TodoNoteProps {
   todo: ITodo;
@@ -25,11 +27,21 @@ export interface TodoNoteProps {
   onToggle: (todo: ITodo) => Promise<ITodo> | ITodo;
 }
 
+const duration = 300;
+
+const transitionStyles: Record<TransitionStatus, SxProps> = {
+  unmounted: {},
+  entering: { opacity: 1, transform: "translateY(30px)" },
+  entered: { opacity: 1, transform: "translateY(30px)" },
+  exiting: { opacity: 0, transform: "translateY(0px)" },
+  exited: { opacity: 0, transform: "translateY(0px)" },
+};
+
 export default function TodoNote({
   todo,
   height = "auto",
   width = 200,
-  delayIndex,
+  delayIndex = 0,
   onDelete,
   onToggle,
   onClick,
@@ -40,16 +52,28 @@ export default function TodoNote({
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [isDeleted, setIsDeleted] = React.useState(false);
+  const hasAppeared = React.useRef(false);
+  const isMountedRef = React.useRef(true);
   const open = !!anchorEl;
 
   useEffect(() => {
-    if (ref.current) {
-      const index = delayIndex || 0;
-      const delay = (index + 1) * 100;
-      ref.current.style.setProperty("--delay", `${delay}ms`);
-      setIsVisible(true);
+    if (!isMountedRef.current) {
+      return;
     }
-  }, [delayIndex, ref]);
+
+    const index = delayIndex || 0;
+    const delay = (index + 1) * 100;
+
+    setTimeout(() => {
+      setIsVisible(true);
+      hasAppeared.current = true;
+    }, delay);
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [delayIndex]);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -63,54 +87,93 @@ export default function TodoNote({
 
   const handleOnDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDelete(todo);
+    setIsVisible(false);
+    setAnchorEl(null);
   };
 
-  return (
-    <Paper
-      ref={ref}
-      className={`py-2 px-4 flex flex-col opacity-0 cursor-pointer ${
-        isVisible ? "note-appear-anim" : ""
-      }`}
-      sx={{ width, height, backgroundColor: todo.color }}
-      onClick={() => {
-        if (onClick) {
-          onClick(todo);
+  const handleDestroy = () => {
+    if (!isVisible && hasAppeared.current) {
+      setTimeout(() => {
+        if (!isMountedRef.current) {
+          return;
         }
-      }}
-    >
-      <div className="flex flex-row justify-between">
-        <Checkbox
-          checked={isCompleted}
-          sx={{
-            "& .MuiSvgIcon-root": { fontSize: 25, color: "gray", opacity: 0.7 },
-          }}
-          color="default"
-          onClick={async (e) => {
-            e.stopPropagation();
-            const result = await onToggle(todo);
-            setIsCompleted(result.completed);
-          }}
-        />
+        setIsDeleted(true);
+        onDelete(todo);
+      }, duration);
+    }
+  };
 
-        <IconButton onClick={handleClick}>
-          <MoreVertIcon sx={{ fontSize: 25 }} />
-        </IconButton>
-        <TodoMenu
-          color={todo.color}
-          anchorEl={anchorEl}
-          open={open}
-          handleClose={handleClose}
-          handleOnDelete={handleOnDelete}
-        />
-      </div>
-      <Box className="my-8">
-        <TodoNoteTitle isCompleted={isCompleted} title={todo.title} />
-        {matches && (
-          <TodoNoteContent isCompleted={isCompleted} content={todo.content} />
-        )}
-      </Box>
-    </Paper>
+  if (isDeleted) {
+    return null;
+  }
+
+  return (
+    <Transition
+      in={isVisible}
+      timeout={duration}
+      nodeRef={ref}
+      addEndListener={handleDestroy}
+    >
+      {(state) => (
+        <Paper
+          ref={ref}
+          className={`py-2 px-4 flex flex-col cursor-pointer`}
+          sx={{
+            width,
+            height,
+            backgroundColor: todo.color,
+            opacity: 0,
+            transition: `all ${duration}ms ease-in-out`,
+            transform: "translateY(30px)",
+            ...transitionStyles[state],
+          }}
+          onClick={() => {
+            if (onClick) {
+              onClick(todo);
+            }
+          }}
+        >
+          <div className="flex flex-row justify-between">
+            <Checkbox
+              checked={isCompleted}
+              sx={{
+                "& .MuiSvgIcon-root": {
+                  fontSize: 25,
+                  color: "gray",
+                  opacity: 0.7,
+                },
+              }}
+              color="default"
+              onClick={async (e) => {
+                e.stopPropagation();
+                const result = await onToggle(todo);
+                setIsCompleted(result.completed);
+              }}
+            />
+
+            <IconButton onClick={handleClick}>
+              <MoreVertIcon sx={{ fontSize: 25 }} />
+            </IconButton>
+            <TodoMenu
+              color={todo.color}
+              anchorEl={anchorEl}
+              open={open}
+              handleClose={handleClose}
+              handleOnDelete={handleOnDelete}
+            />
+          </div>
+          <Box className="my-8">
+            <TodoNoteTitle isCompleted={isCompleted} title={todo.title} />
+            {matches && (
+              <TodoNoteContent
+                isCompleted={isCompleted}
+                content={todo.content}
+              />
+            )}
+          </Box>
+        </Paper>
+      )}
+    </Transition>
   );
 }
 

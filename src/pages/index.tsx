@@ -34,6 +34,7 @@ import { RequestConfig } from "src/client/http-client";
 import { services } from "src/client/services";
 import { TransitionGroup } from "react-transition-group";
 import Collapse from "@mui/material/Collapse";
+import { CSSTransition } from "react-transition-group";
 
 const PAGE_SIZE = 10;
 const todoClient = services.todos;
@@ -256,6 +257,20 @@ function Page({ pageResult }: PageProps) {
     </>
   );
 }
+
+const OnUnmount: React.FC<{}> = ({ children }) => {
+  useEffect(() => {
+    return () => {
+      console.log("Unmounting");
+    };
+
+    const child = React.Children.only(children);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return <>{children}</>;
+};
 
 interface CenterTextProps {
   text: string;
