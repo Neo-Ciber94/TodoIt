@@ -3,10 +3,10 @@
     "background_color": "#FED7AA",
     "display": "standalone",
     "scope": "/",
-    "start_url": "https://next-js-todo-app-mu.vercel.app/",
+    "start_url": "/",
     "name": "TodoIt",
     "short_name": "TodoIt",
-    "description": "An app for save the thing you need todo",
+    "description": "An app for save the things you need todo",
     "icons": [
         {
             "src": "/icon-192x192.png",
