@@ -1,3 +1,4 @@
+import cors from "cors";
 import morgan from "morgan";
 import authMiddleware from "./auth";
 import mongoDbMiddleware from "./mongodb";
@@ -7,6 +8,7 @@ import mongoDbMiddleware from "./mongodb";
  */
 export const commonMiddlewares = [
   morgan("dev"),
+  cors(),
   authMiddleware(),
   mongoDbMiddleware(),
 ];
