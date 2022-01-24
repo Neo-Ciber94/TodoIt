@@ -1,8 +1,4 @@
-import {
-  GetServerSideProps,
-  InferGetServerSidePropsType,
-  NextPageContext,
-} from "next";
+import { InferGetServerSidePropsType } from "next";
 import TodoNote from "src/components/TodoNote";
 import {
   Container,
@@ -11,7 +7,7 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDebounce } from "src/hooks/useDebounce";
 import { ViewInterceptor } from "src/components/ViewInterceptor";
 import { SearchTextField } from "src/components/SearchTextField";
@@ -32,9 +28,8 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PageResult } from "@server/repositories/base/repository";
 import { RequestConfig } from "src/client/http-client";
 import { services } from "src/client/services";
-import { TransitionGroup } from "react-transition-group";
-import Collapse from "@mui/material/Collapse";
-import { CSSTransition } from "react-transition-group";
+
+const abortController = new AbortController();
 
 const PAGE_SIZE = 10;
 const todoClient = services.todos;
@@ -75,6 +70,7 @@ function Page({ pageResult }: PageProps) {
   const firstRender = useRef(true);
   const [todoFilters, setTodoFilters] = useState<TodoFilters>({});
   const router = useRouter();
+  const ongoingRequestRef = useRef(false);
 
   const NoTodosText = () => {
     if (data.length === 0) {
@@ -106,9 +102,15 @@ function Page({ pageResult }: PageProps) {
   const fetchTodos = (options: SearchTodoOptions = {}) => {
     setIsLoading(true);
 
+    if (ongoingRequestRef.current && !abortController.signal.aborted) {
+      //abortController.abort();
+      ongoingRequestRef.current = false;
+    }
+
     // prettier-ignore
     const opts = { page: options.page, pageSize: PAGE_SIZE, search: searchString };
     const config: RequestConfig = {
+      signal: abortController.signal,
       params: { ...todoFilters },
     };
 
@@ -118,6 +120,7 @@ function Page({ pageResult }: PageProps) {
           await delayMs(options.delay); // FIXME: remove delay?
         }
 
+        ongoingRequestRef.current = true;
         const newTodos = await todoClient.search(opts, config);
 
         options.append === true
@@ -127,10 +130,15 @@ function Page({ pageResult }: PageProps) {
         if (options.page != null) {
           setPage(newTodos.currentPage);
         }
-      } catch (e) {
-        console.error(e);
+      } catch (e: any) {
+        if (e.name !== "AbortError") {
+          console.error(e);
+        } else {
+          console.log("ABORTED!");
+        }
       } finally {
         setIsLoading(false);
+        ongoingRequestRef.current = false;
       }
     };
 

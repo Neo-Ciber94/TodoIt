@@ -14,3 +14,11 @@ export type DeepPartial<T> = {
     ? ReadonlyArray<DeepPartial<U>>
     : DeepPartial<T[P]>;
 };
+
+
+/**
+ * Converts the properties of a object to boolean.
+ */
+export type AsBoolean<T> = {
+  [P in keyof T]: T[P] extends boolean ? T[P] : boolean;
+}

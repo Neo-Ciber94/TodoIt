@@ -58,16 +58,14 @@ export default function TodoNote({
   const open = !!anchorEl;
 
   useEffect(() => {
-    if (!isMountedRef.current) {
-      return;
-    }
-
     const index = delayIndex || 0;
     const delay = (index + 1) * 100;
 
     setTimeout(() => {
-      setIsVisible(true);
-      hasAppeared.current = true;
+      if (isMountedRef.current) {
+        setIsVisible(true);
+        hasAppeared.current = true;
+      }
     }, delay);
 
     return () => {
@@ -94,11 +92,10 @@ export default function TodoNote({
   const handleDestroy = () => {
     if (!isVisible && hasAppeared.current) {
       setTimeout(() => {
-        if (!isMountedRef.current) {
-          return;
+        if (isMountedRef.current) {
+          setIsDeleted(true);
+          onDelete(todo);
         }
-        setIsDeleted(true);
-        onDelete(todo);
       }, duration);
     }
   };
