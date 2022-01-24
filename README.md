@@ -36,7 +36,7 @@ Then continue with the following steps:
 
 ## Todo
 
-- [ ] CORS
+- [x] CORS
 - [ ] Rate limiter
 - [ ] Logging
 - [ ] Trash can (soft delete)
