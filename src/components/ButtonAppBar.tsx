@@ -19,6 +19,8 @@ import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import CircularProgress from "@mui/material/CircularProgress";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import Image from "next/image";
+import Link from "next/link";
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
@@ -68,13 +70,26 @@ export function ButtonAppBar() {
       <AppBar position="fixed">
         <Toolbar>
           <div className="flex flex-row w-full justify-between">
-            <IconButton
-              href="https://github.com/Neo-Ciber94/NextJS-TodoApp"
-              target="_black"
-              rel="noopener noreferrer"
-            >
-              <GitHubIcon sx={{ color: "white" }} />
-            </IconButton>
+            <div className="flex flex-row items-center">
+              <IconButton
+                href="https://github.com/Neo-Ciber94/NextJS-TodoApp"
+                target="_black"
+                rel="noopener noreferrer"
+              >
+                <GitHubIcon sx={{ color: "white" }} />
+              </IconButton>
+              <Link href={"/"} passHref>
+                <div className="w-16 h-auto leading-[0px] mx-2 cursor-pointer">
+                  <Image
+                    src="/logo.png"
+                    alt="TodoIt"
+                    width={366}
+                    height={101}
+                  />
+                </div>
+              </Link>
+            </div>
+
             <UserActions />
           </div>
         </Toolbar>
