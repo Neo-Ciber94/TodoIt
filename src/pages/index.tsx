@@ -177,9 +177,6 @@ function Page({ pageResult }: PageProps) {
             </Button>
           </animated.div>
         </div>
-        {/* <animated.div style={springs[1]}>
-        <PageTitle title="Todos" center />
-      </animated.div> */}
         <animated.div style={springs[2]}>
           <div className="flex flex-row justify-center p-3 mb-4">
             <SearchTextField
