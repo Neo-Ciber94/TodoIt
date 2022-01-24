@@ -13,10 +13,12 @@ import IndeterminateCheckBoxOutlinedIcon from "@mui/icons-material/Indeterminate
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { useTags } from "src/hooks/fetchers";
 import React, { useCallback } from "react";
+import { ColorPickerDialog } from "./ColorPickerDialog";
+import { PASTEL_COLORS } from "@shared/config";
 
 export interface TodoFilters {
   completed?: boolean;
-  color?: string[]; // TODO
+  color?: string[];
   tags?: string;
 }
 
@@ -34,6 +36,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   setFilters,
 }) => {
   const { data, error } = useTags();
+  const [colorsDialogOpen, setColorsDialogOpen] = React.useState(false);
 
   const setCompleted = (completed: boolean | undefined) => {
     const newFilters = { ...filters, completed };
@@ -63,11 +66,29 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
     [filters.tags]
   );
 
+  const setColors = (colors: string[]) => {
+    if (colors.length === 0) {
+      const newFilters = { ...filters };
+      delete newFilters.color;
+      setFilters(newFilters);
+    } else {
+      setFilters({ ...filters, color: colors });
+    }
+  };
+
   // @tailwind
   const pillStyle = `
     inline-flex flex-row justify-center items-center content-center 
     rounded-2xl font-normal leading-6 mr-2 w-full px-3 py-2 text-base
     `;
+
+  const openColorPicker = () => {
+    setColorsDialogOpen(true);
+  };
+
+  const closeColorPicker = () => {
+    setColorsDialogOpen(false);
+  };
 
   const MoreButton = React.memo(function MoreButton() {
     return (
@@ -114,55 +135,64 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   };
 
   return (
-    <Drawer
-      anchor={"left"}
-      open={open}
-      onBackdropClick={onClose}
-      keepMounted
-      PaperProps={{
-        sx: {
-          backgroundColor: "#FED7AA",
-          width: ["100%", "50%", "33%"],
-        },
-      }}
-    >
-      <List sx={{ paddingTop: 0, flexDirection: "column", height: "100%" }}>
-        <ListItem
-          onClick={onClose}
-          className="bg-black cursor-pointer select-none flex flex-row"
-        >
-          <div className="text-white text-2xl p-2">Search Todos</div>
+    <>
+      <Drawer
+        anchor={"left"}
+        open={open}
+        onBackdropClick={onClose}
+        keepMounted
+        PaperProps={{
+          sx: {
+            backgroundColor: "#FED7AA",
+            width: ["100%", "50%", "33%"],
+          },
+        }}
+      >
+        <List sx={{ paddingTop: 0, flexDirection: "column", height: "100%" }}>
+          <ListItem
+            onClick={onClose}
+            className="bg-black cursor-pointer select-none flex flex-row"
+          >
+            <div className="text-white text-2xl p-2">Search Todos</div>
 
-          <CloseOutlinedIcon className="ml-auto text-white text-3xl" />
-        </ListItem>
-        <div className="mt-3">
-          <ListItem button onClick={() => setCompleted(undefined)}>
-            <IndeterminateCheckBoxOutlinedIcon className="mr-3 text-[30px]" />
-            <ListItemText className="p-1" primary="All" />
+            <CloseOutlinedIcon className="ml-auto text-white text-3xl" />
           </ListItem>
-          <ListItem button onClick={() => setCompleted(false)}>
-            <CheckBoxOutlineBlankOutlinedIcon className="mr-3 text-[30px]" />
-            <ListItemText className="p-1" primary="Active" />
+          <div className="mt-3">
+            <ListItem button onClick={() => setCompleted(undefined)}>
+              <IndeterminateCheckBoxOutlinedIcon className="mr-3 text-[30px]" />
+              <ListItemText className="p-1" primary="All" />
+            </ListItem>
+            <ListItem button onClick={() => setCompleted(false)}>
+              <CheckBoxOutlineBlankOutlinedIcon className="mr-3 text-[30px]" />
+              <ListItemText className="p-1" primary="Active" />
+            </ListItem>
+            <ListItem button onClick={() => setCompleted(true)}>
+              <CheckBoxOutlinedIcon className="mr-3 text-[30px]" />
+              <ListItemText className="p-1" primary="Completed" />
+            </ListItem>
+            <ListItem button onClick={openColorPicker}>
+              <ColorLensIcon className="mr-3 text-[30px]" />
+              <ListItemText className="p-1" primary="Color" />
+            </ListItem>
+          </div>
+        </List>
+        <Divider className="mx-2" />
+        <List className="mt-auto">
+          <ListItem>
+            <div className="font-bold text-black text-xl">Tags</div>
           </ListItem>
-          <ListItem button onClick={() => setCompleted(true)}>
-            <CheckBoxOutlinedIcon className="mr-3 text-[30px]" />
-            <ListItemText className="p-1" primary="Completed" />
+          <ListItem>
+            <Content />
           </ListItem>
-          <ListItem button onClick={() => {}}>
-            <ColorLensIcon className="mr-3 text-[30px]" />
-            <ListItemText className="p-1" primary="Color" />
-          </ListItem>
-        </div>
-      </List>
-      <Divider className="mx-2" />
-      <List className="mt-auto">
-        <ListItem>
-          <div className="font-bold text-black text-xl">Tags</div>
-        </ListItem>
-        <ListItem>
-          <Content />
-        </ListItem>
-      </List>
-    </Drawer>
+        </List>
+      </Drawer>
+
+      <ColorPickerDialog
+        open={colorsDialogOpen}
+        colors={PASTEL_COLORS}
+        onColorSelected={setColors}
+        onClose={closeColorPicker}
+      />
+    </>
   );
 };

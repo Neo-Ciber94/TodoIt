@@ -24,14 +24,24 @@ export class FetchClient implements IHttpClient<FetchConfig, FetchResponse> {
     let fullUrl = `${this.baseURL}${url}`;
 
     if (params) {
-      const keys = Object.keys(params);
+      const entries = Object.entries(params);
 
-      if (keys.length > 0) {
-        const queryString = keys
-          .map((key) => `${key}=${params[key]}`)
-          .join("&");
+      if (entries.length > 0) {
+        const queryString: string[] = [];
 
-        fullUrl += `?${queryString}`;
+        for (const [key, value] of entries) {
+          const keyEncoded = encodeURIComponent(key);
+
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              queryString.push(`${keyEncoded}=${encodeURIComponent(item)}`);
+            }
+          } else {
+            queryString.push(`${keyEncoded}=${encodeURIComponent(value)}`);
+          }
+        }
+
+        fullUrl += `?${queryString.join("&")}`;
       }
     }
 

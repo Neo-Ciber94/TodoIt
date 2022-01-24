@@ -22,7 +22,7 @@ import {
 import { FadeTransition, SlideTransition } from "./transitions";
 import React from "react";
 import { useTags } from "src/hooks/fetchers";
-import { DarkModal } from "./DarkModal";
+import { CustomDialog } from "./CustomDialog";
 
 const TagSearchField = styled(TextField)({
   width: "100%",
@@ -175,7 +175,7 @@ export default function TagsModal({
   };
 
   return (
-    <DarkModal
+    <CustomDialog
       title="Test"
       open={open}
       handleClose={handleClose}
@@ -233,7 +233,7 @@ export default function TagsModal({
           Cancel
         </Button>
       </div>
-    </DarkModal>
+    </CustomDialog>
   );
 }
 

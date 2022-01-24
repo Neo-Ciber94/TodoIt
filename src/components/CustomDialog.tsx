@@ -20,10 +20,10 @@ export interface DarkModalProps {
   handleClose: () => void;
 }
 
-export const DarkModal = forwardRef<
+export const CustomDialog = forwardRef<
   HTMLDivElement,
   React.PropsWithChildren<DarkModalProps>
->(function CustomModal(props, ref) {
+>(function DarkDialog(props, ref) {
   const { open, title, handleClose, Icon, Transition, children } = props;
 
   return (

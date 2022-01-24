@@ -32,6 +32,8 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PageResult } from "@server/repositories/base/repository";
 import { RequestConfig } from "src/client/http-client";
 import { services } from "src/client/services";
+import { TransitionGroup } from "react-transition-group";
+import Collapse from "@mui/material/Collapse";
 
 const PAGE_SIZE = 10;
 const todoClient = services.todos;
@@ -112,7 +114,7 @@ function Page({ pageResult }: PageProps) {
     const runAsync = async () => {
       try {
         if (options.delay && options.delay > 0) {
-          await delayMs(options.delay);
+          await delayMs(options.delay); // FIXME: remove delay?
         }
 
         const newTodos = await todoClient.search(opts, config);
@@ -203,6 +205,23 @@ function Page({ pageResult }: PageProps) {
             );
           })}
         </MasonryGrid>
+        {/* 
+        <TransitionGroup className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+          {todos.map((todo, index) => {
+            return (
+              <Collapse key={todo.id} sx={{margin: 1}}>
+                <TodoNote
+                  width="100%"
+                  delayIndex={index % 10}
+                  todo={todo}
+                  onDelete={onDeleteTodo}
+                  onToggle={onToggleTodo}
+                  onClick={onTodoClick}
+                />
+              </Collapse>
+            );
+          })}
+        </TransitionGroup> */}
         <ViewInterceptor
           inView={async (isInView) => {
             if (isInView) {

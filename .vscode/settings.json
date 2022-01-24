@@ -10,10 +10,9 @@
   },
   "tailwindCSS.experimental.classRegex": [
     "classname[s]?\\s*=\\s*\"([^\"]*)\"",
+    "className[s]?\\s*=\\s*\"([^\"]*)\"",
     "//\\s*@tailwind\\s*\n\\s*const [a-zA-Z]*Style\\s*=\\s*\"([^\"]*)\"",
     "//\\s*@tailwind\\s*\n\\s*const [a-zA-Z]*Style\\s*=\\s*`([^`]*)`"
   ],
-  "exportall.config.relExclusion": [
-    "/src/client/services"
-  ]
+  "exportall.config.relExclusion": ["/src/client/services"]
 }
