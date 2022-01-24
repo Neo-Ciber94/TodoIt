@@ -18,7 +18,7 @@ import {
   selectCheckedTags,
   TodoTag,
   useTodoTagReducer,
-} from "src/redux/todo-tags.reducer";
+} from "src/redux/todo-tags.redux";
 import { FadeTransition, SlideTransition } from "./transitions";
 import React from "react";
 import { useTags } from "src/hooks/fetchers";
