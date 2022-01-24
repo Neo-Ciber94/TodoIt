@@ -28,6 +28,8 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { PageResult } from "@server/repositories/base/repository";
 import { RequestConfig } from "src/client/http-client";
 import { services } from "src/client/services";
+import { NextSeo } from "next-seo";
+import manifest from "public/manifest.json";
 
 const PAGE_SIZE = 10;
 const todoClient = services.todos;
@@ -68,7 +70,7 @@ function Page({ pageResult }: PageProps) {
   const firstRender = useRef(true);
   const [todoFilters, setTodoFilters] = useState<TodoFilters>({});
   const router = useRouter();
-  const abortControllerRef = useRef<AbortController|null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const NoTodosText = () => {
     if (data.length === 0) {
@@ -159,6 +161,7 @@ function Page({ pageResult }: PageProps) {
 
   return (
     <>
+      <NextSeo title={`${manifest.name} | Todos`} description={manifest.description} />
       <Container className="pt-4">
         <div className="flex flex-row justify-start gap-2">
           <Link href="/todos/add" passHref>

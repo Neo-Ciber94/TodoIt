@@ -1,5 +1,6 @@
 {
-  "name": "todo-app",
+  "name": "todo-it",
+  "description": "An app for save the things you need todo",
   "private": true,
   "scripts": {
     "next:dev": "next dev",
@@ -57,10 +58,11 @@
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.4",
     "express": "^4.17.2",
+    "next-pwa": "^5.4.4",
+    "next-seo": "^4.29.0",
     "postcss": "^8.3.11",
     "tailwindcss": "^3.0.7",
     "ts-node": "^10.4.0",
-    "typescript": "4.4.4",
-    "next-pwa": "^5.4.4"
+    "typescript": "4.4.4"
   }
 }
