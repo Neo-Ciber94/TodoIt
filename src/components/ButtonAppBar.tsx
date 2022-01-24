@@ -18,6 +18,7 @@ import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import CircularProgress from "@mui/material/CircularProgress";
+import GitHubIcon from "@mui/icons-material/GitHub";
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
@@ -66,9 +67,16 @@ export function ButtonAppBar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed">
         <Toolbar>
-          <Box className="flex flex-row ml-auto">
+          <div className="flex flex-row w-full justify-between">
+            <IconButton
+              href="https://github.com/Neo-Ciber94/NextJS-TodoApp"
+              target="_black"
+              rel="noopener noreferrer"
+            >
+              <GitHubIcon sx={{ color: "white" }} />
+            </IconButton>
             <UserActions />
-          </Box>
+          </div>
         </Toolbar>
       </AppBar>
       <Offset />
