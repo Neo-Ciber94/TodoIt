@@ -23,6 +23,7 @@ export type RequestParams = {
 export interface RequestConfig {
   headers?: RequestHeaders;
   params?: RequestParams;
+  signal?: AbortSignal;
 
   // Additional options.
   [key: string]: any;
