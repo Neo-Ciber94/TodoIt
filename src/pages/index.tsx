@@ -29,8 +29,6 @@ import { PageResult } from "@server/repositories/base/repository";
 import { RequestConfig } from "src/client/http-client";
 import { services } from "src/client/services";
 
-const abortController = new AbortController();
-
 const PAGE_SIZE = 10;
 const todoClient = services.todos;
 
@@ -70,7 +68,7 @@ function Page({ pageResult }: PageProps) {
   const firstRender = useRef(true);
   const [todoFilters, setTodoFilters] = useState<TodoFilters>({});
   const router = useRouter();
-  const ongoingRequestRef = useRef(false);
+  const abortControllerRef = useRef<AbortController|null>(null);
 
   const NoTodosText = () => {
     if (data.length === 0) {
@@ -102,15 +100,17 @@ function Page({ pageResult }: PageProps) {
   const fetchTodos = (options: SearchTodoOptions = {}) => {
     setIsLoading(true);
 
-    if (ongoingRequestRef.current && !abortController.signal.aborted) {
-      //abortController.abort();
-      ongoingRequestRef.current = false;
+    // We abort the last request to keep the only the last data
+    if (abortControllerRef.current) {
+      abortControllerRef.current?.abort();
     }
+
+    abortControllerRef.current = new AbortController();
 
     // prettier-ignore
     const opts = { page: options.page, pageSize: PAGE_SIZE, search: searchString };
     const config: RequestConfig = {
-      signal: abortController.signal,
+      signal: abortControllerRef.current.signal,
       params: { ...todoFilters },
     };
 
@@ -120,7 +120,6 @@ function Page({ pageResult }: PageProps) {
           await delayMs(options.delay); // FIXME: remove delay?
         }
 
-        ongoingRequestRef.current = true;
         const newTodos = await todoClient.search(opts, config);
 
         options.append === true
@@ -133,12 +132,12 @@ function Page({ pageResult }: PageProps) {
       } catch (e: any) {
         if (e.name !== "AbortError") {
           console.error(e);
-        } else {
-          console.log("ABORTED!");
         }
       } finally {
         setIsLoading(false);
-        ongoingRequestRef.current = false;
+
+        // Removes the abort controller
+        abortControllerRef.current = null;
       }
     };
 
@@ -211,23 +210,6 @@ function Page({ pageResult }: PageProps) {
             );
           })}
         </MasonryGrid>
-        {/* 
-        <TransitionGroup className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
-          {todos.map((todo, index) => {
-            return (
-              <Collapse key={todo.id} sx={{margin: 1}}>
-                <TodoNote
-                  width="100%"
-                  delayIndex={index % 10}
-                  todo={todo}
-                  onDelete={onDeleteTodo}
-                  onToggle={onToggleTodo}
-                  onClick={onTodoClick}
-                />
-              </Collapse>
-            );
-          })}
-        </TransitionGroup> */}
         <ViewInterceptor
           inView={async (isInView) => {
             if (isInView) {
@@ -254,10 +236,7 @@ function Page({ pageResult }: PageProps) {
         open={openFiltersMenu}
         onClose={onCloseFiltersMenu}
         filters={todoFilters}
-        setFilters={(filters) => {
-          setTodoFilters(filters);
-          fetchTodos();
-        }}
+        setFilters={(filters) => setTodoFilters(filters)}
       />
     </>
   );
