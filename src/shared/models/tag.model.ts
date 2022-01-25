@@ -9,3 +9,8 @@ export interface ITag {
 export type ITagInput = Pick<ITag, "name"> & {
   id?: string;
 };
+
+export type ITagBulkOperation = {
+  insert: ITagInput[];
+  delete: string[];
+};

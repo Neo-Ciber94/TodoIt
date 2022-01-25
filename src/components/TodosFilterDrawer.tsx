@@ -274,7 +274,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
       <TagEditorDialog
         open={tagsEditorOpen}
         handleClose={() => setTagsEditorOpen(false)}
-        tags={tags || []}
+        initialTags={tags || []}
       />
     </>
   );

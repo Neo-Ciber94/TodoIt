@@ -1,8 +1,12 @@
 import { ApiController } from "@server/controllers/api-controller";
 import { commonMiddlewares } from "@server/middlewares/common";
-import { TagRepository } from "@server/repositories/tag.repository";
-import { ITag } from "@shared/models/tag.model";
-import { UseMiddleware, withController } from "next-controllers";
+import {
+  ITagBulkOperationResult,
+  TagRepository,
+} from "@server/repositories/tag.repository";
+import { AppApiContext } from "@server/types";
+import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
+import { Post, UseMiddleware, withController } from "next-controllers";
 
 @UseMiddleware(...commonMiddlewares)
 class TagApiController extends ApiController<ITag> {
@@ -10,6 +14,18 @@ class TagApiController extends ApiController<ITag> {
     super(new TagRepository(), {
       query: true,
     });
+  }
+
+  @Post("/bulk")
+  async bulkOperation({
+    request,
+  }: AppApiContext): Promise<ITagBulkOperationResult> {
+    const repo = this.repository as TagRepository;
+
+    // FIXME: Validate body
+    const input = request.body as ITagBulkOperation;
+    const result = await repo.bulkOperation(input, this.session.userId || "");
+    return result;
   }
 }
 
