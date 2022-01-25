@@ -23,8 +23,8 @@ export const themeOptions: ThemeOptions = {
       paper: "#fed7aa",
     },
     text: {
-      primary: "#000000",
-      secondary: "#000000",
+      primary: "#fffffff",
+      secondary: "#fffffff",
       disabled: "rgba(255,255,255,0)",
       hint: "#f9f9f9",
     },

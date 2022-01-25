@@ -19,40 +19,11 @@ import {
   TodoTag,
   useTodoTagReducer,
 } from "src/redux/todo-tags.redux";
-import { FadeTransition, SlideTransition } from "./transitions";
+import { SlideTransition } from "./transitions";
 import React from "react";
 import { useTags } from "src/hooks/fetchers";
 import { CustomDialog } from "./CustomDialog";
-
-const TagSearchField = styled(TextField)({
-  width: "100%",
-  "& input.MuiInput-input": {
-    color: "white",
-  },
-  "& label.MuiInputLabel-root": {
-    color: "white",
-  },
-  "& div.MuiInput-underline.MuiInput-root:before": {
-    borderBottomColor: "gray",
-  },
-  "& label.Mui-focused": {
-    color: "white",
-  },
-  "& .MuiInput-underline:after": {
-    borderBottomColor: "white",
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "white",
-    },
-    "&:hover fieldset": {
-      borderColor: "white",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "white",
-    },
-  },
-});
+import { CustomTextField } from "./CustomTextField";
 
 export interface TagsModalProps {
   todo?: ITodo;
@@ -61,18 +32,6 @@ export interface TagsModalProps {
   onSelectTags: (tags: ITagInput[]) => void;
   setOpen: (open: boolean) => void;
 }
-
-const tagSx: SxProps = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  borderRadius: 3,
-  overflow: "hidden",
-  color: "white",
-  boxShadow: 24,
-  width: "90%",
-};
 
 enum ModalMinHeight {
   sm = 100,
@@ -189,12 +148,15 @@ export default function TagsModal({
           px: 1,
         }}
       >
-        <TagSearchField
+        <CustomTextField
           label="Tag Name"
           variant="standard"
           autoComplete="off"
           value={searchText}
           onChange={handleSearch}
+          sx={{
+            width: "100%",
+          }}
         />
       </Box>
 

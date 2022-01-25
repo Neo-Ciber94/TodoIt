@@ -21,6 +21,7 @@ import { AsBoolean } from "@shared/types";
 import { noop } from "@shared/utils";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { TagEditorDialog } from "./TagEditorDialog";
 
 const ToggleableFilters = {
   active: "Active",
@@ -51,8 +52,9 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
 }) => {
   const theme = useTheme();
   const mdMatches = useMediaQuery(theme.breakpoints.down("sm"));
-  const { data, error } = useTags();
+  const { data: tags, error } = useTags();
   const [colorsDialogOpen, setColorsDialogOpen] = React.useState(false);
+  const [tagsEditorOpen, setTagsEditorOpen] = React.useState(false);
   const [selectedColors, setSelectedColors] = React.useState<string[]>([]);
   const [activeFilters, setActiveFilters] = React.useState<ActiveFilters>({
     active: false,
@@ -155,15 +157,16 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   const MoreButton = React.memo(function MoreButton() {
     return (
       <button
+        onClick={() => setTagsEditorOpen(true)}
         className={`${pillStyle} bg-stone-700 hover:bg-stone-500 text-white`}
       >
-        More...
+        {(tags || []).length > 0 ? "More..." : "Create tags"}
       </button>
     );
   });
 
   const TagsFilter = () => {
-    if (!data) {
+    if (!tags) {
       return (
         <div className="flex flex-row  w-full justify-center content-center p-1">
           <CircularProgress sx={{ color: "black" }} />
@@ -178,7 +181,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
 
     return (
       <div className="grid grid-cols-3 w-full gap-2 pb-5 pt-2">
-        {data.map((tag, index) => (
+        {tags.map((tag, index) => (
           <button
             key={index}
             onClick={() => setTag(tag.id)}
@@ -192,8 +195,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
           </button>
         ))}
 
-        {/* TODO: Remove hardcoded value */}
-        {/* {data.length > 12 && <MoreButton />} */}
+        {tags.length > 0 && <MoreButton />}
       </div>
     );
   };
@@ -268,80 +270,14 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
         setSelectedColors={setColors}
         onClose={closeColorPicker}
       />
+
+      <TagEditorDialog
+        open={tagsEditorOpen}
+        handleClose={() => setTagsEditorOpen(false)}
+        tags={tags || []}
+      />
     </>
   );
-
-  // return (
-  //   <>
-  //     <Drawer
-  //       anchor={"left"}
-  //       open={open}
-  //       onClose={onClose}
-  //       onBackdropClick={onClose}
-  //       transitionDuration={500}
-  //       keepMounted
-  //       PaperProps={{
-  //         sx: {
-  //           backgroundColor: "#FED7AA",
-  //           width: ["100%", "50%", "33%"],
-  //         },
-  //       }}
-  //     >
-  //       <List sx={{ paddingTop: 0, flexDirection: "column", height: "100%" }}>
-  //         <ListItem
-  //           onClick={onClose}
-  //           className="bg-black cursor-pointer select-none flex flex-row"
-  //         >
-  //           <div className="text-white text-2xl p-2">Search Todos</div>
-
-  //           <CloseOutlinedIcon className="ml-auto text-white text-3xl" />
-  //         </ListItem>
-  //         <div className="mt-3">
-  //           <TodoFilterItem
-  //             onClick={clearFilters}
-  //             label="All"
-  //             Icon={IndeterminateCheckBoxOutlinedIcon}
-  //           />
-  //           <TodoFilterItem
-  //             onClick={setActive}
-  //             label="Active"
-  //             selected={activeFilters.active}
-  //             Icon={CheckBoxOutlineBlankOutlinedIcon}
-  //           />
-  //           <TodoFilterItem
-  //             onClick={setCompleted}
-  //             label="Completed"
-  //             selected={activeFilters.completed}
-  //             Icon={CheckBoxOutlinedIcon}
-  //           />
-  //           <TodoFilterItem
-  //             onClick={openColorPicker}
-  //             label="Color"
-  //             selected={activeFilters.color}
-  //             Icon={ColorLensIcon}
-  //           />
-  //         </div>
-  //       </List>
-  //       <Divider className="mx-2" />
-  //       <List className="mt-auto">
-  //         <ListItem>
-  //           <div className="font-bold text-black text-xl">Tags</div>
-  //         </ListItem>
-  //         <ListItem>
-  //           <TagsFilter />
-  //         </ListItem>
-  //       </List>
-  //     </Drawer>
-
-  //     <ColorPickerDialog
-  //       open={colorsDialogOpen}
-  //       colors={PASTEL_COLORS}
-  //       selectedColors={selectedColors}
-  //       setSelectedColors={setColors}
-  //       onClose={closeColorPicker}
-  //     />
-  //   </>
-  // );
 };
 
 interface TodoFilterItemProps {
