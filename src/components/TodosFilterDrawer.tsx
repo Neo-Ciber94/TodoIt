@@ -1,4 +1,5 @@
 import {
+  SwipeableDrawer,
   Drawer,
   List,
   ListItem,
@@ -17,6 +18,9 @@ import React, { useCallback } from "react";
 import { ColorPickerDialog } from "./ColorPickerDialog";
 import { PASTEL_COLORS } from "@shared/config";
 import { AsBoolean } from "@shared/types";
+import { noop } from "@shared/utils";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const ToggleableFilters = {
   active: "Active",
@@ -45,6 +49,8 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   filters,
   setFilters,
 }) => {
+  const theme = useTheme();
+  const mdMatches = useMediaQuery(theme.breakpoints.down("sm"));
   const { data, error } = useTags();
   const [colorsDialogOpen, setColorsDialogOpen] = React.useState(false);
   const [selectedColors, setSelectedColors] = React.useState<string[]>([]);
@@ -192,21 +198,9 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
     );
   };
 
-  return (
-    <>
-      <Drawer
-        anchor={"left"}
-        open={open}
-        onBackdropClick={onClose}
-        transitionDuration={500}
-        keepMounted
-        PaperProps={{
-          sx: {
-            backgroundColor: "#FED7AA",
-            width: ["100%", "50%", "33%"],
-          },
-        }}
-      >
+  function Content() {
+    return (
+      <>
         <List sx={{ paddingTop: 0, flexDirection: "column", height: "100%" }}>
           <ListItem
             onClick={onClose}
@@ -251,7 +245,21 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
             <TagsFilter />
           </ListItem>
         </List>
-      </Drawer>
+      </>
+    );
+  }
+
+  const drawerProps = {
+    open,
+    onClose,
+    transitionDuration: 500,
+  };
+
+  return (
+    <>
+      {mdMatches
+        ? withSwipeableDrawer(Content, drawerProps)
+        : withDrawer(Content, drawerProps)}
 
       <ColorPickerDialog
         open={colorsDialogOpen}
@@ -262,6 +270,78 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
       />
     </>
   );
+
+  // return (
+  //   <>
+  //     <Drawer
+  //       anchor={"left"}
+  //       open={open}
+  //       onClose={onClose}
+  //       onBackdropClick={onClose}
+  //       transitionDuration={500}
+  //       keepMounted
+  //       PaperProps={{
+  //         sx: {
+  //           backgroundColor: "#FED7AA",
+  //           width: ["100%", "50%", "33%"],
+  //         },
+  //       }}
+  //     >
+  //       <List sx={{ paddingTop: 0, flexDirection: "column", height: "100%" }}>
+  //         <ListItem
+  //           onClick={onClose}
+  //           className="bg-black cursor-pointer select-none flex flex-row"
+  //         >
+  //           <div className="text-white text-2xl p-2">Search Todos</div>
+
+  //           <CloseOutlinedIcon className="ml-auto text-white text-3xl" />
+  //         </ListItem>
+  //         <div className="mt-3">
+  //           <TodoFilterItem
+  //             onClick={clearFilters}
+  //             label="All"
+  //             Icon={IndeterminateCheckBoxOutlinedIcon}
+  //           />
+  //           <TodoFilterItem
+  //             onClick={setActive}
+  //             label="Active"
+  //             selected={activeFilters.active}
+  //             Icon={CheckBoxOutlineBlankOutlinedIcon}
+  //           />
+  //           <TodoFilterItem
+  //             onClick={setCompleted}
+  //             label="Completed"
+  //             selected={activeFilters.completed}
+  //             Icon={CheckBoxOutlinedIcon}
+  //           />
+  //           <TodoFilterItem
+  //             onClick={openColorPicker}
+  //             label="Color"
+  //             selected={activeFilters.color}
+  //             Icon={ColorLensIcon}
+  //           />
+  //         </div>
+  //       </List>
+  //       <Divider className="mx-2" />
+  //       <List className="mt-auto">
+  //         <ListItem>
+  //           <div className="font-bold text-black text-xl">Tags</div>
+  //         </ListItem>
+  //         <ListItem>
+  //           <TagsFilter />
+  //         </ListItem>
+  //       </List>
+  //     </Drawer>
+
+  //     <ColorPickerDialog
+  //       open={colorsDialogOpen}
+  //       colors={PASTEL_COLORS}
+  //       selectedColors={selectedColors}
+  //       setSelectedColors={setColors}
+  //       onClose={closeColorPicker}
+  //     />
+  //   </>
+  // );
 };
 
 interface TodoFilterItemProps {
@@ -301,3 +381,58 @@ const TodoFilterItem = ({
     </ListItem>
   );
 };
+
+interface WithDrawerProps {
+  open: boolean;
+  transitionDuration?: number;
+  onClose: () => void;
+}
+
+function withDrawer(
+  Component: React.ComponentType<any>,
+  { transitionDuration, open, onClose }: WithDrawerProps
+) {
+  return (
+    <Drawer
+      anchor={"left"}
+      open={open}
+      onClose={onClose}
+      onBackdropClick={onClose}
+      transitionDuration={transitionDuration}
+      keepMounted
+      PaperProps={{
+        sx: {
+          backgroundColor: "#FED7AA",
+          width: ["100%", "50%", "33%"],
+        },
+      }}
+    >
+      <Component />
+    </Drawer>
+  );
+}
+
+function withSwipeableDrawer(
+  Component: React.ComponentType<any>,
+  { transitionDuration, open, onClose }: WithDrawerProps
+) {
+  return (
+    <SwipeableDrawer
+      anchor={"left"}
+      open={open}
+      onOpen={noop}
+      onClose={onClose}
+      onBackdropClick={onClose}
+      transitionDuration={transitionDuration}
+      keepMounted
+      PaperProps={{
+        sx: {
+          backgroundColor: "#FED7AA",
+          width: ["100%", "50%", "33%"],
+        },
+      }}
+    >
+      <Component />
+    </SwipeableDrawer>
+  );
+}

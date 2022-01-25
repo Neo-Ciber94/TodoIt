@@ -30,6 +30,8 @@ import { RequestConfig } from "src/client/http-client";
 import { services } from "src/client/services";
 import { NextSeo } from "next-seo";
 import manifest from "public/manifest.json";
+import { useForceUpdate } from "src/hooks/useForceUpdate";
+import { useOrientation } from "src/hooks/useOrientation";
 
 const PAGE_SIZE = 10;
 const todoClient = services.todos;
@@ -71,6 +73,10 @@ function Page({ pageResult }: PageProps) {
   const [todoFilters, setTodoFilters] = useState<TodoFilters>({});
   const router = useRouter();
   const abortControllerRef = useRef<AbortController | null>(null);
+  const orientation = useOrientation();
+  const rerender = useForceUpdate();
+
+  useEffect(rerender, [orientation, rerender]);
 
   const NoTodosText = () => {
     if (data.length === 0) {
@@ -161,7 +167,7 @@ function Page({ pageResult }: PageProps) {
 
   return (
     <>
-      <NextSeo title={`${manifest.name} | Todos`} description={manifest.description} />
+      <NextSeo title={manifest.name} description={manifest.description} />
       <Container className="pt-4">
         <div className="flex flex-row justify-start gap-2">
           <Link href="/todos/add" passHref>
