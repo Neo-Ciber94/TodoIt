@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mongo <<EOF
+mongo --port 27018 <<EOF
 var config = {
     "_id": "rs0",
     "version": 1,
@@ -11,11 +11,11 @@ var config = {
         },
         {
             "_id": 1,
-            "host": "mongo2:27019"
+            "host": "mongo2:27018"
         },
         {
             "_id": 2,
-            "host": "mongo3:27020"
+            "host": "mongo3:27018"
         }
     ]
 };

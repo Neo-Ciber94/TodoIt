@@ -1,7 +1,7 @@
 #!/bin/bash
 
-docker-compose --project-name todoit-mongodb up -d 
+docker-compose --project-name mongodb-cluster up -d 
 
 sleep 5
 
-docker exec -it todoit-mongo1 /scripts/mongo/mongo-replicas.sh
+docker exec -it mongodb-1 /mongo-cluster/scripts/init-replicas.sh

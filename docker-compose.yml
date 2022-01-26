@@ -2,54 +2,48 @@ version: "3.9"
 
 services:
   mongo1:
-    container_name: todoit-mongo1
+    container_name: mongodb-1
     hostname: mongo1
     image: mongo
     ports:
-      - "27018:27017"
-    expose:
-      - "27017"
+      - 27018:27018
     volumes:
-      - /todoit/data/db/mongo1/
+      - /mongo-cluster/data/db/mongo1/
       - type: bind
-        source: ./scripts/mongo/mongo-replicas.sh
-        target: /scripts/mongo/mongo-replicas.sh
+        source: ./scripts/mongo/init-replicas.sh
+        target: /mongo-cluster/scripts/init-replicas.sh
     restart: always
     networks:
-      - todoit-mongodb
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+      - mongodb-cluster-network
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
   mongo2:
-    container_name: todoit-mongo2
+    container_name: mongodb-2
     hostname: mongo2
     image: mongo
     ports:
-      - "27019:27017"
-    expose:
-      - "27017"
+      - 27019:27018
     volumes:
-      - /todoit/data/db/mongo2/
+      - /mongo-cluster/data/db/mongo2/
     restart: always
     networks:
-      - todoit-mongodb
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+      - mongodb-cluster-network
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
   mongo3:
-    container_name: todoit-mongo3
+    container_name: mongodb-3
     hostname: mongo3
     image: mongo
     ports:
-      - "27020:27017"
-    expose:
-      - "27017"
+      - 27020:27018
     volumes:
-      - /todoit/data/db/mongo3/
+      - /mongo-cluster/data/db/mongo3/
     restart: always
     networks:
-      - todoit-mongodb
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+      - mongodb-cluster-network
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
 volumes:
   mongo1:
   mongo2:
   mongo3:
 networks:
-  todoit-mongodb:
+  mongodb-cluster-network:
     driver: bridge
