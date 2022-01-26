@@ -5,8 +5,6 @@ services:
     container_name: todoit-mongo1
     hostname: mongo1
     image: mongo
-    build:
-      context: ./
     ports:
       - "27018:27017"
     expose:
