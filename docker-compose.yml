@@ -1,0 +1,57 @@
+version: "3.9" 
+
+services:
+  mongo1:
+    container_name: todoit-mongo1
+    hostname: mongo1
+    image: mongo
+    build:
+      context: ./
+    ports:
+      - "27018:27017"
+    expose:
+      - "27017"
+    volumes:
+      - /todoit/data/db/mongo1/
+      - type: bind
+        source: ./scripts/mongo/mongo-replicas.sh
+        target: /scripts/mongo/mongo-replicas.sh
+    restart: always
+    networks:
+      - todoit-mongodb
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo2:
+    container_name: todoit-mongo2
+    hostname: mongo2
+    image: mongo
+    ports:
+      - "27019:27017"
+    expose:
+      - "27017"
+    volumes:
+      - /todoit/data/db/mongo2/
+    restart: always
+    networks:
+      - todoit-mongodb
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo3:
+    container_name: todoit-mongo3
+    hostname: mongo3
+    image: mongo
+    ports:
+      - "27020:27017"
+    expose:
+      - "27017"
+    volumes:
+      - /todoit/data/db/mongo3/
+    restart: always
+    networks:
+      - todoit-mongodb
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+volumes:
+  mongo1:
+  mongo2:
+  mongo3:
+networks:
+  todoit-mongodb:
+    driver: bridge
