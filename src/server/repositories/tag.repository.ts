@@ -1,7 +1,6 @@
 import Tag from "@server/database/schemas/tag.schema";
 import { TagModel } from "@server/database/schemas/tag.types";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
-import EventEmitter from "events";
 import { Repository } from "./base/repository.base";
 
 export type ITagBulkOperationResult = {
@@ -51,15 +50,9 @@ export class TagRepository extends Repository<ITag, TagModel> {
       const toCreate: Partial<ITag>[] = insert.filter((t) => t.id == null);
       const toUpdate: Partial<ITag>[] = insert.filter((t) => t.id != null);
 
-      console.log({ toCreate, toUpdate });
-
       toCreate.forEach((tag) => {
         tag.creatorUserId = userId;
       });
-
-      // toUpdate.forEach((tag) => {
-      //   tag.updaterUserId = userId;
-      // });
 
       // Create tags
       const created = await this.model.create(toCreate, { session });

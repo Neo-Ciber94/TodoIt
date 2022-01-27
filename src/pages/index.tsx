@@ -97,6 +97,7 @@ function Page({ pageResult }: PageProps) {
       await todoClient.delete(todo.id);
       setTodos(todos.filter((t) => t.id !== todo.id));
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e);
     }
   };
@@ -139,6 +140,7 @@ function Page({ pageResult }: PageProps) {
         }
       } catch (e: any) {
         if (e.name !== "AbortError") {
+          // eslint-disable-next-line no-console
           console.error(e);
         }
       } finally {
@@ -220,7 +222,7 @@ function Page({ pageResult }: PageProps) {
           })}
         </MasonryGrid>
         <ViewInterceptor
-          inView={async (isInView) => {
+          inView={(isInView) => {
             if (isInView) {
               if (page < totalPages && !isLoading) {
                 fetchTodos({

@@ -61,30 +61,33 @@ class MyDocument extends Document {
           <link rel="shortcut icon" href="/favicon.ico" />
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
+            href={`https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=Optional`}
           />
 
           <meta name="twitter:card" content="summary" />
-          <meta name="twitter:url" content="https://next-js-todo-app-mu.vercel.app/" />
+          <meta
+            name="twitter:url"
+            content="https://next-js-todo-app-mu.vercel.app/"
+          />
           <meta name="twitter:title" content="TodoIt" />
           <meta
             name="twitter:description"
             content="An app for save the things you need todo"
           />
-          <meta
-            name="twitter:image"
-            content="/icon-512x512.png"
-          />
+          <meta name="twitter:image" content="/icon-512x512.png" />
           <meta name="twitter:creator" content="NeoCiber" />
           <meta property="og:type" content="website" />
           <meta property="og:title" content="TodoIt" />
-          <meta property="og:description" content="An app for save the things you need todo" />
-          <meta property="og:site_name" content="TodoIt" />
-          <meta property="og:url" content="https://next-js-todo-app-mu.vercel.app/" />
           <meta
-            property="og:image"
-            content="/icon-512x512.png"
+            property="og:description"
+            content="An app for save the things you need todo"
           />
+          <meta property="og:site_name" content="TodoIt" />
+          <meta
+            property="og:url"
+            content="https://next-js-todo-app-mu.vercel.app/"
+          />
+          <meta property="og:image" content="/icon-512x512.png" />
         </Head>
         <body>
           <Main />

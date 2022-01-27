@@ -72,19 +72,12 @@ export const TagEditorDialog = (props: TagEditorDialogProps) => {
     const toUpdate = Array.from(updatedTags.current);
     const toDelete = Array.from(deletedTags.current);
 
-    console.log({
-      toCreate,
-      toUpdate,
-      toDelete,
-    });
-
     try {
       const result = await services.tags.bulkOperation({
         insert: [...toCreate, ...toUpdate],
         delete: toDelete,
       });
 
-      console.log({ result });
       onDone?.(result);
       handleClose();
       reset();
