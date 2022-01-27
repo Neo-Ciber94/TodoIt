@@ -29,6 +29,9 @@ const StyledTextField = styled(TextField)({
   "& label.Mui-focused": {
     color: "gray",
   },
+  "& label": {
+    color: "rgb(0, 0, 0, 0.3)",
+  },
   "& .MuiInput-underline:after": {
     borderBottomColor: "gray",
   },
