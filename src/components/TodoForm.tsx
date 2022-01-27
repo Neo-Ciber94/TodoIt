@@ -133,7 +133,7 @@ export function TodoForm({
             {buttonText}
             {isLoading && (
               <CircularProgress
-                sx={{ color: "white", margin: "16px 0" }}
+                sx={{ color: "white", marginLeft: 2 }}
                 size={20}
               />
             )}

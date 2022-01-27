@@ -86,7 +86,7 @@ export function CreateOrEditTodoPage({
         />
 
         <animated.div style={tagsSpring}>
-          <div className="md:px-30 sm:px-20 px-0 flex flex-row mt-8 gap-2">
+          <div className="md:px-30 sm:px-20 px-0 flex flex-row flex-wrap mt-8 gap-2">
             {tags.map((tag) => (
               <Chip
                 sx={{
