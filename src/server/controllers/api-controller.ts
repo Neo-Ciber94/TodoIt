@@ -9,9 +9,12 @@ import { ControllerConfig } from "./types";
 /**
  * A read-only api controller.
  */
-export class ApiReadOnlyController<T extends IEntity> extends ControllerBase {
+export class ApiReadOnlyController<
+  T extends IEntity,
+  TRepo extends IRepository<T> = IRepository<T>
+> extends ControllerBase {
   constructor(
-    protected readonly repository: IRepository<T>,
+    protected readonly repository: TRepo,
     config: ControllerConfig<T> = {}
   ) {
     super(config);
@@ -65,8 +68,11 @@ export class ApiReadOnlyController<T extends IEntity> extends ControllerBase {
 /**
  * A api controller.
  */
-export class ApiController<T extends IEntity> extends ApiReadOnlyController<T> {
-  constructor(repository: IRepository<T>, config: ControllerConfig = {}) {
+export class ApiController<
+  T extends IEntity,
+  TRepo extends IRepository<T> = IRepository<T>
+> extends ApiReadOnlyController<T, TRepo> {
+  constructor(repository: TRepo, config: ControllerConfig = {}) {
     super(repository, config);
   }
 

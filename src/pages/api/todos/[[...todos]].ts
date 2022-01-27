@@ -21,7 +21,7 @@ import {
 
 @RouteController({ onError: errorHandler })
 @UseMiddleware(...commonMiddlewares)
-class TodoApiController extends ApiController<TodoDocument> {
+class TodoApiController extends ApiController<TodoDocument, TodoRepository> {
   private readonly tagRepository = new TagRepository();
 
   constructor() {
@@ -90,7 +90,7 @@ class TodoApiController extends ApiController<TodoDocument> {
   }
 
   @Post("/:id/toggle")
-  async toggle({ request }: AppApiContext) {
+  toggle({ request }: AppApiContext) {
     const id = String(request.params.id);
     const creatorUser = request.userId;
 
@@ -98,13 +98,7 @@ class TodoApiController extends ApiController<TodoDocument> {
       return null;
     }
 
-    const todo = await this.repository.findOne({ id, creatorUser });
-
-    if (todo == null) {
-      return null;
-    }
-
-    return await todo.toggleComplete();
+    return this.repository.toggle(id, creatorUser);
   }
 }
 

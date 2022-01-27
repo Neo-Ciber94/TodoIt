@@ -6,4 +6,14 @@ export class TodoRepository extends Repository<TodoDocument, TodoModel> {
   constructor() {
     super(Todo);
   }
+
+  async toggle(id: string, creatorUser: string): Promise<TodoDocument | null> {
+    const todo = await this.findOne({ id, creatorUser });
+
+    if (todo == null) {
+      return null;
+    }
+
+    return await todo.toggleComplete();
+  }
 }
