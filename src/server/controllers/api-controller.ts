@@ -1,4 +1,4 @@
-import { IRepository, PageResult } from "@server/repositories/base/repository";
+import { IRepository, PageResult } from "@server/repositories/base/repository2";
 import { buildPaginationOptions } from "@server/repositories/utils";
 import { AppApiContext, EntityInput, IEntity } from "@server/types";
 import { FilterQuery } from "mongoose";

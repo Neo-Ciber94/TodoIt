@@ -25,7 +25,7 @@ import {
   TodosFiltersDrawer,
 } from "src/components/TodosFilterDrawer";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { PageResult } from "@server/repositories/base/repository";
+import { PageResult } from "@server/repositories/base/repository.base";
 import { RequestConfig } from "src/client/http-client";
 import { services } from "src/client/services";
 import { NextSeo } from "next-seo";

@@ -1,7 +1,7 @@
 import Tag from "@server/database/schemas/tag.schema";
 import { TagModel } from "@server/database/schemas/tag.types";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
-import { Repository } from "./base/repository.base";
+import { Repository } from "./base/repository";
 
 export type ITagBulkOperationResult = {
   created: ITag[];

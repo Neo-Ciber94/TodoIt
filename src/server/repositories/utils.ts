@@ -8,7 +8,7 @@ import {
   PageSorting,
   PaginationOptions,
   SortDirection,
-} from "./base/repository";
+} from "./base/repository2";
 
 export const DEFAULT_MAX_PAGE_SIZE = 10;
 
