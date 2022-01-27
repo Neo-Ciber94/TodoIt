@@ -7,6 +7,7 @@ import {
   Divider,
   CircularProgress,
   SxProps,
+  IconButton,
 } from "@mui/material";
 import ColorLensIcon from "@mui/icons-material/ColorLens";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
@@ -22,6 +23,7 @@ import { noop } from "@shared/utils";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { TagEditorDialog } from "./TagEditorDialog";
+import EditIcon from "@mui/icons-material/Edit";
 
 const ToggleableFilters = {
   active: "Active",
@@ -155,10 +157,14 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
     //onClose();
   };
 
-  const MoreButton = React.memo(function MoreButton() {
+  const openTagEditor = () => {
+    setTagsEditorOpen(true);
+  };
+
+  const CreateTagButton = React.memo(function CreateTagButton() {
     return (
       <button
-        onClick={() => setTagsEditorOpen(true)}
+        onClick={openTagEditor}
         className={`${pillStyle} bg-stone-700 hover:bg-stone-800 text-white`}
       >
         {tagsEmpty ? "Create tags" : "More..."}
@@ -200,7 +206,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
           </button>
         ))}
 
-        <MoreButton />
+        {tagsEmpty && <CreateTagButton />}
       </div>
     );
   };
@@ -246,10 +252,24 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
         <Divider className="mx-2" />
         <List className="mt-auto">
           <ListItem>
-            <div className="font-bold text-black text-xl">Tags</div>
+            <div className="flex flex-row">
+              <ListItemText
+                className="p-1"
+                primary="Tags"
+                primaryTypographyProps={{
+                  fontWeight: 500,
+                  fontSize: "22px",
+                }}
+              />
+              <IconButton onClick={openTagEditor} size="small">
+                <EditIcon />
+              </IconButton>
+            </div>
           </ListItem>
           <ListItem>
-            <TagsFilter />
+            <div className="w-full max-h-[40vh] overflow-auto">
+              <TagsFilter />
+            </div>
           </ListItem>
         </List>
       </>

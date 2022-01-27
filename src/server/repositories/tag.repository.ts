@@ -61,13 +61,13 @@ export class TagRepository extends Repository<ITag, TagModel> {
       const updated: ITag[] = [];
 
       for (const tag of toUpdate) {
-        const existingTag = await this.model.findOne({
-          id: tag.id,
-          creatorUserId: userId,
-        });
+        const updateResult = await this.model.findByIdAndUpdate(
+          tag.id,
+          { ...tag },
+          { session }
+        );
 
-        if (existingTag) {
-          const updateResult = await existingTag.update(tag, { session });
+        if (updateResult) {
           updated.push(updateResult);
         }
       }

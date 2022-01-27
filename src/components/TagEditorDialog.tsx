@@ -4,7 +4,6 @@ import { CustomDialog } from "./CustomDialog";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import {
@@ -22,6 +21,7 @@ import { nanoid } from "nanoid";
 import { services } from "src/client/services";
 import { ITagBulkOperationResult } from "@server/repositories/tag.repository";
 import { useToast } from "src/hooks/useToast";
+import React from "react";
 
 type ITagModel = Pick<ITag, "name"> & {
   id: string;
@@ -100,6 +100,7 @@ export const TagEditorDialog = (props: TagEditorDialogProps) => {
         onUpdate={handleUpdate}
         onDelete={handleDelete}
       />
+
       <div className="flex flex-row gap-2 mt-4">
         <Button
           variant="text"
@@ -141,19 +142,27 @@ const ListContent = (props: ListConcentProps) => {
   const [searchText, setSearchText] = useState("");
   const [tags, setTags] = useState<ITagModel[]>([]);
   const [displayedTags, setDisplayedTags] = useState<ITagModel[]>([]);
+  const canCreate = React.useMemo(
+    () =>
+      searchText.trim().length > 0 &&
+      !displayedTags.some((t) => t.name == searchText),
+    [displayedTags, searchText]
+  );
 
   useEffect(() => {
     setTags(initialTags || []);
     setDisplayedTags(initialTags || []);
   }, [initialTags]);
 
-  const handleCreate = (tag: ITagModel) => {
+  const handleCreate = () => {
+    const tag = { id: nanoid(), name: searchText };
     const newTag = { id: tag.id, name: tag.name };
     const newTags = [...tags, newTag];
 
     onCreate(tag);
     setTags(newTags);
     setDisplayedTags(newTags);
+    setSearchText("");
   };
 
   const handleDelete = (tag: ITagModel) => {
@@ -185,13 +194,11 @@ const ListContent = (props: ListConcentProps) => {
 
   return (
     <>
-      <CreateTagTextField
-        tagName={searchText}
-        setTagName={handleSearch}
-        canCreate={displayedTags.length === 0 && searchText.length > 0}
-        onCreate={handleCreate}
-      />
-      <TransitionGroup>
+      <CreateTagTextField tagName={searchText} setTagName={handleSearch} />
+      <TransitionGroup className="h-64 py-2 overflow-auto">
+        <Collapse>
+          {canCreate && <CreateTagButton onClick={handleCreate} />}
+        </Collapse>
         {displayedTags.map((tag) => (
           <Collapse key={tag.id}>
             <EditableTag
@@ -307,27 +314,17 @@ function EditableTag({ tag, onDelete, onEdit }: EditableTagProps) {
 }
 
 interface CreateTagTextFieldProps {
-  canCreate: boolean;
-  onCreate: (tag: ITagModel) => void;
   tagName: string;
   setTagName: (text: string) => void;
 }
 
 const CreateTagTextField: React.FC<CreateTagTextFieldProps> = ({
-  canCreate,
-  onCreate,
   tagName,
   setTagName,
 }) => {
   const handleSetTagName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setTagName(text);
-  };
-
-  const handleCreateTag = () => {
-    const tag = { name: tagName, id: nanoid() };
-    setTagName("");
-    onCreate(tag);
   };
 
   return (
@@ -339,7 +336,6 @@ const CreateTagTextField: React.FC<CreateTagTextFieldProps> = ({
         autoComplete="off"
         onChange={handleSetTagName}
       />
-      {canCreate && <CreateTagButton onClick={handleCreateTag} />}
     </div>
   );
 };
