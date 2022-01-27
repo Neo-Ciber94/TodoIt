@@ -5,6 +5,7 @@ import {
   TagRepository,
 } from "@server/repositories/tag.repository";
 import { AppApiContext } from "@server/types";
+import { tagBulkOperationValidator } from "@server/validators/tag.validator";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
 import { Post, UseMiddleware, withController } from "next-controllers";
 
@@ -22,8 +23,9 @@ class TagApiController extends ApiController<ITag> {
   }: AppApiContext): Promise<ITagBulkOperationResult> {
     const repo = this.repository as TagRepository;
 
-    // FIXME: Validate body
     const input = request.body as ITagBulkOperation;
+    await tagBulkOperationValidator.validate(input);
+    
     const result = await repo.bulkOperation(input, this.session.userId || "");
     return result;
   }
