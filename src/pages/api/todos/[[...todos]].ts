@@ -108,6 +108,4 @@ class TodoApiController extends ApiController<TodoDocument> {
   }
 }
 
-export default withController(TodoApiController, {
-  middlewareTimeout: 1000 * 60 * 60,
-});
+export default withController(TodoApiController);
