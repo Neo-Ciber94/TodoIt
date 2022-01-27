@@ -251,20 +251,6 @@ function Page({ pageResult }: PageProps) {
   );
 }
 
-const OnUnmount: React.FC<{}> = ({ children }) => {
-  useEffect(() => {
-    return () => {
-      console.log("Unmounting");
-    };
-
-    const child = React.Children.only(children);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return <>{children}</>;
-};
-
 interface CenterTextProps {
   text: string;
 }

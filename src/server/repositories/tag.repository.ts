@@ -1,6 +1,7 @@
 import Tag from "@server/database/schemas/tag.schema";
 import { TagModel } from "@server/database/schemas/tag.types";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
+import EventEmitter from "events";
 import { Repository } from "./base/repository.base";
 
 export type ITagBulkOperationResult = {
@@ -44,9 +45,13 @@ export class TagRepository extends Repository<ITag, TagModel> {
     const { insert, delete: ids } = operation;
 
     const session = await this.model.startSession();
-    const result = await session.withTransaction(async () => {
+    session.startTransaction();
+
+    try {
       const toCreate: Partial<ITag>[] = insert.filter((t) => t.id == null);
       const toUpdate: Partial<ITag>[] = insert.filter((t) => t.id != null);
+
+      console.log({ toCreate, toUpdate });
 
       toCreate.forEach((tag) => {
         tag.creatorUserId = userId;
@@ -75,18 +80,26 @@ export class TagRepository extends Repository<ITag, TagModel> {
       }
 
       // Delete tags
-      const deleted = await this.model
-        .deleteMany({
-          id: { $in: ids },
-          creatorUserId: userId,
-        })
-        .then((t) => t.deletedCount);
+      const deleted: number =
+        ids.length === 0
+          ? 0
+          : await this.model
+              .deleteMany({ _id: { $in: ids }, creatorUserId: userId })
+              .then((t) => t.deletedCount);
+
+      await session.commitTransaction();
 
       return { created, updated, deleted };
-    });
+    } catch {
+      await session.abortTransaction();
 
-    await session.endSession();
-
-    return result;
+      return {
+        created: [],
+        updated: [],
+        deleted: 0,
+      };
+    } finally {
+      await session.endSession();
+    }
   }
 }

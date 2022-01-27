@@ -52,7 +52,8 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
 }) => {
   const theme = useTheme();
   const mdMatches = useMediaQuery(theme.breakpoints.down("sm"));
-  const { data: tags, error } = useTags();
+  const { data: tags, mutate, error } = useTags();
+  const tagsEmpty = !tags || tags.length === 0;
   const [colorsDialogOpen, setColorsDialogOpen] = React.useState(false);
   const [tagsEditorOpen, setTagsEditorOpen] = React.useState(false);
   const [selectedColors, setSelectedColors] = React.useState<string[]>([]);
@@ -142,7 +143,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   // @tailwind
   const pillStyle = `
     inline-flex flex-row justify-center items-center content-center 
-    rounded-2xl font-normal leading-6 mr-2 w-full px-3 py-2 text-base
+    rounded-2xl font-normal leading-6 mr-2 w-full px-3 py-2 text-base shadow-md
     `;
 
   const openColorPicker = () => {
@@ -158,9 +159,9 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
     return (
       <button
         onClick={() => setTagsEditorOpen(true)}
-        className={`${pillStyle} bg-stone-700 hover:bg-stone-500 text-white`}
+        className={`${pillStyle} bg-stone-700 hover:bg-stone-800 text-white`}
       >
-        {(tags || []).length > 0 ? "More..." : "Create tags"}
+        {tagsEmpty ? "Create tags" : "More..."}
       </button>
     );
   });
@@ -168,7 +169,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
   const TagsFilter = () => {
     if (!tags) {
       return (
-        <div className="flex flex-row  w-full justify-center content-center p-1">
+        <div className="flex flex-row w-full justify-center content-center p-1">
           <CircularProgress sx={{ color: "black" }} />
         </div>
       );
@@ -180,7 +181,11 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
     }
 
     return (
-      <div className="grid grid-cols-3 w-full gap-2 pb-5 pt-2">
+      <div
+        className={`grid ${
+          tagsEmpty ? "grid-cols-1" : "grid-cols-3"
+        }  w-full gap-2 pb-5 pt-2`}
+      >
         {tags.map((tag, index) => (
           <button
             key={index}
@@ -195,7 +200,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
           </button>
         ))}
 
-        {tags.length > 0 && <MoreButton />}
+        <MoreButton />
       </div>
     );
   };
@@ -275,6 +280,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
         open={tagsEditorOpen}
         handleClose={() => setTagsEditorOpen(false)}
         initialTags={tags || []}
+        onDone={() => mutate()}
       />
     </>
   );

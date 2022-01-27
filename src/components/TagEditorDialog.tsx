@@ -20,6 +20,8 @@ import { TransitionGroup } from "react-transition-group";
 import Collapse from "@mui/material/Collapse";
 import { nanoid } from "nanoid";
 import { services } from "src/client/services";
+import { ITagBulkOperationResult } from "@server/repositories/tag.repository";
+import { useToast } from "src/hooks/useToast";
 
 type ITagModel = Pick<ITag, "name"> & {
   id: string;
@@ -30,13 +32,21 @@ export interface TagEditorDialogProps {
   open: boolean;
   initialTags: ITagModel[] | undefined;
   handleClose: () => void;
+  onDone?: (result: ITagBulkOperationResult) => void;
 }
 
 export const TagEditorDialog = (props: TagEditorDialogProps) => {
-  const { title = "Tags", open, initialTags, handleClose } = props;
+  const { title = "Tags", open, initialTags, handleClose, onDone } = props;
+  const { error: showError } = useToast();
   const createdTags = useRef<ITagModel[]>([]);
   const deletedTags = useRef<Set<string>>(new Set());
   const updatedTags = useRef<Set<ITagModel>>(new Set());
+
+  const reset = () => {
+    createdTags.current = [];
+    deletedTags.current = new Set();
+    updatedTags.current = new Set();
+  };
 
   const handleCreate = (tag: ITagModel) => {
     createdTags.current.push(tag);
@@ -62,42 +72,27 @@ export const TagEditorDialog = (props: TagEditorDialogProps) => {
     const toUpdate = Array.from(updatedTags.current);
     const toDelete = Array.from(deletedTags.current);
 
-    await services.tags.bulkOperation({
-      insert: [...toCreate, ...toUpdate],
-      delete: toDelete,
+    console.log({
+      toCreate,
+      toUpdate,
+      toDelete,
     });
 
-    handleClose();
+    try {
+      const result = await services.tags.bulkOperation({
+        insert: [...toCreate, ...toUpdate],
+        delete: toDelete,
+      });
+
+      console.log({ result });
+      onDone?.(result);
+      handleClose();
+      reset();
+    } catch (e: any) {
+      const message = e.message || "Something went wrong";
+      showError(message);
+    }
   };
-
-  // const ListContent = () => {
-  //   if (initialTags == null) {
-  //     return <CircularProgress sx={{ color: "white" }} />;
-  //   }
-
-  //   return (
-  //     <>
-  //       <CreateTagTextField
-  //         tagName={searchText}
-  //         setTagName={handleSearch}
-  //         canCreate={displayedTags.length === 0 && searchText.length > 0}
-  //         onCreate={handleCreate}
-  //       />
-  //       <TransitionGroup>
-  //         {displayedTags.map((tag) => (
-  //           <Collapse key={tag.id}>
-  //             <EditableTag
-  //               key={tag.id}
-  //               tag={tag}
-  //               onDelete={handleDelete}
-  //               onEdit={handleUpdate}
-  //             />
-  //           </Collapse>
-  //         ))}
-  //       </TransitionGroup>
-  //     </>
-  //   );
-  // };
 
   return (
     <CustomDialog
@@ -178,6 +173,8 @@ const ListContent = (props: ListConcentProps) => {
   };
 
   const handleSearch = (s: string) => {
+    setSearchText(s);
+
     if (s.trim().length === 0) {
       setDisplayedTags(tags);
     } else {
@@ -186,7 +183,6 @@ const ListContent = (props: ListConcentProps) => {
           t.name.toLowerCase().trim().includes(s.toLowerCase().trim())
         )
       );
-      setSearchText(s);
     }
   };
 
@@ -239,14 +235,18 @@ function EditableTag({ tag, onDelete, onEdit }: EditableTagProps) {
   };
 
   const handleConfirmEdit = () => {
-    onEdit({ ...tag, name: editTagName });
     setTagName(editTagName);
     setIsEditing(false);
+    onEdit({ ...tag, name: editTagName });
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditTagName(tagName);
+  };
+
+  const handleOnLostFocus = () => {
+    handleConfirmEdit();
   };
 
   const Actions = useCallback(
@@ -274,19 +274,9 @@ function EditableTag({ tag, onDelete, onEdit }: EditableTagProps) {
 
   const EditingActions = useCallback(
     () => (
-      <div>
-        <IconButton
-          edge="end"
-          aria-label="edit"
-          onClick={handleConfirmEdit}
-          sx={{ marginRight: 0.5 }}
-        >
-          <SaveIcon sx={{ color: "white" }} />
-        </IconButton>
-        <IconButton edge="end" aria-label="cancel" onClick={handleCancelEdit}>
-          <CloseIcon sx={{ color: "white" }} />
-        </IconButton>
-      </div>
+      <IconButton edge="end" aria-label="cancel" onClick={handleCancelEdit}>
+        <CloseIcon sx={{ color: "white" }} />
+      </IconButton>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -306,10 +296,16 @@ function EditableTag({ tag, onDelete, onEdit }: EditableTagProps) {
           value={editTagName}
           size="small"
           variant="standard"
+          autoFocus
+          onBlur={handleOnLostFocus}
           onChange={handleEditTagName}
         />
       ) : (
-        <ListItemText primary={editTagName} sx={{ marginRight: "auto" }} />
+        <ListItemText
+          primary={editTagName}
+          sx={{ marginRight: "auto" }}
+          onClick={handleStartEditing}
+        />
       )}
 
       {isEditing ? <EditingActions /> : <Actions />}

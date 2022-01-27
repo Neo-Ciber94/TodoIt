@@ -7,13 +7,13 @@ import {
 } from "@mui/material";
 import { PASTEL_COLORS, randomPastelColor } from "@shared/config";
 import { ITodoInput } from "@shared/models/todo.model";
-import { ToastContainer, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { usePageColor } from "src/contexts/PageColorContext";
 import { ColorPickerDrawer } from "./ColorPickerDrawer";
 import { useSprings, animated } from "react-spring";
 import { animations } from "src/animations/springs";
 import { useState } from "react";
+import { useToast } from "src/hooks/useToast";
 
 const AnimatedFormControl = animated(FormControl);
 
@@ -62,7 +62,7 @@ export function TodoForm({
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const showError = (error: string) => toast.error(error);
+  const { error: showError } = useToast();
 
   const [springs, _] = useSprings(3, (index) =>
     animations.slideLeftFadeIn((index + 2) * 100)
@@ -140,7 +140,6 @@ export function TodoForm({
           </Button>
         </animated.div>
       </form>
-      <ToastContainer theme="colored" />
       <ColorPickerDrawer
         open={openColorPicker}
         selectedColor={pageColor}

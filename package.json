@@ -8,6 +8,7 @@
     "next:build": "next build",
     "next:dev-local": "ts-node --project ./tsconfig.server.json ./local/server.ts",
     "next:start-local": "cross-env NODE_ENV=production ts-node --project ./tsconfig.server.json ./local/server.ts",
+    "next:debug": "cross-env NODE_OPTIONS='--inspect' next dev",
     "next:lint": "next lint",
     "typecheck": "tsc --noEmit --incremental"
   },
@@ -51,6 +52,7 @@
     "@types/styled-components": "^5.1.15",
     "autoprefixer": "^10.4.0",
     "babel-plugin-styled-components": "^2.0.2",
+    "cross-env": "^7.0.3",
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.4",
     "express": "^4.17.2",

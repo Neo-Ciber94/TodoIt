@@ -15,7 +15,7 @@ services:
     restart: always
     networks:
       - mongodb-cluster-network
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
+    command: [ "mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
   mongo2:
     container_name: mongodb-2
     hostname: mongo2
@@ -27,7 +27,7 @@ services:
     restart: always
     networks:
       - mongodb-cluster-network
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
+    command: [ "mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
   mongo3:
     container_name: mongodb-3
     hostname: mongo3
@@ -39,7 +39,7 @@ services:
     restart: always
     networks:
       - mongodb-cluster-network
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
+    command: [ "mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
 volumes:
   mongo1:
   mongo2:

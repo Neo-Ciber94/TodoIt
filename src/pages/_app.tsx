@@ -7,6 +7,7 @@ import { UserProvider } from "@auth0/nextjs-auth0";
 import { createTheme, ThemeProvider } from "@mui/material";
 import type { ThemeOptions } from "@mui/system";
 import { SWRConfig } from "swr";
+import { ToastContainer } from "react-toastify";
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -37,19 +38,22 @@ function MyApp({ Component, pageProps }: AppProps) {
   });
 
   return (
-    <UserProvider>
-      <SWRConfig
-        value={{
-          provider: () => new Map(),
-        }}
-      >
-        <ThemeProvider theme={theme}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ThemeProvider>
-      </SWRConfig>
-    </UserProvider>
+    <>
+      <UserProvider>
+        <SWRConfig
+          value={{
+            provider: () => new Map(),
+          }}
+        >
+          <ThemeProvider theme={theme}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ThemeProvider>
+        </SWRConfig>
+      </UserProvider>
+      <ToastContainer theme="colored" />
+    </>
   );
 }
 
