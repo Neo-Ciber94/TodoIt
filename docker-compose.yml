@@ -21,7 +21,7 @@ services:
     ports:
       - 27018:27018
     volumes:
-      - /mongo-cluster/data/db/mongo1/
+      - mongo1:/mongo-cluster/data/db/mongo1/
     restart: always
     networks:
       - mongodb-cluster-network
@@ -34,7 +34,7 @@ services:
     ports:
       - 27019:27018
     volumes:
-      - /mongo-cluster/data/db/mongo2/
+      - mongo2:/mongo-cluster/data/db/mongo2/
     restart: always
     networks:
       - mongodb-cluster-network
@@ -47,13 +47,12 @@ services:
     ports:
       - 27020:27018
     volumes:
-      - /mongo-cluster/data/db/mongo3/
+      - mongo3:/mongo-cluster/data/db/mongo3/
     restart: always
     networks:
       - mongodb-cluster-network
     entrypoint: mongod --bind_ip_all --replSet rs0 --port 27018
 volumes:
-  mongo-setup:
   mongo1:
   mongo2:
   mongo3:
