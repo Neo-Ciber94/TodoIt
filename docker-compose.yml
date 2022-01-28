@@ -1,6 +1,19 @@
-version: "3.9" 
+version: "3.9"
 
 services:
+  mongo-setup:
+    container_name: mongo-setup
+    image: mongo
+    restart: on-failure
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - mongodb-cluster-network
+    volumes:
+      - ./scripts/mongo/init-replicas.sh:/mongo-cluster/scripts/init-replicas.sh
+    entrypoint: /mongo-cluster/scripts/init-replicas.sh
   mongo1:
     container_name: mongodb-1
     hostname: mongo1
@@ -9,13 +22,11 @@ services:
       - 27018:27018
     volumes:
       - /mongo-cluster/data/db/mongo1/
-      - type: bind
-        source: ./scripts/mongo/init-replicas.sh
-        target: /mongo-cluster/scripts/init-replicas.sh
     restart: always
     networks:
       - mongodb-cluster-network
-    command: [ "mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
+    entrypoint: mongod --bind_ip_all --replSet rs0 --port 27018
+
   mongo2:
     container_name: mongodb-2
     hostname: mongo2
@@ -27,7 +38,8 @@ services:
     restart: always
     networks:
       - mongodb-cluster-network
-    command: [ "mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
+    entrypoint: mongod --bind_ip_all --replSet rs0 --port 27018
+
   mongo3:
     container_name: mongodb-3
     hostname: mongo3
@@ -39,8 +51,9 @@ services:
     restart: always
     networks:
       - mongodb-cluster-network
-    command: [ "mongod", "--bind_ip_all", "--replSet", "rs0", "--port", "27018" ]
+    entrypoint: mongod --bind_ip_all --replSet rs0 --port 27018
 volumes:
+  mongo-setup:
   mongo1:
   mongo2:
   mongo3:

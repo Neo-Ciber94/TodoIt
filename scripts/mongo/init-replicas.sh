@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mongo --port 27018 <<EOF
+mongo --host mongo1 --port 27018 <<EOF
 var config = {
     "_id": "rs0",
     "version": 1,
