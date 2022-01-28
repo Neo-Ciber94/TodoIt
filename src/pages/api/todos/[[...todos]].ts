@@ -43,21 +43,11 @@ class TodoApiController extends ApiController<TodoDocument, TodoRepository> {
     this.setAuditData("creator", entity);
     this.setAuditData("creator", entity.tags);
 
-    const userId = this.session.userId || ""; // Empty string is an invalid id
-    const tagsToCreate: EntityInput<ITag>[] = entity.tags as any;
-    const tags: ITag[] = await this.tagRepository.findOrCreate(
-      tagsToCreate,
-      userId
-    );
-    entity.tags = tags;
-
-    const newEntity = await this.repository.create(entity);
-    return newEntity;
+    return this.repository.create(entity, undefined, context.request.userId);
   }
 
   @Put("/:id")
   async updateOne(context: AppApiContext<any>): Promise<TodoDocument | null> {
-    // FIXME: Run in a transaction
     const id = String(context.request.params.id);
     const entity = context.request.body as EntityInput<ITodo>;
 
@@ -65,28 +55,15 @@ class TodoApiController extends ApiController<TodoDocument, TodoRepository> {
     this.setAuditData("updater", entity);
     this.setAuditData("creator", entity.tags);
 
-    const userId = this.session.userId || ""; // Empty string is an invalid id
-    const tagsToCreate: EntityInput<ITag>[] = entity.tags as any;
-
     // Create the query to update the todo
-    const query = { _id: id } as any;
+    const query = { _id: id };
     this.setAuditData("creator", query);
-
-    // Check if exists
-    const exist = await this.repository.findOne(query).then((e) => e != null);
-    if (exist === false) {
-      return null;
-    }
-
-    const tags: ITag[] = await this.tagRepository.findOrCreate(
-      tagsToCreate,
-      userId
+    return this.repository.updateOne(
+      query,
+      entity,
+      undefined, // session
+      context.request.userId
     );
-
-    entity.tags = tags;
-
-    const newEntity = await this.repository.updateOne(query, entity);
-    return newEntity;
   }
 
   @Post("/:id/toggle")

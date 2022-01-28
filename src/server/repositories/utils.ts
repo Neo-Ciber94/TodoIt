@@ -1,14 +1,14 @@
 import { QueryParamsMapper } from "@server/controllers/types";
 import { parseRecord } from "@shared/utils";
 import { ArrayUtils } from "@shared/utils/ArrayUtils";
-import { FilterQuery, Model } from "mongoose";
+import { ClientSession, FilterQuery, Model } from "mongoose";
 import { NextApiRequest } from "next";
 import {
   PageResult,
   PageSorting,
   PaginationOptions,
   SortDirection,
-} from "./base/repository2";
+} from "./base/repository.base";
 
 export const DEFAULT_MAX_PAGE_SIZE = 10;
 
@@ -20,17 +20,24 @@ export const EMPTY_PAGE_RESULT: PageResult<any> = Object.freeze({
   totalPages: 0,
 });
 
+/**
+ * Executes a query and returns the paginated result.
+ * @param model The model to query.
+ * @param pagination The pagination options.
+ * @returns A paginated result.
+ */
 export async function createPagination<TEntity>(
   model: Model<TEntity>,
-  options: PaginationOptions<TEntity>
+  pagination: PaginationOptions<TEntity>
 ): Promise<PageResult<TEntity>> {
-  const currentPage = Math.max(1, options.page || 1);
-  const pageSize = Math.max(1, options.pageSize || DEFAULT_MAX_PAGE_SIZE);
-  const query = options.query || {};
+  const session = pagination.session;
+  const currentPage = Math.max(1, pagination.page || 1);
+  const pageSize = Math.max(1, pagination.pageSize || DEFAULT_MAX_PAGE_SIZE);
+  const query = pagination.query || {};
   const count = await model.countDocuments(query);
   const totalPages = Math.ceil(count / pageSize);
 
-  let sorting = options.sorting || {};
+  let sorting = pagination.sorting || {};
 
   if (Object.entries(sorting).length === 0) {
     sorting = { _id: SortDirection.Descending };
@@ -48,7 +55,7 @@ export async function createPagination<TEntity>(
   }
 
   const data = await model
-    .find(query)
+    .find(query, null, { session })
     .sort(sorting)
     .skip((currentPage - 1) * pageSize)
     .limit(pageSize)
@@ -140,4 +147,35 @@ export function buildPaginationOptions<T>(
     sorting,
     query,
   };
+}
+
+export type TransationOperation<T, TModel extends Model<T>, TResult> = (
+  session: ClientSession,
+  model: TModel
+) => Promise<TResult> | TResult;
+
+/**
+ * Executes a mongodb transaction.
+ * @param model The model to use.
+ * @param f The function to execute.
+ * @returns The result of the transation.
+ */
+export async function runTransation<T, TModel extends Model<T>, TResult>(
+  model: TModel,
+  f: TransationOperation<T, TModel, TResult>,
+  session?: ClientSession
+): Promise<TResult> {
+  session ||= await model.startSession();
+  session.startTransaction();
+
+  try {
+    const result = await f(session, model);
+    await session.commitTransaction();
+    return result;
+  } catch (e) {
+    await session.abortTransaction();
+    throw e;
+  } finally {
+    await session.endSession();
+  }
 }

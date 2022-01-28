@@ -1,6 +1,7 @@
 import Tag from "@server/database/schemas/tag.schema";
 import { TagModel } from "@server/database/schemas/tag.types";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
+import { ClientSession } from "mongoose";
 import { Repository } from "./base/repository";
 
 export type ITagBulkOperationResult = {
@@ -16,7 +17,8 @@ export class TagRepository extends Repository<ITag, TagModel> {
 
   public async findOrCreate(
     tags: Partial<ITag>[],
-    userId: string
+    userId: string,
+    session?: ClientSession
   ): Promise<ITag[]> {
     const ids = tags.map((tag) => tag.id);
     // const names = tags.map((tag) => tag.name);
@@ -33,17 +35,18 @@ export class TagRepository extends Repository<ITag, TagModel> {
         !existingTags.some((existingTag) => existingTag.id === tag.id)
     );
 
-    const createdTags = await this.createMany(tagsToCreate);
+    const createdTags = await this.createMany(tagsToCreate, session);
     return [...existingTags, ...createdTags];
   }
 
   public async bulkOperation(
     operation: ITagBulkOperation,
-    userId: string
+    userId: string,
+    session?: ClientSession | null
   ): Promise<ITagBulkOperationResult> {
     const { insert, delete: ids } = operation;
 
-    const session = await this.model.startSession();
+    session ||= await this.model.startSession();
     session.startTransaction();
 
     try {

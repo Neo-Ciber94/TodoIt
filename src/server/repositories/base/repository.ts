@@ -1,5 +1,5 @@
 import { IRepository, PageResult, PaginationOptions } from "./repository.base";
-import { Model, FilterQuery } from "mongoose";
+import { Model, FilterQuery, ClientSession } from "mongoose";
 import { EntityInput, IEntity } from "@server/types";
 import { createPagination } from "../utils";
 
@@ -12,38 +12,48 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
   constructor(protected readonly model: TModel) {}
 
   // prettier-ignore
-  findWithPagination(options: PaginationOptions<T> = {}): Promise<PageResult<T>> {
-    options.query = options.query || {};
-    this.setId(options.query, options.query.id);
-    return createPagination(this.model, options);
+  findWithPagination(pagination: PaginationOptions<T> = {}): Promise<PageResult<T>> {
+    pagination.query = pagination.query || {};
+    this.setId(pagination.query, pagination.query.id);
+    return createPagination(this.model, pagination);
   }
 
-  async find(query: FilterQuery<T> = {}): Promise<T[]> {
+  async find(
+    query: FilterQuery<T> = {},
+    session?: ClientSession
+  ): Promise<T[]> {
     this.setId(query, query.id);
-    return await this.model.find(query);
+    return await this.model.find(query, null, { session });
   }
 
-  async findOne(query: FilterQuery<T> = {}): Promise<T | null> {
+  async findOne(
+    query: FilterQuery<T> = {},
+    session?: ClientSession
+  ): Promise<T | null> {
     this.setId(query, query.id);
-    return await this.model.findOne(query);
+    return await this.model.findOne(query, null, { session });
   }
 
-  async findById(id: string): Promise<T | null> {
-    return await this.model.findById(id);
+  async findById(id: string, session?: ClientSession): Promise<T | null> {
+    return await this.model.findById(id, null, { session });
   }
 
-  async create(entity: EntityInput<T>): Promise<T> {
-    return await this.model.create(entity);
+  async create(entity: EntityInput<T>, session?: ClientSession): Promise<T> {
+    const result = await this.model.create([entity], { session });
+    return result[0];
   }
 
-  async createMany(entities: EntityInput<T>[]): Promise<T[]> {
-    return await this.model.create(entities);
+  async createMany(
+    entities: EntityInput<T>[],
+    session?: ClientSession
+  ): Promise<T[]> {
+    return await this.model.create(entities, { session });
   }
 
   // prettier-ignore
-  async updateOne(query: FilterQuery<T>, entity: EntityInput<T>): Promise<T | null> {
+  async updateOne(query: FilterQuery<T>, entity: EntityInput<T>, session?: ClientSession): Promise<T | null> {
     this.setId(query, query.id);
-    const entityToUpdate = await this.model.findOne(query);
+    const entityToUpdate = await this.model.findOne(query, { session });
 
     if (!entityToUpdate) {
       return null;
@@ -57,19 +67,22 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
       }
     }
 
-    await entityToUpdate.save();
+    await entityToUpdate.save({ session });
     return entityToUpdate;
   }
 
-  async deleteOne(query: FilterQuery<T>): Promise<T | null> {
+  async deleteOne(
+    query: FilterQuery<T>,
+    session?: ClientSession
+  ): Promise<T | null> {
     this.setId(query, query.id);
-    const entityToDelete = await this.model.findOne(query);
+    const entityToDelete = await this.model.findOne(query, { session });
 
     if (!entityToDelete) {
       return null;
     }
 
-    await entityToDelete.remove();
+    await entityToDelete.remove({ session });
     return entityToDelete;
   }
 
