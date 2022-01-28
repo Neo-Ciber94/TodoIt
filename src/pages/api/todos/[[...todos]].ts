@@ -2,14 +2,12 @@ import { ApiController } from "@server/controllers/api-controller";
 import { errorHandler } from "@server/controllers/utils";
 import { TodoDocument } from "@server/database/schemas/todo.types";
 import { commonMiddlewares } from "@server/middlewares/common";
-import { TagRepository } from "@server/repositories/tag.repository";
 import { TodoRepository } from "@server/repositories/todo.repository";
 import { AppApiContext, EntityInput } from "@server/types";
 import {
   todoCreateValidator,
   todoUpdateValidator,
 } from "@server/validators/todos.validators";
-import { ITag } from "@shared/models/tag.model";
 import { ITodo } from "@shared/models/todo.model";
 import {
   Post,
@@ -22,8 +20,6 @@ import {
 @RouteController({ onError: errorHandler })
 @UseMiddleware(...commonMiddlewares)
 class TodoApiController extends ApiController<TodoDocument, TodoRepository> {
-  private readonly tagRepository = new TagRepository();
-
   constructor() {
     super(new TodoRepository(), { search: true, query: true });
   }
