@@ -13,6 +13,7 @@ export class ControllerBase {
 
   constructor(protected readonly config: ControllerConfig) {
     // This is just used to remove the 'unused' warning.
+    // eslint-disable-next-line no-console
     console.assert(this.__setSessionData);
   }
 

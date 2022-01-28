@@ -37,7 +37,7 @@ export interface IReadRepository<T extends IEntity> {
 
 // prettier-ignore
 export interface IWriteRepository<T extends IEntity> {
-  create(entity: EntityInput<T>): Promise<T>;
+  create(entity: EntityInput<T>, session?: ClientSession): Promise<T>;
   createMany(entities: EntityInput<T>[], session?: ClientSession): Promise<T[]>;
   updateOne(query: FilterQuery<T>, update: EntityInput<T>, session?: ClientSession): Promise<T | null>;
   deleteOne(query: FilterQuery<T>, session?: ClientSession): Promise<T | null>;
