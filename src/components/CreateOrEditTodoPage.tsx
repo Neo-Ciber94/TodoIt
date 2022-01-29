@@ -80,11 +80,11 @@ export function CreateOrEditTodoPage({
         </animated.div>
 
         <TodoForm
+          useCache
           initialValue={todo}
           buttonText={submitButtonText}
           openColorPicker={openColorPicker}
           onCloseColorPicker={() => setOpenColorPicker(false)}
-          cache={cache}
           onSubmit={handleSubmit}
         />
 
