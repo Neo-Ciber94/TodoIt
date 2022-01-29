@@ -14,13 +14,7 @@ import { useSprings, animated } from "react-spring";
 import { animations } from "src/animations/springs";
 import { useState } from "react";
 import { useToast } from "src/hooks/useToast";
-import {
-  CachingOptions,
-  useCachedValue,
-  useCacheState,
-} from "src/hooks/useCacheState";
-import { useEffect } from "react";
-import { LocalStorageCache } from "src/client/caching/storage-cache";
+import { CachingOptions, useCachedValue } from "src/hooks/useCacheState";
 
 const AnimatedFormControl = animated(FormControl);
 
