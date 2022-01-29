@@ -2,16 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-body.swal2-shown {
-  overflow: auto !important;
-}
-
 body {
   min-height: 100%;
 }
 
 html {
   height: 100%;
+  background-color: #fed7aa; /* Checkout 'PageColorContent.tsx' default page color */
 }
 
 div#__next {
