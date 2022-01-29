@@ -13,7 +13,9 @@ services:
       - mongodb-cluster-network
     volumes:
       - ./scripts/mongo/init-replicas.sh:/mongo-cluster/scripts/init-replicas.sh
-    entrypoint: /mongo-cluster/scripts/init-replicas.sh
+    entrypoint: > 
+      bash -c "chmod +x ./mongo-cluster/scripts/init-replicas.sh && 
+      ./mongo-cluster/scripts/init-replicas.sh"
   mongo1:
     container_name: mongodb-1
     hostname: mongo1
