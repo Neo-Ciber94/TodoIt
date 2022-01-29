@@ -139,18 +139,19 @@ export abstract class StorageCache<T> implements ICache<T> {
         continue;
       }
 
-      const value = parseString<CacheItem<T>>(this.storage.getItem(key));
+      const cacheItem = parseString<CacheItem<T>>(this.storage.getItem(key));
 
-      if (value == null) {
+      if (cacheItem == null) {
         continue;
       }
 
-      const isExpired = value.expires && new Date(value.expires) < new Date();
+      // prettier-ignore
+      const isExpired = cacheItem.expires && new Date(cacheItem.expires) < new Date();
 
       if (isExpired) {
-        this.storage.removeItem(key);
-      } else {
-        this.scheduleDelete(key, value.ttl || 0);
+        this.removeCacheItem(key);
+      } else if (cacheItem.ttl) {
+        this.scheduleDelete(key, cacheItem.ttl);
       }
     }
   }

@@ -1,4 +1,5 @@
 import { LocalStorageCache } from "src/client/caching/storage-cache";
+import { delay } from "test/utils";
 
 describe("LocalStorageCache test", () => {
   let cache: LocalStorageCache<string>;
@@ -78,12 +79,45 @@ describe("LocalStorageCache with ttl", () => {
   test("Should not refresh expired", async () => {
     cache.set("odd", 357, { ttl: 100 });
     await delay(1000);
-    
+
     cache.refresh("odd");
     expect(cache.get("odd")).toBeUndefined();
   });
 });
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+describe("Load LocalStorageCache", () => {
+  test("Should load from storage", () => {
+    const cache1 = new LocalStorageCache<number>("test3");
+    cache1.clear();
+    cache1.set("one", 1);
+    cache1.set("two", 2);
+    cache1.set("three", 3);
+
+    const cache2 = new LocalStorageCache<number>("test3");
+    expect(cache2.get("one")).toBe(1);
+    expect(cache2.get("two")).toBe(2);
+    expect(cache2.get("three")).toBe(3);
+    expect(cache2.length).toBe(3);
+  });
+
+  test("Should load with ttl from storage", async () => {
+    const cache1 = new LocalStorageCache<number>("test4");
+    cache1.clear();
+    cache1.set("one", 1, { ttl: 1000 });
+    cache1.set("two", 2, { ttl: 1000 });
+    cache1.set("three", 3, { ttl: 1000 });
+
+    const cache2 = new LocalStorageCache<number>("test4");
+    expect(cache2.get("one")).toBe(1);
+    expect(cache2.get("two")).toBe(2);
+    expect(cache2.get("three")).toBe(3);
+    expect(cache2.length).toBe(3);
+
+    await delay(1500);
+
+    expect(cache2.get("one")).toBeUndefined();
+    expect(cache2.get("two")).toBeUndefined();
+    expect(cache2.get("three")).toBeUndefined();
+    expect(cache2.length).toBe(0);
+  });
+});

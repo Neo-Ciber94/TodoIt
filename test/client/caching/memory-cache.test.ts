@@ -1,4 +1,5 @@
 import { MemoryStorageCache } from "src/client/caching/storage-cache";
+import { delay } from "test/utils";
 
 describe("MemoryStorageCache test", () => {
   let cache: MemoryStorageCache<string>;
@@ -83,7 +84,3 @@ describe("MemoryStorageCache with ttl", () => {
     expect(cache.get("odd")).toBeUndefined();
   });
 });
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
