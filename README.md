@@ -42,3 +42,4 @@ Then continue with the following steps:
 - [ ] Trash can (soft delete)
 - [ ] Sorting
 - [ ] Multi-language
+- [ ] Add custom homepage/login to change Auth0 home
