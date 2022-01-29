@@ -17,6 +17,7 @@ function CreateTodo() {
         description={manifest.description}
       />
       <CreateOrEditTodoPage
+        cache={true}
         title={"Create Todo"}
         submitText="Create"
         onSubmit={async (data) => {

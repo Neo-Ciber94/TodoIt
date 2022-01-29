@@ -9,7 +9,7 @@ export interface CacheItem<T> {
   expires?: string; // Date is stored as ISO format string
 }
 
-export abstract class StorageCache<T> implements ICache<T> {
+export class StorageCache<T> implements ICache<T> {
   private readonly timeouts = new Map<string, number>();
 
   constructor(

@@ -17,9 +17,11 @@ export interface CreateOrEditTodoPageProps {
   onSubmit: (todo: ITodoInput) => void | Promise<void>;
   title: string;
   submitText: string;
+  cache?: boolean;
 }
 
 export function CreateOrEditTodoPage({
+  cache,
   todo,
   onSubmit,
   title: pageTitleText,
@@ -82,6 +84,7 @@ export function CreateOrEditTodoPage({
           buttonText={submitButtonText}
           openColorPicker={openColorPicker}
           onCloseColorPicker={() => setOpenColorPicker(false)}
+          cache={cache}
           onSubmit={handleSubmit}
         />
 
