@@ -14,7 +14,7 @@ import { useSprings, animated } from "react-spring";
 import { animations } from "src/animations/springs";
 import { useState } from "react";
 import { useToast } from "src/hooks/useToast";
-import { useCacheState } from "src/hooks/useCacheState";
+import { useCachedValue, useCacheState } from "src/hooks/useCacheState";
 import { useEffect } from "react";
 import { LocalStorageCache } from "src/client/caching/storage-cache";
 
@@ -72,41 +72,34 @@ export function TodoForm({
     defaultValues: initialValue,
   });
 
-  useEffect(() => {
-    if (cache) {
-      const storageCache = new LocalStorageCache<ITodoInputCache>();
-      const cachedValue = storageCache.get("todo-form");
-
-      if (cachedValue) {
-        if (cachedValue.title) {
-          setValue("title", cachedValue.title);
+  useCachedValue<ITodoInputCache | undefined>(
+    initialValue,
+    { key: "todo-form", ttl: 1000 * 60 * 60 },
+    (cachedForm, update) => {
+      if (cachedForm) {
+        if (cachedForm.title) {
+          setValue("title", cachedForm.title);
         }
 
-        if (cachedValue.content) {
-          setValue("content", cachedValue.content);
+        if (cachedForm.content) {
+          setValue("content", cachedForm.content);
         }
 
-        if (cachedValue.color) {
-          setValue("color", cachedValue.color);
+        if (cachedForm.color) {
+          setValue("color", cachedForm.color);
         }
       }
 
+      // Watch the changes of the form
       watch((form) => {
-        storageCache.set(
-          "todo-form",
-          {
-            title: form.title,
-            content: form.content,
-            color: form.color,
-          },
-          {
-            ttl: 1000 * 60 * 60, // 1 hour
-          }
-        );
+        update({
+          title: form.title,
+          content: form.content,
+          color: form.color,
+        });
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const { error: showError } = useToast();

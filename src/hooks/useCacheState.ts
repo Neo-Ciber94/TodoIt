@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { DependencyList, useEffect, useRef, useState } from "react";
 import { StorageCache } from "src/client/caching/storage-cache";
 
 const CACHE_VALUE_KEY = "__cache_value__";
@@ -65,12 +65,43 @@ export function useCacheState<T>(initialState: InitialValue<T>, options: Caching
   return [state, setCacheState];
 }
 
+/**
+ * A callback to use a cached value.
+ */
+export type UseCachedValue<T> = (
+  value: T,
+  update: (newValue: T) => void
+) => void;
+
+/**
+ *
+ * @param defaultValue The default value used if there is no value in cache.
+ * @param options The options used for caching.
+ * @param action The action to use the value.
+ * @param deps The dependency array.
+ */
 export function useCachedValue<T>(
-  defaultValue: InitialValue<T>,
-  options: CachingOptions = {},
-  f: (value: T) => void
+  defaultValue: T,
+  options: CachingOptions & { key: string },
+  action: UseCachedValue<T>,
+  deps: DependencyList = []
 ) {
-  useEffect(() => {}, []);
+  const cacheRef = useRef(getStorage<T>(options.storage, options.namespace));
+  
+  useEffect(() => {
+    const key = options.key;
+    const cache = cacheRef.current;
+    const value = cache.get(key) || defaultValue;
+
+    if (value) {
+      action(value, (newValue) => {
+        cache.set(key, newValue, {
+          ttl: options.ttl,
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
 }
 
 function getStorage<T>(storage?: Storage, namespace?: string): StorageCache<T> {
