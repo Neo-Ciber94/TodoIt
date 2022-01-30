@@ -33,6 +33,10 @@ yarn-error.log*
 .env.local.production
 .env.local.development
 
+# public
+public/sw.js.map
+public/workbox-*.js.map
+
 # vercel
 .vercel
 
