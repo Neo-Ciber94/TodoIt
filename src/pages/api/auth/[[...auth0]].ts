@@ -1,4 +1,4 @@
-import { handleAuth, handleLogin } from "@auth0/nextjs-auth0";
+import { handleAuth, handleLogin, handleLogout } from "@auth0/nextjs-auth0";
 
 export default handleAuth({
   async login(req, res) {
@@ -12,4 +12,11 @@ export default handleAuth({
       res.status(error.status || 500).end(error.message);
     }
   },
+
+  // https://github.com/auth0/nextjs-auth0/issues/362#issuecomment-860711901
+  async logout(req, res) {
+    await handleLogout(req, res);
+  },
 });
+
+const COMPLETED = Promise.resolve<void>(undefined);

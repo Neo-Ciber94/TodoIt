@@ -38,14 +38,12 @@ export function ButtonAppBar() {
     }
   }, [error]);
 
-  // https://github.com/auth0/nextjs-auth0/issues/520#issuecomment-945756557
-  const goToLogin = () => window.location.assign("/api/auth/login");
-  const goToLogout = () => window.location.assign("/api/auth/logout");
-
   const Login = () => (
-    <Button color="inherit" className="ml-auto" onClick={goToLogin}>
-      Login
-    </Button>
+    <Link passHref href="/api/auth/login">
+      <Button color="inherit" className="ml-auto">
+        Login
+      </Button>
+    </Link>
   );
 
   const UserActions = React.memo(function UserActions() {
@@ -60,7 +58,7 @@ export function ButtonAppBar() {
     return (
       <>
         {!isLogin && <Login />}
-        {isLogin && <Me user={user!} handleLogout={goToLogout} />}
+        {isLogin && <Me user={user!} />}
       </>
     );
   });
@@ -101,10 +99,9 @@ export function ButtonAppBar() {
 
 export interface MeProps {
   user: UserProfile;
-  handleLogout: () => void;
 }
 
-function Me({ user, handleLogout }: MeProps) {
+function Me({ user }: MeProps) {
   const { email, picture, name } = user;
   const [anchorElUser, setAnchorElUser] = useState<HTMLElement | null>();
 
@@ -160,13 +157,11 @@ function Me({ user, handleLogout }: MeProps) {
 
         <MenuItem onClick={handleCloseUserMenu}>
           <LogoutRoundedIcon sx={{ color: "white", marginRight: 1 }} />
-          <Typography
-            textAlign="center"
-            sx={{ color: "white" }}
-            onClick={handleLogout}
-          >
-            Logout
-          </Typography>
+          <Link passHref href="/api/auth/logout">
+            <Typography textAlign="center" sx={{ color: "white" }}>
+              Logout
+            </Typography>
+          </Link>
         </MenuItem>
       </Menu>
     </Box>
