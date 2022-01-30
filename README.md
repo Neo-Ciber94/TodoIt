@@ -13,7 +13,19 @@ For run the app you need to setup an `Auth0` account and a `MongoDB` database.
 
 After that rename the `.env.local.sample` to `.env.local` and add your `Auth0` credentials and `MongoDB` credentials to the file.
 
-Then continue with the following steps:
+### Setup mongodb with Docker
+
+You can also setup a `mongodb` container with docker using the existing `docker-compose.yml` file.
+
+Just register the following hosts in your machine:
+
+```bash
+127.0.0.1 mongo1
+127.0.0.1 mongo2
+127.0.0.1 mongo3
+```
+
+In windows this is done in `System32/drivers/etc/hosts` file.
 
 ### 1. Install the dependencies
 
