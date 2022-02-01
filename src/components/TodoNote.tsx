@@ -62,10 +62,8 @@ export default function TodoNote({
     const delay = (index + 1) * 100;
 
     setTimeout(() => {
-      if (isMountedRef.current) {
-        setIsVisible(true);
-        hasAppeared.current = true;
-      }
+      setIsVisible(true);
+      hasAppeared.current = true;
     }, delay);
 
     return () => {
@@ -92,7 +90,7 @@ export default function TodoNote({
   const handleDestroy = () => {
     if (!isVisible && hasAppeared.current) {
       setTimeout(() => {
-        if (isMountedRef.current) {
+        if (!isDeleted) {
           setIsDeleted(true);
           onDelete(todo);
         }

@@ -55,3 +55,5 @@ In windows this is done in `System32/drivers/etc/hosts` file.
 - [ ] Sorting
 - [ ] Multi-language
 - [ ] Add custom homepage/login to change Auth0 home
+- [ ] Add last modification time
+- [ ] Add hook for create custom dialogs

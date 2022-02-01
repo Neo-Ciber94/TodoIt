@@ -95,7 +95,9 @@ function Page({ pageResult }: PageProps) {
   const onDeleteTodo = async (todo: ITodo) => {
     try {
       await todoClient.delete(todo.id);
-      setTodos(todos.filter((t) => t.id !== todo.id));
+      const newTodos = todos.filter((t) => t.id !== todo.id);
+      setTodos(newTodos);
+      rerender();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);

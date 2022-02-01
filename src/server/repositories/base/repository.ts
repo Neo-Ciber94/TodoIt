@@ -53,7 +53,7 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
   // prettier-ignore
   async updateOne(query: FilterQuery<T>, entity: EntityInput<T>, session?: ClientSession): Promise<T | null> {
     this.setId(query, query.id);
-    const entityToUpdate = await this.model.findOne(query, { session });
+    const entityToUpdate = await this.model.findOne(query, null, { session });
 
     if (!entityToUpdate) {
       return null;
@@ -76,7 +76,7 @@ export class Repository<T extends IEntity, TModel extends Model<T>>
     session?: ClientSession
   ): Promise<T | null> {
     this.setId(query, query.id);
-    const entityToDelete = await this.model.findOne(query, { session });
+    const entityToDelete = await this.model.findOne(query, null, { session });
 
     if (!entityToDelete) {
       return null;
