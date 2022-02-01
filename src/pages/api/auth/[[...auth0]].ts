@@ -1,4 +1,11 @@
-import { handleAuth, handleLogin, handleLogout } from "@auth0/nextjs-auth0";
+import {
+  handleAuth,
+  handleLogin,
+  handleLogout,
+  handleCallback,
+  AfterCallback,
+} from "@auth0/nextjs-auth0";
+import { UserRepository } from "@server/repositories/user.repository";
 
 export default handleAuth({
   async login(req, res) {
@@ -17,6 +24,27 @@ export default handleAuth({
   async logout(req, res) {
     await handleLogout(req, res);
   },
+
+  async callback(req, res) {
+    try {
+      await handleCallback(req, res, {
+        afterCallback,
+      });
+    } catch (error: any) {
+      res.status(error.status || 500).end(error.message);
+    }
+  },
 });
 
-const COMPLETED = Promise.resolve<void>(undefined);
+const userRepository = new UserRepository();
+
+const afterCallback: AfterCallback = async (_req, _res, session) => {
+  const { user } = session;
+
+  if (user.sub) {
+    const userId = user.sub;
+    await userRepository.getOrCreate(userId);
+  }
+
+  return session;
+};

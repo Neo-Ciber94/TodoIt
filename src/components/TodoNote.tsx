@@ -98,15 +98,12 @@ export default function TodoNote({
     }
   };
 
-  if (isDeleted) {
-    return null;
-  }
-
   return (
     <Transition
       in={isVisible}
       timeout={duration}
       nodeRef={ref}
+      unmountOnExit={false}
       addEndListener={handleDestroy}
     >
       {(state) => (

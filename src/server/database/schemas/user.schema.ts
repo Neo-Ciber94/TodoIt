@@ -1,20 +1,19 @@
 import mongoose, { Schema } from "mongoose";
-import { TagDocument, TagModel } from "./tag.types";
+import { UserDocument, UserModel } from "./user.types";
 
-const tagSchema = new Schema<TagDocument, TagModel>(
+export const userSchema = new Schema<UserDocument, UserModel>(
   {
-    name: {
+    userId: {
       type: String,
       required: true,
+      trim: true,
       unique: true,
-      trim: true,
-      minlength: 1,
-      maxLength: 25,
+      index: true,
     },
-    creatorUserId: {
-      type: String,
+    isInitialized: {
+      type: Boolean,
       required: true,
-      trim: true,
+      default: false,
     },
     createdAt: {
       type: Date,
@@ -35,7 +34,7 @@ const tagSchema = new Schema<TagDocument, TagModel>(
 );
 
 // Extensions
-tagSchema.set("toJSON", {
+userSchema.set("toJSON", {
   transform: (_doc, ret) => {
     ret.id = ret._id;
     delete ret._id;
@@ -43,8 +42,9 @@ tagSchema.set("toJSON", {
   },
 });
 
-const Tag: TagModel =
-  mongoose.models.Tag ||
-  mongoose.model<TagDocument, TagModel>("Tag", tagSchema);
+const MODEL_NAME = "User";
+const User: UserModel =
+  mongoose.models[MODEL_NAME] ||
+  mongoose.model<UserDocument, UserModel>(MODEL_NAME, userSchema);
 
-export default Tag;
+export default User;

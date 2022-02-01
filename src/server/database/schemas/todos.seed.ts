@@ -3,12 +3,25 @@ import fs from "fs";
 import path from "path";
 import Todo from "./todo.schema";
 import { TodoDocument } from "./todo.types";
+import User from "./user.schema";
+
+// Number of todos to create by default, for test purposes.
+const SAMPLE_TODOS_COUNT = 23;
 
 export default async function seedTodos(
   userId: string,
-  count: number = 100
+  count: number = SAMPLE_TODOS_COUNT
 ): Promise<boolean> {
-  // TODO: Remove harcoded `creatorUserId` prop
+  const user = await User.findOne({ userId });
+
+  if (user == null) {
+    return false;
+  }
+
+  if (user.isInitialized) {
+    return true;
+  }
+
   const todosCount = await Todo.count({ creatorUserId: userId });
 
   if (todosCount === 0) {
@@ -23,6 +36,8 @@ export default async function seedTodos(
     }
 
     await Todo.insertMany(todos);
+    user.isInitialized = true;
+    await user.save();
     return true;
   }
 

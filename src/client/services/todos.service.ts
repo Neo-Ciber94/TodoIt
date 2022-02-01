@@ -1,4 +1,4 @@
-import { PageResult } from "@server/repositories/base/repository2";
+import { PageResult } from "@server/repositories/base/repository.base";
 import { RequestConfig } from "src/client/http-client";
 import { ITodo } from "src/shared/models/todo.model";
 import { ApiService, PagingOptions } from "./api-service";

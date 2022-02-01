@@ -1,4 +1,3 @@
-import { PartialProperty } from "@shared/types";
 import { ITag, ITagInput } from "./tag.model";
 
 export interface ITodo {

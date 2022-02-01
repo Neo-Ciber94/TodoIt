@@ -1,4 +1,4 @@
-import { PageResult } from "@server/repositories/base/repository2";
+import { PageResult } from "@server/repositories/base/repository.base";
 import { DeepPartial } from "@shared/types";
 import { API_URL } from "src/client/constants";
 import {
