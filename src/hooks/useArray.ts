@@ -134,12 +134,12 @@ export interface UseArray<T> {
   /**
    * Returns a readonly view of the array.
    */
-  view: ReadonlyArray<T>;
+  readonly view: ReadonlyArray<T>;
 
   /**
    * Gets the number of items in the array.
    */
-  length: number;
+  readonly length: number;
 }
 
 /**
