@@ -7,6 +7,8 @@ import {
 } from "@auth0/nextjs-auth0";
 import { UserRepository } from "@server/repositories/user.repository";
 
+const userRepository = new UserRepository();
+
 export default handleAuth({
   async login(req, res) {
     try {
@@ -35,8 +37,6 @@ export default handleAuth({
     }
   },
 });
-
-const userRepository = new UserRepository();
 
 const afterCallback: AfterCallback = async (_req, _res, session) => {
   const { user } = session;

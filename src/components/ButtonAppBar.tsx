@@ -155,14 +155,14 @@ function Me({ user }: MeProps) {
           </MenuItem>
         )}
 
-        <MenuItem onClick={handleCloseUserMenu}>
-          <LogoutRoundedIcon sx={{ color: "white", marginRight: 1 }} />
-          <Link passHref href="/api/auth/logout">
+        <Link passHref href="/api/auth/logout">
+          <MenuItem onClick={handleCloseUserMenu}>
+            <LogoutRoundedIcon sx={{ color: "white", marginRight: 1 }} />
             <Typography textAlign="center" sx={{ color: "white" }}>
               Logout
             </Typography>
-          </Link>
-        </MenuItem>
+          </MenuItem>
+        </Link>
       </Menu>
     </Box>
   );
