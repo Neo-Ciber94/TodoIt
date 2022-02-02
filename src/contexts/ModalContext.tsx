@@ -7,15 +7,10 @@ import { nanoid } from "nanoid";
 import { SlideTransition } from "src/components/transitions";
 import { Button, PaperProps } from "@mui/material";
 import { useArray } from "src/hooks/useArray";
-
-const noop = () => {};
-
-type RequiredExcept<T, K extends keyof T> = {
-  [P in keyof T]: T[P] extends K ? T[P] | undefined : T[P];
-};
+import { noop } from "@shared/utils";
 
 // prettier-ignore
-interface ActiveModal extends RequiredExcept<ModalProps, "content" | "Icon" | "Transition"> {
+interface ActiveModal extends ModalProps{
   open: boolean;
   readonly id: string;
 }
@@ -57,11 +52,11 @@ export const ModalProvider: React.FC<{}> = ({ children }) => {
     ...rest
   }: ModalProps) => {
     const newModal: ActiveModal = {
+      id: nanoid(),
+      open: true,
       closeOnConfirm,
       closeOnCancel,
       ...rest,
-      id: nanoid(),
-      open: true,
     };
 
     modals.push(newModal);
@@ -125,7 +120,7 @@ const ModalDialog = forwardRef<HTMLDivElement, ActiveModal>(
       Transition,
       PaperProps,
       onCancel,
-      onClose = noop,
+      onClose,
       onConfirm,
       confirmText,
       cancelText,
@@ -135,7 +130,7 @@ const ModalDialog = forwardRef<HTMLDivElement, ActiveModal>(
       <CustomDialog
         ref={ref}
         key={id}
-        handleClose={onClose}
+        handleClose={onClose || noop}
         open={open}
         title={title}
         Icon={Icon}

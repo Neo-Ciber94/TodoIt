@@ -16,6 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { TransitionStatus } from "react-transition-group";
 import { Transition } from "react-transition-group";
+import { useModal } from "src/contexts/ModalContext";
 
 export interface TodoNoteProps {
   todo: ITodo;
@@ -57,6 +58,8 @@ export default function TodoNote({
   const isMountedRef = React.useRef(true);
   const open = !!anchorEl;
 
+  const { open: openModal } = useModal();
+
   useEffect(() => {
     const index = delayIndex || 0;
     const delay = (index + 1) * 100;
@@ -73,7 +76,15 @@ export default function TodoNote({
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setAnchorEl(e.currentTarget);
+    openModal({
+      title: "Delete Todo",
+      onConfirm: () => {
+        openModal({
+          title: "Are you really sure?",
+        });
+      },
+    });
+    // setAnchorEl(e.currentTarget);
   };
 
   const handleClose = (e: React.MouseEvent) => {

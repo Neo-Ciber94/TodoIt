@@ -5,6 +5,7 @@ import {
   IconButton,
   Typography,
   Dialog,
+  PaperProps,
 } from "@mui/material";
 import { forwardRef } from "react";
 
@@ -17,6 +18,7 @@ export interface DarkModalProps {
   title: string;
   Icon?: React.ComponentType<any>;
   Transition?: React.ComponentType<ModalTransitionProps>;
+  PaperProps?: Partial<PaperProps>;
   handleClose: () => void;
 }
 
@@ -24,7 +26,8 @@ export const CustomDialog = forwardRef<
   HTMLDivElement,
   React.PropsWithChildren<DarkModalProps>
 >(function CustomDialog(props, ref) {
-  const { open, title, handleClose, Icon, Transition, children } = props;
+  const { open, title, handleClose, Icon, Transition, PaperProps, children } =
+    props;
 
   return (
     <div>
@@ -40,6 +43,7 @@ export const CustomDialog = forwardRef<
             overflow: "hidden",
             borderRadius: 3,
             backgroundColor: "rgb(31, 31, 31)",
+            ...PaperProps,
           },
         }}
       >

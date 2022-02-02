@@ -8,6 +8,7 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import type { ThemeOptions } from "@mui/system";
 import { SWRConfig } from "swr";
 import { ToastContainer } from "react-toastify";
+import { ModalProvider } from "src/contexts/ModalContext";
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -40,17 +41,15 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <UserProvider>
-        <SWRConfig
-          value={{
-            provider: () => new Map(),
-          }}
-        >
-          <ThemeProvider theme={theme}>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </ThemeProvider>
-        </SWRConfig>
+        <ModalProvider>
+          <SWRConfig value={{ provider: () => new Map() }}>
+            <ThemeProvider theme={theme}>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </ThemeProvider>
+          </SWRConfig>
+        </ModalProvider>
       </UserProvider>
       <ToastContainer theme="colored" />
     </>
