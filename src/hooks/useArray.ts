@@ -134,12 +134,12 @@ export interface UseArray<T> {
   /**
    * Returns a readonly view of the array.
    */
-  view: () => ReadonlyArray<T>;
+  view: ReadonlyArray<T>;
 
   /**
    * Gets the number of items in the array.
    */
-  length: () => number;
+  length: number;
 }
 
 /**
@@ -290,10 +290,6 @@ export function useArray<T>(init?: InitializeArray<T>): UseArray<T> {
     arrayState.forEach(fn);
   };
 
-  const view = () => arrayState;
-
-  const length = () => arrayState.length;
-
   return {
     push,
     pop,
@@ -311,8 +307,8 @@ export function useArray<T>(init?: InitializeArray<T>): UseArray<T> {
     sortByDescending,
     forEach,
     clear,
-    view,
-    length,
+    view: arrayState,
+    length: arrayState.length,
   };
 }
 
