@@ -6,6 +6,7 @@ import {
   AfterCallback,
 } from "@auth0/nextjs-auth0";
 import { UserRepository } from "@server/repositories/user.repository";
+import { connectMongoDb } from "@server/database/connectMongoDb";
 
 const userRepository = new UserRepository();
 
@@ -43,6 +44,7 @@ const afterCallback: AfterCallback = async (_req, _res, session) => {
 
   if (user.sub) {
     const userId = user.sub;
+    await connectMongoDb();
     await userRepository.getOrCreate(userId);
   }
 
