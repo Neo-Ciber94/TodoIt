@@ -76,15 +76,7 @@ export default function TodoNote({
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    openModal({
-      title: "Delete Todo",
-      onConfirm: () => {
-        openModal({
-          title: "Are you really sure?",
-        });
-      },
-    });
-    // setAnchorEl(e.currentTarget);
+    setAnchorEl(e.currentTarget);
   };
 
   const handleClose = (e: React.MouseEvent) => {
