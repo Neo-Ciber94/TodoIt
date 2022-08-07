@@ -117,7 +117,13 @@ function Me({ user }: MeProps) {
     <Box sx={{ flexGrow: 0 }}>
       <Tooltip title="Open settings">
         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-          <Avatar alt={name || "User"} src={picture || ""} />
+          <Avatar
+            alt={name || "User"}
+            src={picture || ""}
+            imgProps={{
+              referrerPolicy: "no-referrer",
+            }}
+          />
         </IconButton>
       </Tooltip>
       <Menu
