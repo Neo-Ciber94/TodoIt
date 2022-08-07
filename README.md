@@ -48,6 +48,7 @@ In windows this is done in `System32/drivers/etc/hosts` file.
 
 ## Todo
 
+- [ ] CI/CD pipeline
 - [x] CORS
 - [ ] Rate limiter
 - [x] Logging
