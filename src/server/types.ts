@@ -11,4 +11,4 @@ export type NextApiRequestWithUser = NextApiRequestWithParams & {
 };
 
 // prettier-ignore
-export type AppApiContext<T = any> = NextApiContext<T, NextApiRequestWithUser>;
+export type ApiContext<T = any> = NextApiContext<T, NextApiRequestWithUser>;

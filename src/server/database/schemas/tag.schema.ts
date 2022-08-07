@@ -1,7 +1,13 @@
-import mongoose, { Schema } from "mongoose";
-import { TagDocument, TagModel } from "./tag.types";
+import { ITag } from "@shared/models/tag.model";
+import mongoose, { Schema, Model } from "mongoose";
 
-const tagSchema = new Schema<TagDocument, TagModel>(
+export interface TagMethods {
+  id: string;
+}
+
+export type TagModel = Model<ITag, {}, TagMethods>;
+
+const tagSchema = new Schema<ITag, TagModel, TagMethods>(
   {
     name: {
       type: String,
@@ -44,7 +50,6 @@ tagSchema.set("toJSON", {
 });
 
 const Tag: TagModel =
-  mongoose.models.Tag ||
-  mongoose.model<TagDocument, TagModel>("Tag", tagSchema);
-
+  <TagModel>mongoose.models.Tag ||
+  mongoose.model<ITag, TagModel>("Tag", tagSchema);
 export default Tag;

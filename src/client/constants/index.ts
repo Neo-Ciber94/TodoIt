@@ -12,3 +12,10 @@ function getApiUrl() {
 
   return process.env.NEXT_PUBLIC_API_URL;
 }
+
+/**
+ * Whether if the app is running in development mode.
+ */
+export function isDevelopment() {
+  return process.env.NODE_ENV === "development";
+}

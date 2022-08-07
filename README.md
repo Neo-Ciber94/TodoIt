@@ -50,7 +50,7 @@ In windows this is done in `System32/drivers/etc/hosts` file.
 
 - [x] CORS
 - [ ] Rate limiter
-- [ ] Logging
+- [x] Logging
 - [ ] Trash can (soft delete)
 - [ ] Sorting
 - [ ] Multi-language

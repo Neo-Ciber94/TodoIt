@@ -15,7 +15,8 @@ export class UserRepository {
     return user;
   }
 
-  exists(userId: string): Promise<boolean> {
-    return this.model.exists({ userId });
+  async exists(userId: string): Promise<boolean> {
+    const result = await this.model.exists({ userId });
+    return result != null;
   }
 }

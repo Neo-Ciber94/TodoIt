@@ -1,4 +1,5 @@
 import { connectMongoDb } from "@server/database/connectMongoDb";
+import logger from "@server/logging";
 import morgan from "morgan";
 import { Get, UseMiddleware, withController } from "next-controllers";
 
@@ -23,7 +24,8 @@ class HealthCheckController {
     try {
       const connection = await connectMongoDb();
       return connection != null;
-    } catch {
+    } catch (err) {
+      logger.error(err);
       return false;
     }
   }

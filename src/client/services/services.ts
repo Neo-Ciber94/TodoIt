@@ -7,4 +7,4 @@ import { TodoApiService } from "./todos.service";
 export const services = {
   todos: new TodoApiService(),
   tags: new TagApiService(),
-};
+} as const;

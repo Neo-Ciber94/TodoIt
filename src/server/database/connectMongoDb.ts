@@ -1,3 +1,4 @@
+import logger from "@server/logging";
 import * as Mongoose from "mongoose";
 
 let connection: Mongoose.Connection;
@@ -20,7 +21,7 @@ export async function connectMongoDb(): Promise<Mongoose.Connection> {
     throw new Error("'MONGO_DB_URI' is not defined");
   }
 
-  console.log("Connecting to MongoDB...");
+  logger.info("Connecting to MongoDB...");
 
   try {
     await Mongoose.connect(uri);
@@ -28,9 +29,9 @@ export async function connectMongoDb(): Promise<Mongoose.Connection> {
     // Cache the connection
     connection = Mongoose.connection;
 
-    console.log("Connected to MongoDB");
+    logger.info("Connected to MongoDB");
   } catch (error) {
-    console.error("Error connecting to MongoDB", error);
+    logger.error("Error connecting to MongoDB", error);
   }
 
   return connection;

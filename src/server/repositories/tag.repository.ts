@@ -1,8 +1,9 @@
-import Tag from "@server/database/schemas/tag.schema";
-import { TagModel } from "@server/database/schemas/tag.types";
+import Tag, { TagModel } from "@server/database/schemas/tag.schema";
+import logger from "@server/logging";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
 import { ClientSession } from "mongoose";
 import { Repository } from "./base/repository";
+import { runTransaction } from "./utils";
 
 export type ITagBulkOperationResult = {
   created: ITag[];
@@ -47,7 +48,67 @@ export class TagRepository extends Repository<ITag, TagModel> {
     const { insert, delete: ids } = operation;
 
     session ||= await this.model.startSession();
-    session.startTransaction();
+
+    const result = await runTransaction<ITagBulkOperationResult, TagModel>(
+      this.model,
+      session,
+      async (session, model) => {
+        const toCreate: Partial<ITag>[] = insert.filter((t) => t.id == null);
+        const toUpdate: Partial<ITag>[] = insert.filter((t) => t.id != null);
+
+        toCreate.forEach((tag) => {
+          tag.creatorUserId = userId;
+        });
+
+        // Create tags
+        const created = await model.create(toCreate, { session });
+
+        // Update tags
+        const updated: ITag[] = [];
+
+        for (const tag of toUpdate) {
+          const updateResult = await model.findByIdAndUpdate(
+            tag.id,
+            { ...tag },
+            { session }
+          );
+
+          if (updateResult) {
+            updated.push(updateResult);
+          }
+        }
+
+        // Delete tags
+        const deleted: number =
+          ids.length === 0
+            ? 0
+            : await this.model
+                .deleteMany({ _id: { $in: ids }, creatorUserId: userId })
+                .then((t) => t.deletedCount);
+
+        return { created, updated, deleted };
+      }
+    );
+
+    if (result == null) {
+      return {
+        created: [],
+        updated: [],
+        deleted: 0,
+      };
+    }
+
+    return result;
+  }
+
+  public async _bulkOperation(
+    operation: ITagBulkOperation,
+    userId: string,
+    session?: ClientSession | null
+  ): Promise<ITagBulkOperationResult> {
+    const { insert, delete: ids } = operation;
+
+    session ||= await this.model.startSession();
 
     try {
       const toCreate: Partial<ITag>[] = insert.filter((t) => t.id == null);
@@ -86,9 +147,9 @@ export class TagRepository extends Repository<ITag, TagModel> {
       await session.commitTransaction();
 
       return { created, updated, deleted };
-    } catch {
+    } catch (err) {
+      logger.error(err);
       await session.abortTransaction();
-
       return {
         created: [],
         updated: [],

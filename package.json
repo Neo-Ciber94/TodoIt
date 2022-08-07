@@ -11,7 +11,7 @@
     "next:debug": "cross-env NODE_OPTIONS='--inspect' next dev",
     "next:lint": "next lint",
     "test": "jest",
-    "typecheck": "tsc --noEmit --incremental"
+    "typecheck": "npx tsc --noEmit --incremental"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^1.6.1",
@@ -22,9 +22,10 @@
     "@tailwindcss/line-clamp": "^0.3.1",
     "@types/imagesloaded": "^4.1.2",
     "axios": "^0.24.0",
+    "chalk": "^5.0.1",
     "cors": "^2.8.5",
     "imagesloaded": "^4.1.4",
-    "mongoose": "^6.0.13",
+    "mongoose": "^6.5.1",
     "mongoose-autopopulate": "^0.16.0",
     "morgan": "^1.10.0",
     "nanoid": "^3.2.0",
@@ -39,6 +40,7 @@
     "react-transition-group": "^4.4.2",
     "styled-components": "^5.3.3",
     "swr": "^1.1.2",
+    "winston": "^3.8.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@ import {
   ITagBulkOperationResult,
   TagRepository,
 } from "@server/repositories/tag.repository";
-import { AppApiContext } from "@server/types";
+import type{ ApiContext } from "@server/types";
 import { tagBulkOperationValidator } from "@server/validators/tag.validator";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
 import { Post, UseMiddleware, withController } from "next-controllers";
@@ -20,7 +20,7 @@ class TagApiController extends ApiController<ITag> {
   @Post("/bulk")
   async bulkOperation({
     request,
-  }: AppApiContext): Promise<ITagBulkOperationResult> {
+  }: ApiContext): Promise<ITagBulkOperationResult> {
     const repo = this.repository as TagRepository;
 
     const input = request.body as ITagBulkOperation;

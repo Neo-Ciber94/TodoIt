@@ -1,5 +1,5 @@
 import { ITag, ITagInput } from "@shared/models/tag.model";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CustomDialog } from "./CustomDialog";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,6 +22,8 @@ import { services } from "src/client/services";
 import { ITagBulkOperationResult } from "@server/repositories/tag.repository";
 import { useToast } from "src/hooks/useToast";
 import React from "react";
+import { useSet } from "src/hooks/useSet";
+import { useArray } from "src/hooks/useArray";
 
 type ITagModel = Pick<ITag, "name"> & {
   id: string;
@@ -38,30 +40,30 @@ export interface TagEditorDialogProps {
 export const TagEditorDialog = (props: TagEditorDialogProps) => {
   const { title = "Tags", open, initialTags, handleClose, onDone } = props;
   const { error: showError } = useToast();
-  const createdTags = useRef<ITagModel[]>([]);
-  const deletedTags = useRef<Set<string>>(new Set());
-  const updatedTags = useRef<Set<ITagModel>>(new Set());
+  const createdTags = useArray<ITagModel>([]);
+  const deletedTags = useSet<string>(new Set());
+  const updatedTags = useSet<ITagModel>(new Set());
 
   const reset = () => {
-    createdTags.current = [];
-    deletedTags.current = new Set();
-    updatedTags.current = new Set();
+    createdTags.clear();
+    deletedTags.reset();
+    updatedTags.reset();
   };
 
   const handleCreate = (tag: ITagModel) => {
-    createdTags.current.push(tag);
+    createdTags.push(tag);
   };
 
   const handleUpdate = (tag: ITagModel) => {
-    updatedTags.current.add(tag);
+    updatedTags.add(tag);
   };
 
   const handleDelete = (tag: ITagModel) => {
-    deletedTags.current.add(tag.id);
+    deletedTags.add(tag.id);
   };
 
   const handleSave = async () => {
-    const toCreate: ITagInput[] = createdTags.current.map((tag) => ({
+    const toCreate: ITagInput[] = createdTags.view.map((tag) => ({
       ...tag,
     }));
 
@@ -69,8 +71,8 @@ export const TagEditorDialog = (props: TagEditorDialogProps) => {
       tag.id = undefined;
     });
 
-    const toUpdate = Array.from(updatedTags.current);
-    const toDelete = Array.from(deletedTags.current);
+    const toUpdate = Array.from(updatedTags.items);
+    const toDelete = Array.from(deletedTags.items);
 
     try {
       const result = await services.tags.bulkOperation({
