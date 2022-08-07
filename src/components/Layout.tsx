@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import { PageColorProvider } from "src/contexts/PageColorContext";
-import { ButtonAppBar } from "./ButtonAppBar";
+import { HeaderAppBar } from "./HeaderAppBar";
 
 export const Layout: React.FC = ({ children }) => {
   return (
     <PageColorProvider>
       <Box>
-        <ButtonAppBar />
+        <HeaderAppBar />
         {children}
       </Box>
     </PageColorProvider>

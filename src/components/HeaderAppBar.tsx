@@ -24,7 +24,7 @@ import Link from "next/link";
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
-export function ButtonAppBar() {
+export function HeaderAppBar() {
   const { user, error, isLoading } = useUser();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isLogin = user && !isLoading;
