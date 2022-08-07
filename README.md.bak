@@ -48,7 +48,6 @@ In windows this is done in `System32/drivers/etc/hosts` file.
 
 ## Todo
 
-- [ ] Use production keys in Auth0
 - [ ] CI/CD pipeline
 - [x] CORS
 - [ ] Rate limiter
