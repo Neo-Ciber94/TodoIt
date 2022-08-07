@@ -1,0 +1,19 @@
+body {
+  min-height: 100%;
+}
+
+html {
+  height: 100%;
+  background-color: #fed7aa; /* Checkout 'PageColorContent.tsx' default page color */
+}
+
+div#__next {
+  height: 100vh !important;
+}
+
+.masonry-grid {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-auto-rows: 1px;
+}
