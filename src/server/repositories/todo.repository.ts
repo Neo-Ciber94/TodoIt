@@ -1,14 +1,14 @@
-import Todo from "@server/database/schemas/todo.schema";
-import { TodoDocument, TodoModel } from "@server/database/schemas/todo.types";
+import Todo, { TodoModel } from "@server/database/schemas/todo.schema";
 import { ThrowHelper } from "@server/errors";
 import { EntityInput } from "@server/types";
 import { ITag } from "@shared/models/tag.model";
+import { ITodo } from "@shared/models/todo.model";
 import { ClientSession, FilterQuery } from "mongoose";
 import { Repository } from "./base/repository";
 import { TagRepository } from "./tag.repository";
-import { runTransation } from "./utils";
+import { runTransaction } from "./utils";
 
-export class TodoRepository extends Repository<TodoDocument, TodoModel> {
+export class TodoRepository extends Repository<ITodo, TodoModel> {
   private readonly tagRepository = new TagRepository();
 
   constructor() {
@@ -16,10 +16,10 @@ export class TodoRepository extends Repository<TodoDocument, TodoModel> {
   }
 
   async create(
-    entity: EntityInput<TodoDocument>,
+    entity: EntityInput<ITodo>,
     session?: ClientSession,
     userId?: string
-  ): Promise<TodoDocument> {
+  ): Promise<ITodo> {
     if (userId == null) {
       ThrowHelper.expectedUserId();
     }
@@ -37,42 +37,40 @@ export class TodoRepository extends Repository<TodoDocument, TodoModel> {
   }
 
   updateOne(
-    query: FilterQuery<TodoDocument>,
-    entity: EntityInput<TodoDocument>,
+    query: FilterQuery<ITodo>,
+    entity: EntityInput<ITodo>,
     session?: ClientSession,
     userId?: string
-  ): Promise<TodoDocument | null> {
+  ): Promise<ITodo | null> {
     if (userId == null) {
       ThrowHelper.expectedUserId();
     }
 
-    return runTransation(
-      this.model,
-      async (session) => {
-        const tagsToCreate: EntityInput<ITag>[] = entity.tags || [];
-        const tags: ITag[] = await this.tagRepository.findOrCreate(
-          tagsToCreate,
-          userId,
-          session
-        );
+    return runTransaction(this.model, session, async (session) => {
+      const tagsToCreate: EntityInput<ITag>[] = entity.tags || [];
+      const tags: ITag[] = await this.tagRepository.findOrCreate(
+        tagsToCreate,
+        userId,
+        session
+      );
 
-        entity.tags = tags;
+      entity.tags = tags;
 
-        return this.model.findByIdAndUpdate(query, entity, {
-          session,
-        });
-      },
-      session
-    );
+      return this.model.findByIdAndUpdate(query, entity, {
+        session,
+      });
+    });
   }
 
-  async toggle(id: string, creatorUser: string): Promise<TodoDocument | null> {
-    const todo = await this.findOne({ id, creatorUser });
+  async toggle(id: string, creatorUser: string): Promise<ITodo | null> {
+    const todo = await this.model.findOne({ id, creatorUser });
 
     if (todo == null) {
       return null;
     }
 
-    return await todo.toggleComplete();
+    todo.toggleComplete();
+    await todo.save();
+    return todo;
   }
 }

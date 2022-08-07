@@ -1,9 +1,16 @@
-import mongoose, { Schema, SchemaTypes } from "mongoose";
+import mongoose, { Model, Schema, SchemaTypes } from "mongoose";
 import autoPopulate from "mongoose-autopopulate";
-import { TodoDocument, TodoModel } from "./todo.types";
 import { PASTEL_COLORS } from "@shared/config";
+import { ITodo } from "@shared/models/todo.model";
 
-const todoSchema = new Schema<TodoDocument, TodoModel>(
+export interface TodoMethods {
+  id: string;
+  toggleComplete(): void;
+}
+
+export type TodoModel = Model<ITodo, {}, TodoMethods>;
+
+const todoSchema = new Schema<ITodo, TodoModel, TodoMethods>(
   {
     title: {
       type: String,
@@ -72,13 +79,10 @@ todoSchema.set("toJSON", {
   },
 });
 
-todoSchema.methods.toggleComplete = function (
-  this: TodoDocument
-): Promise<TodoDocument> {
+todoSchema.methods.toggleComplete = function () {
   this.completed = !this.completed;
-  return this.save();
 };
 
 // prettier-ignore
-const Todo = mongoose.models.Todo as TodoModel || mongoose.model<TodoDocument, TodoModel>("Todo", todoSchema);
+const Todo = <TodoModel>mongoose.models.Todo || mongoose.model<ITodo, TodoModel>("Todo", todoSchema);
 export default Todo;

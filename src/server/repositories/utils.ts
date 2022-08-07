@@ -150,7 +150,7 @@ export function buildPaginationOptions<T>(
   };
 }
 
-export type TransationOperation<T, TModel extends Model<T>, TResult> = (
+export type TransactionOperation<TModel extends Model<unknown>, TResult> = (
   session: ClientSession,
   model: TModel
 ) => Promise<TResult> | TResult;
@@ -158,26 +158,28 @@ export type TransationOperation<T, TModel extends Model<T>, TResult> = (
 /**
  * Executes a mongodb transaction.
  * @param model The model to use.
- * @param f The function to execute.
- * @returns The result of the transation.
+ * @param fn The function to execute.
+ * @returns The result of the transaction.
  */
-export async function runTransation<T, TModel extends Model<T>, TResult>(
+export async function runTransaction<
+  TResult,
+  TModel extends Model<any> = Model<any>
+>(
   model: TModel,
-  f: TransationOperation<T, TModel, TResult>,
-  session?: ClientSession
-): Promise<TResult> {
+  session: ClientSession | null | undefined,
+  fn: TransactionOperation<TModel, TResult>
+): Promise<TResult | null> {
   session ||= await model.startSession();
-  session.startTransaction();
+
+  let result: TResult | null = null;
 
   try {
-    const result = await f(session, model);
-    await session.commitTransaction();
-    return result;
-  } catch (e) {
-    logger.error(e);
-    await session.abortTransaction();
-    throw e;
-  } finally {
-    await session.endSession();
+    await session.withTransaction(async (session) => {
+      result = await fn(session, model);
+    });
+  } catch (err) {
+    logger.error(err);
   }
+
+  return result;
 }
