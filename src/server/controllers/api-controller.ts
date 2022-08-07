@@ -1,6 +1,9 @@
-import { IRepository, PageResult } from "@server/repositories/base/repository.base";
+import {
+  IRepository,
+  PageResult,
+} from "@server/repositories/base/repository.base";
 import { buildPaginationOptions } from "@server/repositories/utils";
-import { AppApiContext, EntityInput, IEntity } from "@server/types";
+import type { AppApiContext, EntityInput, IEntity } from "@server/types";
 import { FilterQuery } from "mongoose";
 import { Get, Post, Put, Delete } from "next-controllers";
 import { ControllerBase } from "./controller.base";

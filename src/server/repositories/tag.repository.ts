@@ -1,5 +1,6 @@
 import Tag from "@server/database/schemas/tag.schema";
 import { TagModel } from "@server/database/schemas/tag.types";
+import logger from "@server/logging";
 import { ITag, ITagBulkOperation } from "@shared/models/tag.model";
 import { ClientSession } from "mongoose";
 import { Repository } from "./base/repository";
@@ -86,7 +87,8 @@ export class TagRepository extends Repository<ITag, TagModel> {
       await session.commitTransaction();
 
       return { created, updated, deleted };
-    } catch {
+    } catch (err) {
+      logger.error(err);
       await session.abortTransaction();
 
       return {

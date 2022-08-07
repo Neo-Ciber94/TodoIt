@@ -1,4 +1,5 @@
 import { QueryParamsMapper } from "@server/controllers/types";
+import logger from "@server/logging";
 import { parseRecord } from "@shared/utils";
 import { ArrayUtils } from "@shared/utils/ArrayUtils";
 import { ClientSession, FilterQuery, Model } from "mongoose";
@@ -173,6 +174,7 @@ export async function runTransation<T, TModel extends Model<T>, TResult>(
     await session.commitTransaction();
     return result;
   } catch (e) {
+    logger.error(e);
     await session.abortTransaction();
     throw e;
   } finally {

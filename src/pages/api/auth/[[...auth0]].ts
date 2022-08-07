@@ -7,6 +7,7 @@ import {
 } from "@auth0/nextjs-auth0";
 import { UserRepository } from "@server/repositories/user.repository";
 import { connectMongoDb } from "@server/database/connectMongoDb";
+import logger from "@server/logging";
 
 const userRepository = new UserRepository();
 
@@ -19,6 +20,7 @@ export default handleAuth({
         },
       });
     } catch (error: any) {
+      logger.error(error);
       res.status(error.status || 500).end(error.message);
     }
   },
@@ -34,6 +36,7 @@ export default handleAuth({
         afterCallback,
       });
     } catch (error: any) {
+      logger.error(error);
       res.status(error.status || 500).end(error.message);
     }
   },

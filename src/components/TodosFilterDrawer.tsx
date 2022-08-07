@@ -267,7 +267,7 @@ export const TodosFiltersDrawer: React.FC<TodosFiltersProps> = ({
             </div>
           </ListItem>
           <ListItem>
-            <div className="w-full max-h-[40vh] overflow-auto">
+            <div className="tag-filter-list w-full max-h-[40vh] overflow-auto">
               <TagsFilter />
             </div>
           </ListItem>

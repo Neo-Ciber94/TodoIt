@@ -74,11 +74,14 @@ export const TagEditorDialog = (props: TagEditorDialogProps) => {
     const toUpdate = Array.from(updatedTags.items);
     const toDelete = Array.from(deletedTags.items);
 
+    console.log({ toCreate, toUpdate, toDelete });
     try {
       const result = await services.tags.bulkOperation({
         insert: [...toCreate, ...toUpdate],
         delete: toDelete,
       });
+
+      console.log({ result });
 
       onDone?.(result);
       handleClose();
@@ -86,6 +89,7 @@ export const TagEditorDialog = (props: TagEditorDialogProps) => {
     } catch (e: any) {
       const message = e.message || "Something went wrong";
       showError(message);
+      console.error(e);
     }
   };
 

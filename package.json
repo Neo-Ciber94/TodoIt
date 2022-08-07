@@ -39,6 +39,7 @@
     "react-transition-group": "^4.4.2",
     "styled-components": "^5.3.3",
     "swr": "^1.1.2",
+    "winston": "^3.8.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {
