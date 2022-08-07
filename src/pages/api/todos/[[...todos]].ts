@@ -1,9 +1,8 @@
 import { ApiController } from "@server/controllers/api-controller";
 import { errorHandler } from "@server/controllers/utils";
-import { TodoDocument } from "@server/database/schemas/todo.types";
 import { commonMiddlewares } from "@server/middlewares/common";
 import { TodoRepository } from "@server/repositories/todo.repository";
-import { AppApiContext, EntityInput } from "@server/types";
+import type { ApiContext, EntityInput } from "@server/types";
 import {
   todoCreateValidator,
   todoUpdateValidator,
@@ -19,21 +18,21 @@ import {
 
 @RouteController({ onError: errorHandler })
 @UseMiddleware(...commonMiddlewares)
-class TodoApiController extends ApiController<TodoDocument, TodoRepository> {
+class TodoApiController extends ApiController<ITodo, TodoRepository> {
   constructor() {
     super(new TodoRepository(), { search: true, query: true });
   }
 
-  async beforeCreate(entity: EntityInput<TodoDocument>) {
+  async beforeCreate(entity: EntityInput<ITodo>) {
     await todoCreateValidator.validate(entity);
   }
 
-  async beforeUpdate(entity: EntityInput<TodoDocument>) {
+  async beforeUpdate(entity: EntityInput<ITodo>) {
     await todoUpdateValidator.validate(entity);
   }
 
   @Post("/")
-  async create(context: AppApiContext<any>): Promise<TodoDocument> {
+  async create(context: ApiContext<any>): Promise<ITodo> {
     const entity = context.request.body as EntityInput<ITodo>;
     await todoCreateValidator.validate(entity);
     this.setAuditData("creator", entity);
@@ -43,7 +42,7 @@ class TodoApiController extends ApiController<TodoDocument, TodoRepository> {
   }
 
   @Put("/:id")
-  async updateOne(context: AppApiContext<any>): Promise<TodoDocument | null> {
+  async updateOne(context: ApiContext<any>): Promise<ITodo | null> {
     const id = String(context.request.params.id);
     const entity = context.request.body as EntityInput<ITodo>;
 
@@ -63,7 +62,7 @@ class TodoApiController extends ApiController<TodoDocument, TodoRepository> {
   }
 
   @Post("/:id/toggle")
-  toggle({ request }: AppApiContext) {
+  toggle({ request }: ApiContext) {
     const id = String(request.params.id);
     const creatorUser = request.userId;
 

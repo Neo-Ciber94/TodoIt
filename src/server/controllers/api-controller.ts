@@ -3,7 +3,7 @@ import {
   PageResult,
 } from "@server/repositories/base/repository.base";
 import { buildPaginationOptions } from "@server/repositories/utils";
-import type { AppApiContext, EntityInput, IEntity } from "@server/types";
+import type { ApiContext, EntityInput, IEntity } from "@server/types";
 import { FilterQuery } from "mongoose";
 import { Get, Post, Put, Delete } from "next-controllers";
 import { ControllerBase } from "./controller.base";
@@ -29,7 +29,7 @@ export class ApiReadOnlyController<
    * @returns A paginated result.
    */
   @Get("/")
-  async find(context: AppApiContext): Promise<PageResult<T> | T[]> {
+  async find(context: ApiContext): Promise<PageResult<T> | T[]> {
     const { page, pageSize } = context.request.query;
 
     // If dont have a page or pageSize, return all the entities
@@ -59,7 +59,7 @@ export class ApiReadOnlyController<
    * @returns The found entity or 404 if not found.
    */
   @Get("/:id")
-  async findById(context: AppApiContext): Promise<T | null> {
+  async findById(context: ApiContext): Promise<T | null> {
     const id = String(context.request.params.id);
     const query: FilterQuery<T> = { _id: id } as any;
     this.setAuditData("creator", query);
@@ -97,7 +97,7 @@ export class ApiController<
    * @returns The created entity or entities.
    */
   @Post("/")
-  async create(context: AppApiContext): Promise<T | T[]> {
+  async create(context: ApiContext): Promise<T | T[]> {
     const data = context.request.body || {};
     this.setAuditData("creator", data);
 
@@ -121,7 +121,7 @@ export class ApiController<
    * @returns The updated entity or 404 if not found.
    */
   @Put("/:id")
-  updateOne(context: AppApiContext): Promise<T | null> {
+  updateOne(context: ApiContext): Promise<T | null> {
     const { request } = context;
     const id = String(request.params.id);
     const data = request.body || {};
@@ -139,7 +139,7 @@ export class ApiController<
    * @returns The deleted entity or 404 if not found.
    */
   @Delete("/:id")
-  deleteOne(context: AppApiContext): Promise<T | null> {
+  deleteOne(context: ApiContext): Promise<T | null> {
     const id = String(context.request.params.id);
     const query: FilterQuery<T> = { _id: id } as any;
     this.setAuditData("creator", query);

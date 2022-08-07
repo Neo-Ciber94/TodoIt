@@ -11,7 +11,7 @@
     "next:debug": "cross-env NODE_OPTIONS='--inspect' next dev",
     "next:lint": "next lint",
     "test": "jest",
-    "typecheck": "tsc --noEmit --incremental"
+    "typecheck": "npx tsc --noEmit --incremental"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^1.6.1",

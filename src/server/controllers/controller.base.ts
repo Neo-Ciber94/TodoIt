@@ -1,4 +1,4 @@
-import { AppApiContext } from "@server/types";
+import { ApiContext } from "@server/types";
 import { BeforeRequest } from "next-controllers";
 import { ControllerConfig, AppSession, AuditConfig } from "./types";
 import { defaultAuditProps } from "./utils";
@@ -26,7 +26,7 @@ export class ControllerBase {
 
   // Sets the current session data from the request
   @BeforeRequest()
-  private __setSessionData({ request }: AppApiContext) {
+  private __setSessionData({ request }: ApiContext) {
     if (this.config.useSession === false) {
       return;
     }
