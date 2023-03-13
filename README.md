@@ -1,4 +1,4 @@
-# TodoApp
+# TodoIt
 
 A todo app in created in `NextJS`.
 
